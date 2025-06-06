@@ -128,7 +128,7 @@ function ZapTable({ zaps }: { zaps: Zap[] }) {
             ))}
           </div>
           <div className="flex-1">{z.id}</div>
-          <div className="flex-1">Nov 13, 2023</div>
+          <div className="flex-1">{Date.now()}</div>
           <div className="flex-1">{`${HOOKS_URL}/hooks/catch/1/${z.id}`}</div>
           <div className="flex-1">
             <LinkButton

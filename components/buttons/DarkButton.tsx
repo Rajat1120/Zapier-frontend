@@ -3,11 +3,9 @@ import { ReactNode } from "react";
 export const DarkButton = ({
   children,
   onClick,
-  size = "small",
 }: {
   children: ReactNode;
   onClick: () => void;
-  size?: "big" | "small";
 }) => {
   return (
     <div

@@ -62,14 +62,11 @@ export default function SignUp() {
             <div className="pt-4">
               <PrimaryButton
                 onClick={async () => {
-                  const res = await axios.post(
-                    `${BACKEND_URL}/api/v1/user/signup`,
-                    {
-                      username: email,
-                      password,
-                      name,
-                    }
-                  );
+                  await axios.post(`${BACKEND_URL}/api/v1/user/signup`, {
+                    username: email,
+                    password,
+                    name,
+                  });
                   router.push("/login");
                 }}
                 size="big"

@@ -46,7 +46,7 @@ export default function CreateZap() {
       index: number;
       availableActionId: string;
       availableActionName: string;
-      metadata: any;
+      metadata: object;
     }[]
   >([]);
   const [selectedModalIndex, setSelectedModalIndex] = useState<null | number>(
@@ -63,7 +63,7 @@ export default function CreateZap() {
               return;
             }
 
-            const response = await axios.post(
+            await axios.post(
               `${BACKEND_URL}/api/v1/zap`,
               {
                 availableTriggerId: selectedTrigger.id,
@@ -140,7 +140,7 @@ export default function CreateZap() {
             selectedModalIndex === 1 ? availableTriggers : availableActions
           }
           onSelect={(
-            props: null | { name: string; id: string; metadata: any }
+            props: null | { name: string; id: string; metadata: object }
           ) => {
             if (props === null) {
               setSelectedModalIndex(null);
@@ -178,7 +178,9 @@ function Modal({
   availableItems,
 }: {
   index: number;
-  onSelect: (props: null | { name: string; id: string; metadata: any }) => void;
+  onSelect: (
+    props: null | { name: string; id: string; metadata: object }
+  ) => void;
   availableItems: { id: string; name: string; image: string }[];
 }) {
   const [step, setStep] = useState(0);
@@ -309,7 +311,7 @@ function Modal({
 function EmailSelector({
   setMetadata,
 }: {
-  setMetadata: (params: any) => void;
+  setMetadata: (params: object) => void;
 }) {
   const [email, setEmail] = useState("");
   const [body, setBody] = useState("");
@@ -347,7 +349,7 @@ function EmailSelector({
 function SolanaSelector({
   setMetadata,
 }: {
-  setMetadata: (params: any) => void;
+  setMetadata: (params: object) => void;
 }) {
   const [amount, setAmount] = useState("");
   const [address, setAddress] = useState("");
