@@ -2,7 +2,6 @@
 
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { BACKEND_URL, HOOKS_URL } from "../config";
 
 import { useRouter } from "next/navigation";
 
@@ -44,7 +43,7 @@ function useZaps() {
 
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/v1/zap`, {
+      .get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/zap`, {
         headers: {
           Authorization: localStorage.getItem("token"),
         },
@@ -129,7 +128,7 @@ function ZapTable({ zaps }: { zaps: Zap[] }) {
           </div>
           <div className="flex-1">{z.id}</div>
           <div className="flex-1">{Date.now()}</div>
-          <div className="flex-1">{`${HOOKS_URL}/hooks/catch/1/${z.id}`}</div>
+          <div className="flex-1">{`${process.env.NEXT_PUBLIC_HOOKS_URL}/hooks/catch/1/${z.id}`}</div>
           <div className="flex-1">
             <LinkButton
               onClick={() => {

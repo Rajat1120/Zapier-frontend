@@ -8,7 +8,6 @@ import { Appbar } from "../../../components/Appbar";
 import { PrimaryButton } from "../../../components/buttons/PrimaryButton";
 import { CheckFeature } from "../../../components/CheckFeature";
 import { Input } from "../../../components/Input";
-import { BACKEND_URL } from "../config";
 
 export default function SignUp() {
   const router = useRouter();
@@ -62,11 +61,14 @@ export default function SignUp() {
             <div className="pt-4">
               <PrimaryButton
                 onClick={async () => {
-                  await axios.post(`${BACKEND_URL}/api/v1/user/signup`, {
-                    username: email,
-                    password,
-                    name,
-                  });
+                  await axios.post(
+                    `${process.env.BACKEND_URL}/api/v1/user/signup`,
+                    {
+                      username: email,
+                      password,
+                      name,
+                    }
+                  );
                   router.push("/login");
                 }}
                 size="big"

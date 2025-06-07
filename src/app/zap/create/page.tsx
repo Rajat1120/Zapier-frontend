@@ -1,7 +1,5 @@
 "use client";
 
-import { BACKEND_URL } from "@/app/config";
-
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -18,11 +16,11 @@ function useAvailableActionsAndTriggers() {
 
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/v1/trigger/available`)
+      .get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/trigger/available`)
       .then((x) => setAvailableTriggers(x.data.availableTriggers));
 
     axios
-      .get(`${BACKEND_URL}/api/v1/action/available`)
+      .get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/action/available`)
       .then((x) => setAvailableActions(x.data.availableActions));
   }, []);
 
@@ -64,7 +62,7 @@ export default function CreateZap() {
             }
 
             await axios.post(
-              `${BACKEND_URL}/api/v1/zap`,
+              `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/zap`,
               {
                 availableTriggerId: selectedTrigger.id,
                 triggerMetadata: {},

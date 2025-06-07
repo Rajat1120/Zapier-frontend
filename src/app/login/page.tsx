@@ -2,10 +2,9 @@
 
 import axios from "axios";
 import { useState } from "react";
-// import { BACKEND_URL } from "../config";
+
 import { useRouter } from "next/navigation";
 
-import { BACKEND_URL } from "../config";
 import { Appbar } from "../../../components/Appbar";
 import { CheckFeature } from "../../../components/CheckFeature";
 import { Input } from "../../../components/Input";
@@ -54,7 +53,7 @@ export default function Login() {
               <PrimaryButton
                 onClick={async () => {
                   const res = await axios.post(
-                    `${BACKEND_URL}/api/v1/user/signin`,
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/signin`,
                     {
                       username: email,
                       password,
