@@ -4,7 +4,7 @@ import axios from "axios";
 import { useState } from "react";
 // import { BACKEND_URL } from "../config";
 import { useRouter } from "next/navigation";
-import { Appbar } from "../../../components/Appbar";
+import { AppBar } from "../../../components/AppBar";
 import { PrimaryButton } from "../../../components/buttons/PrimaryButton";
 import { CheckFeature } from "../../../components/CheckFeature";
 import { Input } from "../../../components/Input";
@@ -17,7 +17,7 @@ export default function SignUp() {
 
   return (
     <div>
-      <Appbar />
+      <AppBar />
       <div className="flex justify-center">
         <div className="flex pt-8 max-w-4xl">
           <div className="flex-1 pt-20 px-4">

@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { LinkButton } from "../../../components/buttons/LinkButton";
 import { DarkButton } from "../../../components/buttons/DarkButton";
-import { Appbar } from "../../../components/Appbar";
+import { AppBar } from "../../../components/AppBar";
 
 interface Zap {
   id: string;
@@ -66,7 +66,7 @@ export default function DashBoard() {
 
   return (
     <div>
-      <Appbar />
+      <AppBar />
       <div className="flex justify-center pt-8">
         <div className="max-w-screen-lg	 w-full">
           <div className="flex justify-between pr-8 ">

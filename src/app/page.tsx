@@ -1,11 +1,11 @@
-import { Appbar } from "../../components/Appbar";
+import { AppBar } from "../../components/AppBar";
 import { Hero } from "../../components/Hero";
 import { HeroVideo } from "../../components/heroVideo";
 
 export default function Home() {
   return (
     <main className="pb-48">
-      <Appbar />
+      <AppBar />
       <Hero />
 
       <div className="pt-8">{<HeroVideo />}</div>

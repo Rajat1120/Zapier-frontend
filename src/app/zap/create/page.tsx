@@ -3,7 +3,7 @@
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Appbar } from "../../../../components/Appbar";
+import { Appbar } from "../../../../components/AppBar";
 import { PrimaryButton } from "../../../../components/buttons/PrimaryButton";
 import { Input } from "../../../../components/Input";
 import { ZapCell } from "../../../../components/ZapCell";
