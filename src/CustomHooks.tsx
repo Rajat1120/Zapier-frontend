@@ -1,3 +1,5 @@
+"use client";
+
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import axios from "axios";
 import { useEffect } from "react";
