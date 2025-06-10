@@ -42,10 +42,15 @@ function useZaps() {
   const [zaps, setZaps] = useState<Zap[]>([]);
 
   useEffect(() => {
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+    if (!token) return;
+
     axios
       .get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/zap`, {
         headers: {
-          Authorization: localStorage.getItem("token"),
+          Authorization: token,
         },
       })
       .then((res) => {
