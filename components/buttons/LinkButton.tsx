@@ -11,7 +11,7 @@ export const LinkButton = ({
 }) => {
   return (
     <div
-      className="flex justify-center px-2 py-2 cursor-pointer hover:bg-[var(--bgHover)] font-light text-sm rounded"
+      className="flex justify-center px-2 py-2 font-semibold cursor-default hover:bg-[var(--bgHover)]  text-sm rounded"
       onClick={onClick}
     >
       {children}

@@ -3,7 +3,7 @@
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Appbar } from "../../../../components/AppBar";
+import { AppBar } from "../../../../components/AppBar";
 import { PrimaryButton } from "../../../../components/buttons/PrimaryButton";
 import { Input } from "../../../../components/Input";
 import { ZapCell } from "../../../../components/ZapCell";
@@ -53,7 +53,7 @@ export default function CreateZap() {
 
   return (
     <div>
-      <Appbar />
+      <AppBar />
       <div className="flex justify-end bg-slate-200 p-4">
         <PrimaryButton
           onClick={async () => {

@@ -1,62 +1,24 @@
 "use client";
 
-import axios from "axios";
-import { useEffect, useState } from "react";
-
 import { useRouter } from "next/navigation";
 
 import { AppBar } from "../../../components/AppBar";
 import { CheckFeature } from "../../../components/CheckFeature";
 import { Input } from "../../../components/Input";
 import { PrimaryButton } from "../../../components/buttons/PrimaryButton";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { handleLogin, useLogin } from "../../../CustomHooks";
 
-async function handleLogin(
-  email: string,
-  password: string,
-  router: AppRouterInstance
-) {
-  const res = await axios.post(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/user/signin`,
-    {
-      username: email,
-      password,
-    }
-  );
-  localStorage.setItem("token", res.data.token);
-  router.push("/dashboard");
-}
+import useStore from "../../../store";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const setEmail = useStore((state) => state.setEmail);
+  const setPassword = useStore((state) => state.setPassword);
+  const email = useStore((state) => state.email);
+  const password = useStore((state) => state.password);
+
   const router = useRouter();
 
-  useEffect(() => {
-    // Check if the user is already logged in
-    const token = localStorage.getItem("token");
-    if (token) {
-      // Redirect to dashboard if already logged in
-      router.push("/dashboard");
-    }
-
-    window.addEventListener("keydown", (e) => {
-      // Check for Ctrl+Enter or Cmd+Enter to submit the form
-      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-        e.preventDefault();
-        handleLogin(email, password, router);
-      }
-    });
-    return () => {
-      window.removeEventListener("keydown", (e) => {
-        // Cleanup the event listener
-        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-          e.preventDefault();
-          handleLogin(email, password, router);
-        }
-      });
-    };
-  }, [router, email, password]);
+  useLogin(email, password, router);
 
   return (
     <div>

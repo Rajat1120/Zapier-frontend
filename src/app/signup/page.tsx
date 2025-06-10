@@ -4,10 +4,11 @@ import axios from "axios";
 import { useState } from "react";
 // import { BACKEND_URL } from "../config";
 import { useRouter } from "next/navigation";
-import { AppBar } from "../../../components/AppBar";
+
 import { PrimaryButton } from "../../../components/buttons/PrimaryButton";
 import { CheckFeature } from "../../../components/CheckFeature";
 import { Input } from "../../../components/Input";
+import { AppBar } from "../../../components/AppBar";
 
 export default function SignUp() {
   const router = useRouter();

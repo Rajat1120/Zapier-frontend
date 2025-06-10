@@ -69,8 +69,8 @@ export default function DashBoard() {
       <AppBar />
       <div className="flex justify-center pt-8">
         <div className="max-w-screen-lg	 w-full">
-          <div className="flex justify-between pr-8 ">
-            <div className="text-2xl font-bold">My Zaps</div>
+          <div className="flex justify-between  ">
+            <div className="text-2xl font-bold">Zaps</div>
             <DarkButton
               onClick={() => {
                 router.push("/zap/create");
@@ -97,13 +97,13 @@ function ZapTable({ zaps }: { zaps: Zap[] }) {
   const router = useRouter();
 
   return (
-    <div className="p-8 max-w-screen-lg w-full">
+    <div className=" max-w-screen-lg w-full">
       <div className="flex">
         <div className="flex-1">Name</div>
-        <div className="flex-1">ID</div>
+        <div className="flex-1">Apps</div>
         <div className="flex-1">Created at</div>
-        <div className="flex-1">Webhook URL</div>
-        <div className="flex-1">Go</div>
+
+        <div className="flex-1">Owner</div>
       </div>
       {zaps.map((z, i) => (
         <div key={i} className="flex border-b border-t py-4">
