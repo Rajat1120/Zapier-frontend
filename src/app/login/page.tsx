@@ -9,6 +9,7 @@ import { PrimaryButton } from "../../../components/buttons/PrimaryButton";
 
 import { handleLogin, useLogin } from "../../../utils/CustomHooks";
 import useStore from "../../../store";
+import ClientRedirect from "../../../utils/ClientRedirect";
 
 export default function Login() {
   const setEmail = useStore((state) => state.setEmail);
@@ -23,6 +24,7 @@ export default function Login() {
   return (
     <div>
       <AppBar />
+      <ClientRedirect></ClientRedirect>
       <div className="flex justify-center">
         <div className="flex pt-8 max-w-4xl">
           <div className="flex-1 pt-20 px-4">

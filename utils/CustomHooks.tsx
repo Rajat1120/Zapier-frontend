@@ -2,7 +2,7 @@
 
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export async function handleLogin(
   email: string,
@@ -45,24 +45,7 @@ export const useLogin = (
   password: string,
   router: AppRouterInstance
 ) => {
-  const [isClient, setIsClient] = useState(false);
-
   useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isClient) return;
-
-    // ✅ Now this will only run in the browser
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
-
-    if (token) {
-      router.push("/dashboard");
-      return;
-    }
-
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
         e.preventDefault();
@@ -75,5 +58,5 @@ export const useLogin = (
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isClient, router, email, password]);
+  }, [router, email, password]);
 };
