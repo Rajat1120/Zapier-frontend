@@ -8,9 +8,18 @@ export const AppBar = () => {
   const pathName = usePathname();
   const isDashboard = pathName === "/dashboard";
   const [showPopup, setShowPopup] = useState(false);
-  const name = localStorage.getItem("name") || "";
-  const userEmail = localStorage.getItem("email") || "";
+  const [name, setName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setName(localStorage.getItem("name") || "");
+      setUserEmail(localStorage.getItem("email") || "");
+    }
+  }, []);
+
   const router = useRouter();
+  if (typeof window === "undefined") return;
   return (
     <div className="flex border-b justify-between p-4">
       <div className="flex flex-col justify-center text-2xl font-extrabold">
@@ -112,6 +121,7 @@ export default function Popup({ isOpen, onClose, children }: PopupProps) {
     };
   }, [onClose]);
 
+  if (typeof window === "undefined") return null;
   if (!isOpen) return null;
 
   return (

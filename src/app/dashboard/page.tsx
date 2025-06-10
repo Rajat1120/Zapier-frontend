@@ -42,10 +42,14 @@ function useZaps() {
   const [zaps, setZaps] = useState<Zap[]>([]);
 
   useEffect(() => {
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    // This code will only run on the client-side
+    const token = localStorage.getItem("token");
 
-    if (!token) return;
+    if (!token) {
+      // Handle cases where no token is found, e.g., redirect to login
+      setLoading(false);
+      return;
+    }
 
     axios
       .get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/zap`, {
@@ -56,8 +60,12 @@ function useZaps() {
       .then((res) => {
         setZaps(res.data.zaps);
         setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching zaps:", error);
+        setLoading(false);
       });
-  }, []);
+  }, []); // Empty dependency array means it runs once on mount
 
   return {
     loading,
@@ -68,6 +76,30 @@ function useZaps() {
 export default function DashBoard() {
   const { loading, zaps } = useZaps();
   const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (typeof window === "undefined") return;
+  if (!isClient) {
+    return (
+      <div>
+        <AppBar />
+        <div className="flex justify-center pt-8">
+          <div className="max-w-screen-lg w-full">
+            <div className="flex justify-between">
+              <div className="text-2xl font-bold">Zaps</div>
+              <DarkButton onClick={() => {}}>Create</DarkButton>
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-center">
+          <div className="max-w-screen-lg w-full">Loading...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
