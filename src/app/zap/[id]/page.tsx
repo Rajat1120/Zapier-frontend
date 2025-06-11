@@ -33,12 +33,14 @@ const initialNodes = [
     position: { x: 0, y: 0 },
     data: { label: "1" },
     connectable: false,
+    style: { width: 220, height: 60 },
   },
   {
     id: "2",
     position: { x: 0, y: 100 },
     data: { label: "2" },
     connectable: false,
+    style: { width: 220, height: 60 },
   },
 ];
 const initialEdges = [{ id: "e1-2", source: "1", target: "2", type: "custom" }];
@@ -52,6 +54,61 @@ export default function ActionsList() {
   const [error, setError] = useState<string | null>(null);
   const params = useParams();
   const id = params.id;
+  const [nodes, setNodes] = useState(initialNodes);
+  const [edges, setEdges] = useState(initialEdges);
+
+  useEffect(() => {
+    const handleAddNode = (event: CustomEvent) => {
+      const { edgeId } = event.detail;
+      const edgeToSplit = edges.find((e) => e.id === edgeId);
+      if (!edgeToSplit) return;
+
+      const { source, target } = edgeToSplit;
+      const newNodeId = (nodes.length + 1).toString();
+
+      const sourceIndex = nodes.findIndex((n) => n.id === source);
+      const targetIndex = nodes.findIndex((n) => n.id === target);
+      if (sourceIndex === -1 || targetIndex === -1) return;
+
+      const newNode = {
+        id: newNodeId,
+        position: { x: 0, y: 0 }, // temporary
+        data: { label: newNodeId },
+        connectable: false,
+        style: { width: 220, height: 60 },
+      };
+
+      const newNodeList = [...nodes];
+      const insertIndex = Math.max(sourceIndex, targetIndex);
+      newNodeList.splice(insertIndex, 0, newNode);
+
+      const verticalGap = 100;
+      const updatedNodes = newNodeList.map((node, index) => ({
+        ...node,
+        position: { x: 0, y: index * verticalGap },
+      }));
+
+      const updatedEdges = [];
+
+      for (let i = 0; i < updatedNodes.length - 1; i++) {
+        updatedEdges.push({
+          id: `e${updatedNodes[i].id}-${updatedNodes[i + 1].id}`,
+          source: updatedNodes[i].id,
+          target: updatedNodes[i + 1].id,
+          type: "custom",
+        });
+      }
+
+      setNodes(updatedNodes);
+      setEdges(updatedEdges);
+    };
+
+    window.addEventListener("add-node", handleAddNode as EventListener);
+
+    return () => {
+      window.removeEventListener("add-node", handleAddNode as EventListener);
+    };
+  }, [nodes, edges]);
 
   useEffect(() => {
     const fetchActions = async () => {
@@ -68,9 +125,6 @@ export default function ActionsList() {
 
     if (id) fetchActions();
   }, [id]);
-
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
 
   const onNodesChange = useCallback(
     (

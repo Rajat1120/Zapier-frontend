@@ -42,8 +42,10 @@ const CustomEdge = ({
             zIndex: 1000,
           }}
           onClick={() => {
-            console.log("Plus button clicked on edge:", id);
-            // You can dispatch node insert logic here
+            const event = new CustomEvent("add-node", {
+              detail: { edgeId: id },
+            });
+            window.dispatchEvent(event);
           }}
         >
           +
