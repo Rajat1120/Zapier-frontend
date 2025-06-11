@@ -10,7 +10,7 @@ export const DarkButton = ({
   return (
     <div
       onClick={onClick}
-      className={`flex flex-col justify-center px-8 py-2 cursor-pointer hover:shadow-md bg-purple-800 text-white rounded text-center`}
+      className={`flex flex-col justify-center px-8 py-2 cursor-pointer hover:bg-[#5449ba] bg-[#695be8] text-white rounded text-center`}
     >
       {children}
     </div>

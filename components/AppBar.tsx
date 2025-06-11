@@ -27,7 +27,9 @@ export const AppBar = () => {
       </div>
       <div className="flex space-x-2">
         <div className=" border rounded-md cursor-none hover:bg-gray-100">
-          <LinkButton onClick={() => {}}>Contact Sales</LinkButton>
+          <LinkButton cursor="cursor-default" onClick={() => {}}>
+            Contact Sales
+          </LinkButton>
         </div>
         {isDashboard ? (
           <div className="px-2 py-2 rounded-md text-white text-md font-bold bg-[#695be8]">
@@ -39,6 +41,7 @@ export const AppBar = () => {
               onClick={() => {
                 router.push("/login");
               }}
+              cursor="cursor-pointer"
             >
               Login
             </LinkButton>

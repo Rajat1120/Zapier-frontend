@@ -131,6 +131,8 @@ export default function DashBoard() {
 }
 
 function ZapTable({ zaps }: { zaps: Zap[] }) {
+  const router = useRouter();
+  console.log("Zaps:", zaps);
   return (
     <div className="overflow-hidden my-4 rounded-2xl border  max-w-screen-lg w-full">
       <table className="w-full text-left   border-black   border-collapse">
@@ -145,7 +147,14 @@ function ZapTable({ zaps }: { zaps: Zap[] }) {
         <tbody>
           {zaps.map((z, i) => (
             <tr key={i} className="border-b">
-              <td className="p-2">name</td>
+              <td className="p-2">
+                <button
+                  className="cursor-pointer"
+                  onClick={() => router.push(`/zap/${z.id}`)}
+                >
+                  zap name
+                </button>
+              </td>
               <td className="p-2 flex items-center space-x-2">
                 <Image
                   alt="Trigger"
