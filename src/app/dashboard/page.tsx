@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import Image from "next/image";
-import { LinkButton } from "../../../components/buttons/LinkButton";
+
 import { DarkButton } from "../../../components/buttons/DarkButton";
 import { AppBar } from "../../../components/AppBar";
 
@@ -131,52 +131,50 @@ export default function DashBoard() {
 }
 
 function ZapTable({ zaps }: { zaps: Zap[] }) {
-  const router = useRouter();
-
   return (
-    <div className=" max-w-screen-lg w-full">
-      <div className="flex">
-        <div className="flex-1">Name</div>
-        <div className="flex-1">Apps</div>
-        <div className="flex-1">Created at</div>
-
-        <div className="flex-1">Owner</div>
-      </div>
-      {zaps.map((z, i) => (
-        <div key={i} className="flex border-b border-t py-4">
-          <div className="flex-1 flex">
-            <Image
-              alt="img"
-              width={30}
-              height={30}
-              src={z.trigger.type.image}
-              className="w-[30px] h-[30px]"
-            ></Image>{" "}
-            {z.actions.map((x, i) => (
-              <Image
-                alt="image"
-                width={30}
-                height={30}
-                key={i}
-                src={x.type.image}
-                className="w-[30px] h-[30px]"
-              />
-            ))}
-          </div>
-          <div className="flex-1">{z.id}</div>
-          <div className="flex-1">{Date.now()}</div>
-          <div className="flex-1">{`${process.env.NEXT_PUBLIC_HOOKS_URL}/hooks/catch/1/${z.id}`}</div>
-          <div className="flex-1">
-            <LinkButton
-              onClick={() => {
-                router.push("/zap/" + z.id);
-              }}
-            >
-              Go
-            </LinkButton>
-          </div>
-        </div>
-      ))}
+    <div className="overflow-hidden my-4 rounded-2xl border  max-w-screen-lg w-full">
+      <table className="w-full text-left   border-black   border-collapse">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="p-2 border-b">Name</th>
+            <th className="p-2 border-b">Apps</th>
+            <th className="p-2 border-b">Created At</th>
+            <th className="p-2 border-b">Owner</th>
+          </tr>
+        </thead>
+        <tbody>
+          {zaps.map((z, i) => (
+            <tr key={i} className="border-b">
+              <td className="p-2">name</td>
+              <td className="p-2 flex items-center space-x-2">
+                <Image
+                  alt="Trigger"
+                  width={30}
+                  height={30}
+                  src={z.trigger.type.image}
+                  className="w-[30px] h-[30px]"
+                />
+                {z.actions.map((x, j) => (
+                  <Image
+                    key={j}
+                    alt="Action"
+                    width={30}
+                    height={30}
+                    src={x.type.image}
+                    className="w-[30px] h-[30px]"
+                  />
+                ))}
+              </td>
+              <td className="p-2">{new Date().toLocaleString()}</td>
+              <td className="p-2 ">
+                <div className="border h-10 w-10 border-black rounded-full">
+                  user
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
