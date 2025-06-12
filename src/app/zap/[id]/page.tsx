@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { JSX, useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Authentication from "../../../../utils/Authentication";
+import type { Connection } from "@xyflow/react";
 
 import {
   addEdge,
@@ -18,6 +19,18 @@ import {
 
 import "@xyflow/react/dist/style.css";
 import CustomEdge from "../../../../utils/CustomEdge";
+
+type NodeData = {
+  label: string | JSX.Element; // Allow both string and JSX elements
+};
+
+type CustomNode = {
+  id: string;
+  position: { x: number; y: number };
+  data: NodeData;
+  connectable: boolean;
+  style: { width: number; height: number };
+};
 
 type Action = {
   id: string;
@@ -71,10 +84,12 @@ const edgeTypes = {
 
 export default function ActionsList() {
   const [actions, setActions] = useState<Action[]>([]);
+
+  console.log("ActionsList actions:", actions);
   const [error, setError] = useState<string | null>(null);
   const params = useParams();
   const id = params.id;
-  const [nodes, setNodes] = useState(initialNodes);
+  const [nodes, setNodes] = useState<CustomNode[]>(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
 
   useEffect(() => {
@@ -147,15 +162,7 @@ export default function ActionsList() {
   }, [id]);
 
   const onNodesChange = useCallback(
-    (
-      changes: NodeChange<{
-        id: string;
-        position: { x: number; y: number };
-        data: { label: string };
-        connectable: boolean;
-        style: { width: number; height: number };
-      }>[]
-    ) =>
+    (changes: NodeChange<CustomNode>[]) =>
       setNodes((nds) =>
         applyNodeChanges(changes, nds).map((node, idx) => ({
           ...node,
@@ -177,7 +184,7 @@ export default function ActionsList() {
   );
 
   const onConnect = useCallback(
-    (params: any) => setEdges((eds) => addEdge(params, eds)),
+    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
     []
   );
 
