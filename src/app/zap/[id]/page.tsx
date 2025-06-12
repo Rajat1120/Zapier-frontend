@@ -71,7 +71,27 @@ const initialNodes = [
   {
     id: "2",
     position: { x: 0, y: 100 },
-    data: { label: "2" },
+    data: {
+      label: (
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div
+            style={{
+              fontSize: "10px",
+              padding: "2px 6px",
+              backgroundColor: "#e0f7fa",
+              borderRadius: "4px",
+              display: "inline-block",
+              width: "fit-content",
+            }}
+          >
+            Action
+          </div>
+          <div style={{ fontSize: "8px" }}>
+            2. Select the event for your zap to run
+          </div>
+        </div>
+      ),
+    },
     connectable: false,
     style: { width: 220, height: 60 },
   },
@@ -118,10 +138,59 @@ export default function ActionsList() {
       newNodeList.splice(insertIndex, 0, newNode);
 
       const verticalGap = 100;
-      const updatedNodes = newNodeList.map((node, index) => ({
-        ...node,
-        position: { x: 0, y: index * verticalGap },
-      }));
+      const updatedNodes = newNodeList.map((node, index) => {
+        let label;
+        if (node.id === "1") {
+          label = (
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "4px" }}
+            >
+              <div
+                style={{
+                  fontSize: "10px",
+                  padding: "2px 6px",
+                  backgroundColor: "#eee",
+                  borderRadius: "4px",
+                  display: "inline-block",
+                  width: "fit-content",
+                }}
+              >
+                Trigger
+              </div>
+              <div style={{ fontSize: "8px" }}>
+                1. Select the event that starts your zap
+              </div>
+            </div>
+          );
+        } else {
+          label = (
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "4px" }}
+            >
+              <div
+                style={{
+                  fontSize: "10px",
+                  padding: "2px 6px",
+                  backgroundColor: "#e0f7fa",
+                  borderRadius: "4px",
+                  display: "inline-block",
+                  width: "fit-content",
+                }}
+              >
+                Action
+              </div>
+              <div style={{ fontSize: "8px" }}>
+                {index + 1}. Select the event for your zap to run
+              </div>
+            </div>
+          );
+        }
+        return {
+          ...node,
+          position: { x: 0, y: index * verticalGap },
+          data: { label },
+        };
+      });
 
       const updatedEdges = [];
 
