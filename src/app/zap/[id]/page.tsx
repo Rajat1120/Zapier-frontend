@@ -31,7 +31,27 @@ const initialNodes = [
   {
     id: "1",
     position: { x: 0, y: 0 },
-    data: { label: "1" },
+    data: {
+      label: (
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div
+            style={{
+              fontSize: "10px",
+              padding: "2px 6px",
+              backgroundColor: "#eee",
+              borderRadius: "4px",
+              display: "inline-block",
+              width: "fit-content",
+            }}
+          >
+            Trigger
+          </div>
+          <div style={{ fontSize: "8px" }}>
+            1. Select the event that starts your zap
+          </div>
+        </div>
+      ),
+    },
     connectable: false,
     style: { width: 220, height: 60 },
   },
@@ -133,8 +153,15 @@ export default function ActionsList() {
         position: { x: number; y: number };
         data: { label: string };
         connectable: boolean;
+        style: { width: number; height: number };
       }>[]
-    ) => setNodes((nds) => applyNodeChanges(changes, nds)),
+    ) =>
+      setNodes((nds) =>
+        applyNodeChanges(changes, nds).map((node, idx) => ({
+          ...node,
+          style: node.style ?? nds[idx]?.style ?? { width: 220, height: 60 },
+        }))
+      ),
     []
   );
   const onEdgesChange = useCallback(
