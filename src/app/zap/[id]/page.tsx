@@ -4,7 +4,7 @@ import { JSX, useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Authentication from "../../../../utils/Authentication";
-import type { Connection } from "@xyflow/react";
+import type { Connection, Edge } from "@xyflow/react";
 
 import {
   addEdge,
@@ -49,24 +49,51 @@ const initialNodes = [
         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
           <div
             style={{
-              fontSize: "10px",
+              fontSize: "8px",
               padding: "2px 6px",
               backgroundColor: "#eee",
               borderRadius: "4px",
-              display: "inline-block",
+              fontWeight: "bold",
+              display: "flex",
+              justifyItems: "start",
+              gap: "4px",
               width: "fit-content",
+              border: "1px solid black",
             }}
           >
+            <div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                height="14"
+                width="14"
+                color="GrayWarm8"
+                name="miscBolt"
+              >
+                <path
+                  fill="#2D2E2E"
+                  d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm4.87-11L11 18v-5H7.13L13 6v5h3.87Z"
+                ></path>
+              </svg>
+            </div>
             Trigger
           </div>
-          <div style={{ fontSize: "8px" }}>
+          <div
+            style={{
+              fontSize: "10px",
+              color: "#666666",
+              textAlign: "left",
+              fontWeight: "bold",
+            }}
+          >
             1. Select the event that starts your zap
           </div>
         </div>
       ),
     },
     connectable: false,
-    style: { width: 220, height: 60 },
+    style: { width: 240, height: 60 },
   },
   {
     id: "2",
@@ -76,24 +103,49 @@ const initialNodes = [
         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
           <div
             style={{
-              fontSize: "10px",
+              fontSize: "8px",
               padding: "2px 6px",
-              backgroundColor: "#e0f7fa",
+              backgroundColor: "#eee",
               borderRadius: "4px",
-              display: "inline-block",
+              fontWeight: "bold",
+              display: "flex",
+              justifyItems: "start",
+              gap: "4px",
               width: "fit-content",
+              border: "1px solid black",
             }}
           >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              height="14"
+              width="14"
+              color="GrayWarm8"
+              name="miscBolt"
+            >
+              <path
+                fill="#2D2E2E"
+                d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm4.87-11L11 18v-5H7.13L13 6v5h3.87Z"
+              ></path>
+            </svg>
             Action
           </div>
-          <div style={{ fontSize: "8px" }}>
+          <div
+            style={{
+              fontSize: "10px",
+              color: "#666666",
+              textAlign: "left",
+              fontWeight: "bold",
+            }}
+          >
             2. Select the event for your zap to run
           </div>
         </div>
       ),
     },
     connectable: false,
-    style: { width: 220, height: 60 },
+    style: { width: 240, height: 60 },
   },
 ];
 const initialEdges = [{ id: "e1-2", source: "1", target: "2", type: "custom" }];
@@ -112,7 +164,7 @@ export default function ActionsList() {
   const [nodes, setNodes] = useState<CustomNode[]>(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
 
-  const addTrailingPlusNode = (nodeList: CustomNode[], edgeList: any[]) => {
+  const addTrailingPlusNode = (nodeList: CustomNode[], edgeList: Edge[]) => {
     // Always remove any existing dummy node and its edges before adding new one
     const filteredNodes = nodeList.filter((n) => n.id !== "dummy");
     const filteredEdges = edgeList.filter(
@@ -127,7 +179,7 @@ export default function ActionsList() {
       position: { x: 0, y: filteredNodes.length * verticalGap },
       data: { label: "" },
       connectable: false,
-      style: { width: 220, height: 60, opacity: 0, pointerEvents: "none" },
+      style: { width: 240, height: 60, opacity: 0, pointerEvents: "none" },
     };
     filteredNodes.push(dummyNode);
     filteredEdges.push({
@@ -151,9 +203,6 @@ export default function ActionsList() {
 
       // Remove existing dummy node and all edges involving dummy
       const filteredNodes = nodes.filter((n) => n.id !== "dummy");
-      const filteredEdges = edges.filter(
-        (e) => e.source !== "dummy" && e.target !== "dummy"
-      );
 
       const { source, target } = edgeToSplit;
       const newNodeId = (filteredNodes.length + 1).toString();
@@ -169,7 +218,7 @@ export default function ActionsList() {
         position: { x: 0, y: 0 }, // temporary
         data: { label: newNodeId },
         connectable: false,
-        style: { width: 220, height: 60 },
+        style: { width: 240, height: 60 },
       };
 
       const newNodeList = [...filteredNodes];
@@ -188,17 +237,42 @@ export default function ActionsList() {
             >
               <div
                 style={{
-                  fontSize: "10px",
+                  fontSize: "8px",
                   padding: "2px 6px",
                   backgroundColor: "#eee",
                   borderRadius: "4px",
-                  display: "inline-block",
+                  fontWeight: "bold",
+                  display: "flex",
+                  justifyItems: "start",
+                  gap: "4px",
                   width: "fit-content",
+                  border: "1px solid black",
                 }}
               >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  height="14"
+                  width="14"
+                  color="GrayWarm8"
+                  name="miscBolt"
+                >
+                  <path
+                    fill="#2D2E2E"
+                    d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm4.87-11L11 18v-5H7.13L13 6v5h3.87Z"
+                  ></path>
+                </svg>
                 Trigger
               </div>
-              <div style={{ fontSize: "8px" }}>
+              <div
+                style={{
+                  fontSize: "10px",
+                  color: "#666666",
+                  textAlign: "left",
+                  fontWeight: "bold",
+                }}
+              >
                 1. Select the event that starts your zap
               </div>
             </div>
@@ -210,17 +284,42 @@ export default function ActionsList() {
             >
               <div
                 style={{
-                  fontSize: "10px",
+                  fontSize: "8px",
                   padding: "2px 6px",
-                  backgroundColor: "#e0f7fa",
+                  backgroundColor: "#eee",
                   borderRadius: "4px",
-                  display: "inline-block",
+                  fontWeight: "bold",
+                  display: "flex",
+                  justifyItems: "start",
+                  gap: "4px",
                   width: "fit-content",
+                  border: "1px solid black",
                 }}
               >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  height="14"
+                  width="14"
+                  color="GrayWarm8"
+                  name="miscBolt"
+                >
+                  <path
+                    fill="#2D2E2E"
+                    d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm4.87-11L11 18v-5H7.13L13 6v5h3.87Z"
+                  ></path>
+                </svg>
                 Action
               </div>
-              <div style={{ fontSize: "8px" }}>
+              <div
+                style={{
+                  fontSize: "10px",
+                  color: "#666666",
+                  textAlign: "left",
+                  fontWeight: "bold",
+                }}
+              >
                 {index + 1}. Select the event for your zap to run
               </div>
             </div>
@@ -301,7 +400,7 @@ export default function ActionsList() {
       setNodes((nds) =>
         applyNodeChanges(changes, nds).map((node, idx) => ({
           ...node,
-          style: node.style ?? nds[idx]?.style ?? { width: 220, height: 60 },
+          style: node.style ?? nds[idx]?.style ?? { width: 240, height: 60 },
         }))
       ),
     []
