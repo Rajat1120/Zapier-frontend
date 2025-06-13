@@ -112,18 +112,57 @@ export default function ActionsList() {
   const [nodes, setNodes] = useState<CustomNode[]>(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
 
+  const addTrailingPlusNode = (nodeList: CustomNode[], edgeList: any[]) => {
+    // Always remove any existing dummy node and its edges before adding new one
+    const filteredNodes = nodeList.filter((n) => n.id !== "dummy");
+    const filteredEdges = edgeList.filter(
+      (e) => e.source !== "dummy" && e.target !== "dummy"
+    );
+    const verticalGap = 100;
+    const lastNodeId = filteredNodes[filteredNodes.length - 1].id;
+    const dummyNodeId = "dummy";
+    // Make dummy node invisible and non-interactive, but keep edge visible
+    const dummyNode = {
+      id: dummyNodeId,
+      position: { x: 0, y: filteredNodes.length * verticalGap },
+      data: { label: "" },
+      connectable: false,
+      style: { width: 220, height: 60, opacity: 0, pointerEvents: "none" },
+    };
+    filteredNodes.push(dummyNode);
+    filteredEdges.push({
+      id: `e${lastNodeId}-${dummyNodeId}`,
+      source: lastNodeId,
+      target: dummyNodeId,
+      type: "custom",
+    });
+    // Mutate the arrays in place
+    nodeList.length = 0;
+    edgeList.length = 0;
+    nodeList.push(...filteredNodes);
+    edgeList.push(...filteredEdges);
+  };
+
   useEffect(() => {
     const handleAddNode = (event: CustomEvent) => {
       const { edgeId } = event.detail;
       const edgeToSplit = edges.find((e) => e.id === edgeId);
       if (!edgeToSplit) return;
 
-      const { source, target } = edgeToSplit;
-      const newNodeId = (nodes.length + 1).toString();
+      // Remove existing dummy node and all edges involving dummy
+      const filteredNodes = nodes.filter((n) => n.id !== "dummy");
+      const filteredEdges = edges.filter(
+        (e) => e.source !== "dummy" && e.target !== "dummy"
+      );
 
-      const sourceIndex = nodes.findIndex((n) => n.id === source);
-      const targetIndex = nodes.findIndex((n) => n.id === target);
-      if (sourceIndex === -1 || targetIndex === -1) return;
+      const { source, target } = edgeToSplit;
+      const newNodeId = (filteredNodes.length + 1).toString();
+
+      const sourceIndex = filteredNodes.findIndex((n) => n.id === source);
+      const targetIndex = filteredNodes.findIndex((n) => n.id === target);
+      // Allow dummy target for trailing edge
+      const isTrailing = target === "dummy";
+      if (sourceIndex === -1 || (!isTrailing && targetIndex === -1)) return;
 
       const newNode = {
         id: newNodeId,
@@ -133,8 +172,10 @@ export default function ActionsList() {
         style: { width: 220, height: 60 },
       };
 
-      const newNodeList = [...nodes];
-      const insertIndex = Math.max(sourceIndex, targetIndex);
+      const newNodeList = [...filteredNodes];
+      const insertIndex = isTrailing
+        ? sourceIndex + 1
+        : Math.max(sourceIndex, targetIndex);
       newNodeList.splice(insertIndex, 0, newNode);
 
       const verticalGap = 100;
@@ -203,6 +244,8 @@ export default function ActionsList() {
         });
       }
 
+      addTrailingPlusNode(updatedNodes, updatedEdges);
+
       setNodes(updatedNodes);
       setEdges(updatedEdges);
     };
@@ -213,6 +256,29 @@ export default function ActionsList() {
       window.removeEventListener("add-node", handleAddNode as EventListener);
     };
   }, [nodes, edges]);
+
+  useEffect(() => {
+    const verticalGap = 100;
+    const updatedNodes = nodes.map((node, index) => ({
+      ...node,
+      position: { x: 0, y: index * verticalGap },
+    }));
+
+    const updatedEdges = [];
+    for (let i = 0; i < updatedNodes.length - 1; i++) {
+      updatedEdges.push({
+        id: `e${updatedNodes[i].id}-${updatedNodes[i + 1].id}`,
+        source: updatedNodes[i].id,
+        target: updatedNodes[i + 1].id,
+        type: "custom",
+      });
+    }
+
+    addTrailingPlusNode(updatedNodes, updatedEdges);
+
+    setNodes(updatedNodes);
+    setEdges(updatedEdges);
+  }, []);
 
   useEffect(() => {
     const fetchActions = async () => {

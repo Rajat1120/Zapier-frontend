@@ -1,4 +1,3 @@
-// src/components/CustomEdge.tsx
 import React from "react";
 import {
   BaseEdge,
@@ -15,6 +14,8 @@ const CustomEdge = ({
   targetY,
   style = {},
   markerEnd,
+  source,
+  target,
 }: EdgeProps) => {
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -23,6 +24,7 @@ const CustomEdge = ({
     targetY,
   });
 
+  // Render "+" button for all edges (including trailing/dummy edge)
   return (
     <>
       <BaseEdge path={edgePath} markerEnd={markerEnd} style={style} />
@@ -37,7 +39,6 @@ const CustomEdge = ({
             padding: "0px 0px",
             backgroundColor: "#fdf7f2",
             pointerEvents: "all",
-
             cursor: "pointer",
             zIndex: 1000,
           }}
