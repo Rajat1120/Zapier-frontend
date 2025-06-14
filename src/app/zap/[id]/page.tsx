@@ -19,6 +19,7 @@ import {
 
 import "@xyflow/react/dist/style.css";
 import CustomEdge from "../../../../utils/CustomEdge";
+import ZapModal from "../../../../components/ZapModal";
 
 type NodeData = {
   label: string | JSX.Element; // Allow both string and JSX elements
@@ -163,6 +164,7 @@ export default function ActionsList() {
   const id = params.id;
   const [nodes, setNodes] = useState<CustomNode[]>(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
+  const [selectedNode, setSelectedNode] = useState<CustomNode | null>(null);
 
   const addTrailingPlusNode = (nodeList: CustomNode[], edgeList: Edge[]) => {
     // Always remove any existing dummy node and its edges before adding new one
@@ -440,6 +442,7 @@ export default function ActionsList() {
           nodesDraggable={false}
           edgeTypes={edgeTypes}
           fitView
+          onNodeClick={(_, node) => setSelectedNode(node)}
         >
           <Background />
           <Controls />
@@ -447,6 +450,12 @@ export default function ActionsList() {
       </div>
 
       {error && <p>Error: {error}</p>}
+      {selectedNode && (
+        <ZapModal
+          selectedNode={selectedNode}
+          setSelectedNode={setSelectedNode}
+        ></ZapModal>
+      )}
     </div>
   );
 }
