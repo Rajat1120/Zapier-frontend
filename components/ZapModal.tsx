@@ -1,12 +1,20 @@
 import { useEffect, useRef } from "react";
 
-export default function ZapModal({
-  selectedNode,
-  setSelectedNode,
-}: {
+import type { Action } from "@/app/zap/[id]/page";
+
+type Props = {
+  actions: Action[];
   selectedNode: any;
   setSelectedNode: (node: any) => void;
-}) {
+  AvailableActions: Action[];
+};
+
+export default function ZapModal({
+  actions,
+  selectedNode,
+  setSelectedNode,
+  AvailableActions,
+}: Props) {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,8 +47,8 @@ export default function ZapModal({
           position: "fixed",
           top: "50%",
           left: "50%",
-          maxHeight: "80%",
-          maxWidth: "80%",
+          maxHeight: "70%",
+          maxWidth: "60%",
           overflowY: "auto",
           transform: "translate(-50%, -50%)",
           backgroundColor: "white",
@@ -52,7 +60,7 @@ export default function ZapModal({
         }}
       >
         <h3 style={{ marginBottom: "8px" }}>Node Details</h3>
-        <pre>{JSON.stringify(selectedNode, null, 2)}</pre>
+        <pre>{}</pre>
       </div>
     </div>
   );

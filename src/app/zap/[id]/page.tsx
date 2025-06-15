@@ -33,7 +33,7 @@ type CustomNode = {
   style: { width: number; height: number };
 };
 
-type Action = {
+export type Action = {
   id: string;
   zapId: string;
   adtionId: string;
@@ -157,8 +157,8 @@ const edgeTypes = {
 
 export default function ActionsList() {
   const [actions, setActions] = useState<Action[]>([]);
+  const [AvailableActions, setAvailableActions] = useState<Action[]>([]);
 
-  console.log("ActionsList actions:", actions);
   const [error, setError] = useState<string | null>(null);
   const params = useParams();
   const id = params.id;
@@ -393,6 +393,17 @@ export default function ActionsList() {
       if (error) setError(error.message);
       else setActions(data);
     };
+    const fetchAvailableActions = async () => {
+      const supabase = createClientComponentClient();
+      const { data, error } = await supabase
+        .from("AvailableActions")
+        .select("*"); //
+      console.log(data, error);
+      if (error) setError(error.message);
+      else setAvailableActions(data);
+    };
+
+    fetchAvailableActions();
 
     if (id) fetchActions();
   }, [id]);
@@ -452,8 +463,10 @@ export default function ActionsList() {
       {error && <p>Error: {error}</p>}
       {selectedNode && (
         <ZapModal
+          actions={actions}
           selectedNode={selectedNode}
           setSelectedNode={setSelectedNode}
+          AvailableActions={AvailableActions}
         ></ZapModal>
       )}
     </div>
