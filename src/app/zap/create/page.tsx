@@ -34,11 +34,6 @@ function useAvailableActionsAndTriggers() {
 export default function CreateZap() {
   const router = useRouter();
 
-  const [selectedTrigger, setSelectedTrigger] = useState<{
-    id: string;
-    name: string;
-  }>();
-
   return (
     <div className="h-full w-full flex">
       <div className="h-full bg-[#413735] flex justify-center py-4 w-10">

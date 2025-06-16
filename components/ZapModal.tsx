@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
-
-import type { Action, AvailableActions } from "@/app/zap/[id]/page";
+import { Action, AvailableActions } from "./ActionList";
 
 type Props = {
   actions: Action[];
