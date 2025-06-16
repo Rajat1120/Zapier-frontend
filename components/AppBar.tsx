@@ -12,14 +12,12 @@ export const AppBar = () => {
   const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setName(localStorage.getItem("name") || "");
-      setUserEmail(localStorage.getItem("email") || "");
-    }
+    setName(localStorage.getItem("name") || "");
+    setUserEmail(localStorage.getItem("email") || "");
   }, []);
 
   const router = useRouter();
-  if (typeof window === "undefined") return;
+
   return (
     <div className="flex border-b justify-between p-4">
       <div className="flex flex-col justify-center text-2xl font-extrabold">
@@ -123,9 +121,13 @@ export default function Popup({ isOpen, onClose, children }: PopupProps) {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [onClose]);
+  const [isClient, setIsClient] = useState(false);
 
-  if (typeof window === "undefined") return null;
-  if (!isOpen) return null;
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient || !isOpen) return null;
 
   return (
     <div className="absolute top-9 right-0 mt-2 z-50">

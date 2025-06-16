@@ -10,6 +10,9 @@ import Image from "next/image";
 import { DarkButton } from "../../../components/buttons/DarkButton";
 import { AppBar } from "../../../components/AppBar";
 
+let zapIcon =
+  "https://img.icons8.com/?size=100&id=VvT7gqRrJ4Bp&format=png&color=000000";
+
 interface Zap {
   id: string;
   triggerId: string;
@@ -81,7 +84,6 @@ export default function DashBoard() {
     setIsClient(true);
   }, []);
 
-  if (typeof window === "undefined") return;
   if (!isClient) {
     return (
       <div>
@@ -160,7 +162,7 @@ function ZapTable({ zaps }: { zaps: Zap[] }) {
                   alt="Trigger"
                   width={30}
                   height={30}
-                  src={z.trigger.type.image}
+                  src={z.trigger.type.image || zapIcon}
                   className="w-[30px] h-[30px]"
                 />
                 {z.actions.map((x, j) => (
@@ -169,7 +171,7 @@ function ZapTable({ zaps }: { zaps: Zap[] }) {
                     alt="Action"
                     width={30}
                     height={30}
-                    src={x.type.image}
+                    src={x.type.image || zapIcon}
                     className="w-[30px] h-[30px]"
                   />
                 ))}
