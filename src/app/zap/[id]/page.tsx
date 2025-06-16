@@ -41,6 +41,12 @@ export type Action = {
   sortingOrder: number;
 };
 
+export type AvailableActions = {
+  id: string;
+  name: string;
+  image: string;
+};
+
 const initialNodes = [
   {
     id: "1",
@@ -157,7 +163,9 @@ const edgeTypes = {
 
 export default function ActionsList() {
   const [actions, setActions] = useState<Action[]>([]);
-  const [AvailableActions, setAvailableActions] = useState<Action[]>([]);
+  const [AvailableActions, setAvailableActions] = useState<AvailableActions[]>(
+    []
+  );
 
   const [error, setError] = useState<string | null>(null);
   const params = useParams();
