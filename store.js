@@ -18,7 +18,7 @@ const useStore = create((set) => ({
   setSelectedAction: (action) => set(() => ({ selectedAction: action })),
   setSelectedActions: (actions) =>
     set((state) => ({
-      selectedActions: [...state, actions],
+      selectedActions: [...state.selectedActions, actions],
     })),
 }));
 

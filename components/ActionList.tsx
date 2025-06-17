@@ -78,6 +78,7 @@ export default function ActionsList({ id }: { id?: string }) {
   const [edges, setEdges] = useState<StrictEdge[]>(initialEdges);
 
   const setSelectedNode = useStore((state) => state.setSelectedNode);
+  const setSelectedActions = useStore((state) => state.setSelectedActions);
   const selectedNode = useStore((state) => state.selectedNode);
   const selectedAction = useStore((state) => state.selectedAction);
   useEffect(() => {
@@ -143,6 +144,9 @@ export default function ActionsList({ id }: { id?: string }) {
     addTrailingPlusNode(updatedNodes, updatedEdges);
     setNodes(updatedNodes);
     setEdges(updatedEdges);
+    if (selectedAction) {
+      setSelectedActions({ name: selectedAction.name, id: selectedNode.id });
+    }
     setSelectedNode(null);
   }, [selectedAction]);
 

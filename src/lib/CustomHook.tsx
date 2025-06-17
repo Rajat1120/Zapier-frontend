@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { addTrailingPlusNode } from "./utils";
 import { CustomNode, StrictEdge } from "../../components/ActionList";
+import useStore from "../../store";
 
 type UseAddNodeParams = {
   nodes: CustomNode[];
@@ -15,7 +16,8 @@ export const handleAddNode = (
   nodes: CustomNode[],
 
   setNodes: React.Dispatch<React.SetStateAction<CustomNode[]>>,
-  setEdges: React.Dispatch<React.SetStateAction<StrictEdge[]>>
+  setEdges: React.Dispatch<React.SetStateAction<StrictEdge[]>>,
+  selectedActions: { id: string | number; name: string }[]
 ) => {
   const { edgeId } = event?.detail;
   const edgeToSplit = edges?.find((e) => e.id === edgeId);
@@ -25,10 +27,12 @@ export const handleAddNode = (
   const filteredNodes = nodes.filter((n) => n.id !== "dummy");
 
   const { source, target } = edgeToSplit;
+
   const newNodeId = (filteredNodes.length + 1).toString();
 
   const sourceIndex = filteredNodes.findIndex((n) => n.id === source);
   const targetIndex = filteredNodes.findIndex((n) => n.id === target);
+
   // Allow dummy target for trailing edge
   const isTrailing = target === "dummy";
   if (sourceIndex === -1 || (!isTrailing && targetIndex === -1)) return;
@@ -42,6 +46,7 @@ export const handleAddNode = (
   };
 
   const newNodeList = [...filteredNodes];
+
   const insertIndex = isTrailing
     ? sourceIndex + 1
     : Math.max(sourceIndex, targetIndex);
@@ -50,6 +55,18 @@ export const handleAddNode = (
   const verticalGap = 100;
   const updatedNodes = newNodeList.map((node, index) => {
     let label;
+
+    const isSelected = selectedActions.find(
+      (val) => Number(val.id) === Number(node.id)
+    );
+
+    if (isSelected) {
+      return {
+        ...node,
+        position: { x: 0, y: index * verticalGap },
+      };
+    }
+
     if (node.id === "1") {
       label = (
         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
@@ -160,7 +177,8 @@ export const handleAddNode = (
   }
 
   addTrailingPlusNode(updatedNodes, updatedEdges);
-
+  console.log(updatedEdges);
+  console.log(updatedNodes);
   setNodes(updatedNodes);
   setEdges(updatedEdges);
 };
@@ -171,9 +189,18 @@ export const useAddNode = ({
   setNodes,
   setEdges,
 }: UseAddNodeParams) => {
+  const selectedActions = useStore((state) => state.selectedActions);
+
   useEffect(() => {
     const listener = (event: Event) => {
-      handleAddNode(event as CustomEvent, edges, nodes, setNodes, setEdges);
+      handleAddNode(
+        event as CustomEvent,
+        edges,
+        nodes,
+        setNodes,
+        setEdges,
+        selectedActions
+      );
     };
 
     window.addEventListener("add-node", listener);
