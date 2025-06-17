@@ -25,7 +25,7 @@ import CustomEdge from "../utils/CustomEdge";
 import useStore from "../store";
 import { addTrailingPlusNode } from "@/lib/utils";
 import { initialNodes } from "@/lib/reactFlow";
-import { useAddNode } from "@/lib/CustomHook";
+import { handleAddNode, useAddNode } from "@/lib/CustomHook";
 
 type NodeData = {
   label: string | JSX.Element; // Allow both string and JSX elements
@@ -80,6 +80,71 @@ export default function ActionsList({ id }: { id?: string }) {
   const setSelectedNode = useStore((state) => state.setSelectedNode);
   const selectedNode = useStore((state) => state.selectedNode);
   const selectedAction = useStore((state) => state.selectedAction);
+  useEffect(() => {
+    const filteredNodes = nodes.filter((n) => n.id !== "dummy");
+
+    const updatedNodes = filteredNodes.map((node, index) => {
+      let label: string | JSX.Element;
+      if (selectedNode && node.id === selectedNode.id) {
+        label = (
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+            <div
+              style={{
+                fontSize: "8px",
+                padding: "2px 6px",
+                backgroundColor: "#ffffff",
+                borderRadius: "4px",
+                fontWeight: "bold",
+                display: "flex",
+                justifyItems: "start",
+                gap: "4px",
+                width: "fit-content",
+                border: "1px solid #cccccc",
+              }}
+            >
+              <img
+                className="h-3 w-3"
+                src={selectedAction.image}
+                alt={selectedAction.name}
+              />
+              <span className="font-bold">{selectedAction.name}</span>
+            </div>
+            <div
+              style={{
+                fontSize: "10px",
+                color: "#666666",
+                textAlign: "left",
+                fontWeight: "bold",
+              }}
+            >
+              {selectedNode.id}. Select the event that starts your zap
+            </div>
+          </div>
+        );
+      } else {
+        label = node.data.label;
+      }
+      return {
+        ...node,
+        data: { label },
+      };
+    });
+    const updatedEdges = [];
+
+    for (let i = 0; i < updatedNodes.length - 1; i++) {
+      updatedEdges.push({
+        id: `e${updatedNodes[i].id}-${updatedNodes[i + 1].id}`,
+        source: updatedNodes[i].id,
+        target: updatedNodes[i + 1].id,
+        type: "custom",
+      });
+    }
+
+    addTrailingPlusNode(updatedNodes, updatedEdges);
+    setNodes(updatedNodes);
+    setEdges(updatedEdges);
+    setSelectedNode(null);
+  }, [selectedAction]);
 
   useAddNode({ nodes, edges, setNodes, setEdges });
 

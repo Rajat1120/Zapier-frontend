@@ -5,16 +5,21 @@ const useStore = create((set) => ({
   password: "",
   selectedNode: null,
   selectedAction: null,
+  selectedActions: [],
 
   increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
   setEmail: (email) => set(() => ({ email })),
   setPassword: (password) => set(() => ({ password })),
   reset: () => set(() => ({ email: "", password: "" })),
-  setSelectedNode: () =>
-    set((state) => ({
-      selectedNode: state.selectedNode ? null : "defaultNode",
+  setSelectedNode: (node) =>
+    set(() => ({
+      selectedNode: node ? node : null,
     })),
   setSelectedAction: (action) => set(() => ({ selectedAction: action })),
+  setSelectedActions: (actions) =>
+    set((state) => ({
+      selectedActions: [...state, actions],
+    })),
 }));
 
 export default useStore;

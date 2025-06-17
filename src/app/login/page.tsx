@@ -7,7 +7,7 @@ import { CheckFeature } from "../../../components/CheckFeature";
 import { Input } from "../../../components/Input";
 import { PrimaryButton } from "../../../components/buttons/PrimaryButton";
 
-import { handleLogin, useLogin } from "../../../utils/CustomHooks";
+import { handleLogin, useLogin } from "../../../utils/HelperFunctions";
 import useStore from "../../../store";
 import ClientRedirect from "../../../utils/ClientRedirect";
 
