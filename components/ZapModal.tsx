@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Action, AvailableActions } from "./ActionList";
+import useStore from "../store";
 
 type Props = {
   actions: Action[];
@@ -49,10 +50,12 @@ let builtInTools = [
 export default function ZapModal({
   actions,
   selectedNode,
-  setSelectedNode,
+
   AvailableActions,
 }: Props) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const setSelectedAction = useStore((state) => state.setSelectedAction);
+  const setSelectedNode = useStore((state) => state.setSelectedNode);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -157,7 +160,7 @@ export default function ZapModal({
                   <div
                     key={action.id}
                     className="flex items-center gap-2 min-w-[200px] py-2 px-2 font-bold cursor-pointer hover:bg-[#f7f6fd]"
-                    onClick={() => setSelectedNode(action)}
+                    onClick={() => setSelectedAction(action)}
                   >
                     <img
                       src={action.image}
