@@ -60,104 +60,49 @@ export const handleAddNode = (
       (val) => Number(val.id) === Number(node.id)
     );
 
+    //if already selected , only update the label
     if (isSelected) {
-      return {
-        ...node,
-        position: { x: 0, y: index * verticalGap },
-      };
+      const originalLabel = node.data.label;
+
+      // Clone the two children only if originalLabel is a valid React element
+      if (
+        typeof originalLabel === "object" &&
+        originalLabel !== null &&
+        "props" in originalLabel &&
+        Array.isArray((originalLabel as any).props.children)
+      ) {
+        const [topDiv, bottomDiv] = (originalLabel as any).props.children;
+
+        // Replace the number inside the second child
+        const newBottomDiv = {
+          ...bottomDiv,
+          props: {
+            ...bottomDiv.props,
+            children: [
+              `${index + 1}`,
+              ". Select the event that starts your zap",
+            ],
+          },
+        };
+
+        const newLabel = {
+          ...originalLabel,
+          props: {
+            ...originalLabel.props,
+            children: [topDiv, newBottomDiv],
+          },
+        };
+
+        return {
+          ...node,
+          position: { x: 0, y: index * verticalGap },
+          data: { ...node.data, label: newLabel },
+        };
+      }
     }
 
-    if (node.id === "1") {
-      label = (
-        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-          <div
-            style={{
-              fontSize: "8px",
-              padding: "2px 6px",
-              backgroundColor: "#eee",
-              borderRadius: "4px",
-              fontWeight: "bold",
-              display: "flex",
-              justifyItems: "start",
-              gap: "4px",
-              width: "fit-content",
-              border: "1px solid black",
-            }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              height="14"
-              width="14"
-              color="GrayWarm8"
-              name="miscBolt"
-            >
-              <path
-                fill="#2D2E2E"
-                d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm4.87-11L11 18v-5H7.13L13 6v5h3.87Z"
-              ></path>
-            </svg>
-            Trigger
-          </div>
-          <div
-            style={{
-              fontSize: "10px",
-              color: "#666666",
-              textAlign: "left",
-              fontWeight: "bold",
-            }}
-          >
-            1. Select the event that starts your zap
-          </div>
-        </div>
-      );
-    } else {
-      label = (
-        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-          <div
-            style={{
-              fontSize: "8px",
-              padding: "2px 6px",
-              backgroundColor: "#eee",
-              borderRadius: "4px",
-              fontWeight: "bold",
-              display: "flex",
-              justifyItems: "start",
-              gap: "4px",
-              width: "fit-content",
-              border: "1px solid black",
-            }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              height="14"
-              width="14"
-              color="GrayWarm8"
-              name="miscBolt"
-            >
-              <path
-                fill="#2D2E2E"
-                d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm4.87-11L11 18v-5H7.13L13 6v5h3.87Z"
-              ></path>
-            </svg>
-            Action
-          </div>
-          <div
-            style={{
-              fontSize: "10px",
-              color: "#666666",
-              textAlign: "left",
-              fontWeight: "bold",
-            }}
-          >
-            {index + 1}. Select the event for your zap to run
-          </div>
-        </div>
-      );
-    }
+    label = updateLabel(node.id, index);
+
     return {
       ...node,
       position: { x: 0, y: index * verticalGap },
@@ -210,3 +155,100 @@ export const useAddNode = ({
     };
   }, [nodes, edges, setNodes, setEdges]);
 };
+
+function updateLabel(id: string, index: number) {
+  let label;
+  if (id === "1") {
+    label = (
+      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+        <div
+          style={{
+            fontSize: "8px",
+            padding: "2px 6px",
+            backgroundColor: "#eee",
+            borderRadius: "4px",
+            fontWeight: "bold",
+            display: "flex",
+            justifyItems: "start",
+            gap: "4px",
+            width: "fit-content",
+            border: "1px solid black",
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            height="14"
+            width="14"
+            color="GrayWarm8"
+            name="miscBolt"
+          >
+            <path
+              fill="#2D2E2E"
+              d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm4.87-11L11 18v-5H7.13L13 6v5h3.87Z"
+            ></path>
+          </svg>
+          Trigger
+        </div>
+        <div
+          style={{
+            fontSize: "10px",
+            color: "#666666",
+            textAlign: "left",
+            fontWeight: "bold",
+          }}
+        >
+          1. Select the event that starts your zap
+        </div>
+      </div>
+    );
+  } else {
+    label = (
+      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+        <div
+          style={{
+            fontSize: "8px",
+            padding: "2px 6px",
+            backgroundColor: "#eee",
+            borderRadius: "4px",
+            fontWeight: "bold",
+            display: "flex",
+            justifyItems: "start",
+            gap: "4px",
+            width: "fit-content",
+            border: "1px solid black",
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            height="14"
+            width="14"
+            color="GrayWarm8"
+            name="miscBolt"
+          >
+            <path
+              fill="#2D2E2E"
+              d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm4.87-11L11 18v-5H7.13L13 6v5h3.87Z"
+            ></path>
+          </svg>
+          Action
+        </div>
+        <div
+          style={{
+            fontSize: "10px",
+            color: "#666666",
+            textAlign: "left",
+            fontWeight: "bold",
+          }}
+        >
+          {index + 1}. Select the event for your zap to run
+        </div>
+      </div>
+    );
+  }
+
+  return label;
+}

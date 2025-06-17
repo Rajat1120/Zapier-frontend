@@ -144,7 +144,7 @@ export default function ActionsList({ id }: { id?: string }) {
     addTrailingPlusNode(updatedNodes, updatedEdges);
     setNodes(updatedNodes);
     setEdges(updatedEdges);
-    if (selectedAction) {
+    if (selectedAction && selectedNode) {
       setSelectedActions({ name: selectedAction.name, id: selectedNode.id });
     }
     setSelectedNode(null);
