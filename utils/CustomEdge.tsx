@@ -14,8 +14,6 @@ const CustomEdge = ({
   targetY,
   style = {},
   markerEnd,
-  source,
-  target,
 }: EdgeProps) => {
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,

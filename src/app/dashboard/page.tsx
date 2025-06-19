@@ -10,7 +10,7 @@ import Image from "next/image";
 import { DarkButton } from "../../../components/buttons/DarkButton";
 import { AppBar } from "../../../components/AppBar";
 
-let zapIcon =
+const zapIcon =
   "https://img.icons8.com/?size=100&id=VvT7gqRrJ4Bp&format=png&color=000000";
 
 interface Zap {

@@ -14,7 +14,7 @@ export async function createZap({
   router,
 }: {
   selectedTrigger: { id: string };
-  selectedActions: Array<{ availableActionId: string; metadata: any }>;
+  selectedActions: Array<{ availableActionId: string; metadata: unknown }>;
   router: { push: (path: string) => void };
 }): Promise<() => Promise<void>> {
   return async () => {

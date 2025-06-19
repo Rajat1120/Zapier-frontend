@@ -54,8 +54,6 @@ export const handleAddNode = (
 
   const verticalGap = 100;
   const updatedNodes = newNodeList.map((node, index) => {
-    let label;
-
     const isSelected = selectedActions.find(
       (val) => Number(val.id) === Number(node.id)
     );
@@ -69,9 +67,9 @@ export const handleAddNode = (
         typeof originalLabel === "object" &&
         originalLabel !== null &&
         "props" in originalLabel &&
-        Array.isArray((originalLabel as any).props.children)
+        Array.isArray(originalLabel.props.children)
       ) {
-        const [topDiv, bottomDiv] = (originalLabel as any).props.children;
+        const [topDiv, bottomDiv] = originalLabel.props.children;
 
         // Replace the number inside the second child
         const newBottomDiv = {
@@ -101,7 +99,7 @@ export const handleAddNode = (
       }
     }
 
-    label = updateLabel(node.id, index);
+    const label = updateLabel(node.id, index);
 
     return {
       ...node,
@@ -153,7 +151,7 @@ export const useAddNode = ({
     return () => {
       window.removeEventListener("add-node", listener);
     };
-  }, [nodes, edges, setNodes, setEdges]);
+  }, [nodes, edges, setNodes, setEdges, selectedActions]);
 };
 
 function updateLabel(id: string, index: number) {

@@ -1,15 +1,17 @@
 import { useEffect, useRef } from "react";
 import { Action, AvailableActions } from "./ActionList";
 import useStore from "../store";
+import type { Node as FlowNode } from "@xyflow/react";
+import Image from "next/image";
 
 type Props = {
   actions: Action[];
-  selectedNode: any;
-  setSelectedNode: (node: any) => void;
+  selectedNode: FlowNode | null;
+  setSelectedNode: (node: FlowNode | null) => void;
   AvailableActions: AvailableActions[];
 };
 
-let builtInTools = [
+const builtInTools = [
   {
     name: "Ai by zapier",
     image:
@@ -48,7 +50,6 @@ let builtInTools = [
 ];
 
 export default function ZapModal({
-  actions,
   selectedNode,
 
   AvailableActions,
@@ -61,7 +62,8 @@ export default function ZapModal({
     const handleClickOutside = (event: MouseEvent) => {
       if (
         modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
+        event.target instanceof Node &&
+        !modalRef.current.contains(event.target)
       ) {
         setSelectedNode(null);
       }
@@ -109,15 +111,15 @@ export default function ZapModal({
           }}
         >
           <div className="p-2 bg-[#dedcdc] rounded-md flex items-center gap-2">
-            <img
+            <Image
+              src="https://img.icons8.com/?size=100&id=2797&format=png&color=FF4F00"
+              alt="icon"
+              width={20}
+              height={20}
               style={{
-                width: "20px",
-                height: "20px",
                 display: "block",
                 objectFit: "contain",
               }}
-              src="https://img.icons8.com/?size=100&id=2797&format=png&color=FF4F00"
-              alt=""
             />
             <span className="">Home</span>
           </div>
@@ -160,14 +162,16 @@ export default function ZapModal({
                   <div
                     key={action.id}
                     className="flex items-center gap-2 min-w-[200px] py-2 px-2 font-bold cursor-pointer hover:bg-[#f7f6fd]"
-                    onClick={() => setSelectedAction(action)}
+                    onClick={() => {
+                      setSelectedAction(action);
+                    }}
                   >
-                    <img
+                    <Image
                       src={action.image}
+                      width={20}
+                      height={20}
                       alt=""
                       style={{
-                        width: "20px",
-                        height: "20px",
                         display: "block",
                         objectFit: "contain",
                       }}
@@ -194,11 +198,11 @@ export default function ZapModal({
                     key={tool.name}
                     className="flex items-center gap-2 min-w-[200px] py-2 px-2 font-bold cursor-pointer hover:bg-[#f7f6fd]"
                   >
-                    <img
+                    <Image
                       src={tool.image}
+                      width={20}
+                      height={20}
                       style={{
-                        width: "20px",
-                        height: "20px",
                         display: "block",
                         objectFit: "contain",
                       }}

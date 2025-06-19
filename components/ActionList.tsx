@@ -4,7 +4,7 @@ import { JSX, useCallback, useEffect, useState } from "react";
 
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
-import type { Connection, Edge } from "@xyflow/react";
+import type { Connection } from "@xyflow/react";
 
 import {
   addEdge,
@@ -25,7 +25,8 @@ import CustomEdge from "../utils/CustomEdge";
 import useStore from "../store";
 import { addTrailingPlusNode } from "@/lib/utils";
 import { initialNodes } from "@/lib/reactFlow";
-import { handleAddNode, useAddNode } from "@/lib/CustomHook";
+import { useAddNode } from "@/lib/CustomHook";
+import Image from "next/image";
 
 type NodeData = {
   label: string | JSX.Element; // Allow both string and JSX elements
@@ -84,7 +85,7 @@ export default function ActionsList({ id }: { id?: string }) {
   useEffect(() => {
     const filteredNodes = nodes.filter((n) => n.id !== "dummy");
 
-    const updatedNodes = filteredNodes.map((node, index) => {
+    const updatedNodes = filteredNodes.map((node) => {
       let label: string | JSX.Element;
       if (selectedNode && node.id === selectedNode.id) {
         label = (
@@ -103,8 +104,9 @@ export default function ActionsList({ id }: { id?: string }) {
                 border: "1px solid #cccccc",
               }}
             >
-              <img
-                className="h-3 w-3"
+              <Image
+                height={12}
+                width={12}
                 src={selectedAction.image}
                 alt={selectedAction.name}
               />
@@ -148,7 +150,8 @@ export default function ActionsList({ id }: { id?: string }) {
       setSelectedActions({ name: selectedAction.name, id: selectedNode.id });
     }
     setSelectedNode(null);
-  }, [selectedAction]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedAction, setSelectedActions, setSelectedNode]);
 
   useAddNode({ nodes, edges, setNodes, setEdges });
 
@@ -173,6 +176,7 @@ export default function ActionsList({ id }: { id?: string }) {
 
     setNodes(updatedNodes);
     setEdges(updatedEdges);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
