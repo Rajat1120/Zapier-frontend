@@ -7,10 +7,12 @@ const useStore = create((set) => ({
   selectedAction: null,
   selectedActions: [],
   zapTrigger: null,
+  currentZap: null,
 
   increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
   setEmail: (email) => set(() => ({ email })),
   setPassword: (password) => set(() => ({ password })),
+  setCurrentZap: (zapId) => set(() => ({ currentZap: zapId })),
   reset: () => set(() => ({ email: "", password: "" })),
   setSelectedNode: (node) =>
     set(() => ({
