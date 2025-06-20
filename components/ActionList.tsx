@@ -267,8 +267,8 @@ export default function ActionsList({ id }: { id?: string }) {
           AvailableActions={AvailableActions}
         ></ZapModal>
       )}
-      <div className="fixed top-16 right-4 w-[28%] h-[80%] border-2 border-[#695be8] bg-[#fdf7f2] rounded-md">
-        <div className="p-3 rounded-md justify-between bg-[#f0eefb] flex">
+      <div className="fixed top-16 right-4 w-[28%] h-[80%] flex  flex-col border-2 border-[#695be8] bg-[#fdf7f2] rounded-md">
+        <div className="p-3 rounded-md justify-between  bg-[#f0eefb] flex">
           <div>
             img
             <span>some text</span>
@@ -278,9 +278,9 @@ export default function ActionsList({ id }: { id?: string }) {
             <span>close it</span>
           </div>
         </div>
-        <div className="">
+        <div className="flex-grow border-b-[#d7d3c9] border overflow-y-auto">
           <div className="p-3">setup</div>
-          <div className=" border-t border-b p-3 border-[#d7d3c9]">
+          <div className=" border-t border-b p-3 h-full border-[#d7d3c9]">
             <div className="flex m-2 flex-col">
               <span>App</span>
               <div className="w-full rounded-md  m-1 flex justify-between p-2 border border-[#d7d3c9]">
@@ -311,18 +311,19 @@ export default function ActionsList({ id }: { id?: string }) {
               </div>
             </div>
             <div className="p-3">
-              <span className="text-sm leading-0">
+              <p className="text-sm leading-5  ">
                 Google Drive is a secure partner with Zapier. Your credentials
                 are encrypted and can be removed at any time. You can manage all
                 of your connected accounts here.
-              </span>
+              </p>
             </div>
           </div>
         </div>
-        <div className="p-3 align-self-end">
-          <button>to continue choose an event</button>
+       <div className="p-3 flex justify-center items-center ">
+          <button className="w-full bg-[#ece9df] font-bold text-[#737272] p-2" >To continue, choose an event</button>
         </div>
       </div>
+       
     </div>
   );
 }
