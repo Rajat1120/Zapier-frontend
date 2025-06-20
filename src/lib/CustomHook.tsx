@@ -17,7 +17,7 @@ export const handleAddNode = (
 
   setNodes: React.Dispatch<React.SetStateAction<CustomNode[]>>,
   setEdges: React.Dispatch<React.SetStateAction<StrictEdge[]>>,
-  selectedActions: { id: string | number; name: string }[]
+  selectedActions: { sortingOrder: string | number; name: string }[]
 ) => {
   const { edgeId } = event?.detail;
   const edgeToSplit = edges?.find((e) => e.id === edgeId);
@@ -55,7 +55,7 @@ export const handleAddNode = (
   const verticalGap = 100;
   const updatedNodes = newNodeList.map((node, index) => {
     const isSelected = selectedActions.find(
-      (val) => Number(val.id) === Number(node.id)
+      (val) => Number(val.sortingOrder) === Number(node.id)
     );
 
     //if already selected , only update the label

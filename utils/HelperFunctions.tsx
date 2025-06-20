@@ -60,3 +60,37 @@ export const useLogin = (
     };
   }, [router, email, password]);
 };
+
+
+export default async function handleZapCreate (selectedTrigger: {availableActionId: string |number, metadata: unknown}
+
+,selectedActions: unknown[]){
+  
+  if(!selectedActions || !selectedTrigger) return
+  try {
+    
+    const res = await axios.post(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/zap`,
+      JSON.stringify({
+        availableTriggerId: String(selectedTrigger.availableActionId),
+        triggerMetadata: {},
+        actions: selectedActions.map((a) => {
+          const action = a as { availableActionId: string | number; metadata: unknown };
+          return {
+            availableActionId: action.availableActionId,
+            actionMetadata: action.metadata,
+          };
+        }),
+      }),
+      {
+        headers: {
+          Authorization: localStorage.getItem("token"),
+           'Content-Type': 'application/json'
+        },
+      }
+    );
+    console.log(res)
+  }catch(err){
+    throw err
+  }
+}
