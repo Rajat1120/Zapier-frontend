@@ -13,6 +13,7 @@ export default function ZapPage() {
       <div className="h-full bg-[#413735] flex justify-center py-4 w-10">
         <Image
           onClick={() => router.push("/dashboard")}
+          className="h-8 w-8"
           width={32}
           height={32}
           style={{
