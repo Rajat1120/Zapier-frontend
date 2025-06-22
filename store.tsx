@@ -9,7 +9,7 @@ type StoreState = {
   selectedNode: Node | null;
   selectedAction: AvailableActions | null;
   selectedActions: SelectedAction[];
-  zapTrigger: SelectedAction | null;
+  zapTrigger: SelectedAction |Action | null;
   actions: Action[];
   AvailableActions: AvailableActions[];
 
@@ -20,7 +20,7 @@ type StoreState = {
   reset: () => void;
   setSelectedNode: (node: Node | null) => void;
   setSelectedAction: (action: AvailableActions) => void;
-  setZapTrigger: (action: SelectedAction) => void;
+  setZapTrigger: (action: SelectedAction |Action | null ) => void;
   setSelectedActions: (newAction: SelectedAction | null) => void;
 };
 
@@ -40,14 +40,14 @@ const useStore = create<StoreState>((set) => ({
   reset: () => set(() => ({ email: "", password: "" })),
   setSelectedNode: (node) => set(() => ({ selectedNode: node ?? null })),
   setSelectedAction: (action) => set(() => ({ selectedAction: action })),
-  setZapTrigger: (action) => set(() => ({ zapTrigger: action })),
+  setZapTrigger: (action: SelectedAction | Action | null) => set(() => ({ zapTrigger: action })),
   setSelectedActions: (newAction) =>
     set((state) => {
       if (!newAction) return { selectedActions: [] };
-
       const exists = state.selectedActions.some(
         (action) => action.sortingOrder === newAction.sortingOrder
       );
+      
 
       return {
         selectedActions: exists

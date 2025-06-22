@@ -6,6 +6,7 @@ import { useEffect } from "react";
 
 import {supabase} from "../utils/supabase"
 import { ParamValue } from "next/dist/server/request/params";
+import { Action, SelectedAction } from "../components/ActionList";
 
 
 export async function handleLogin(
@@ -66,7 +67,7 @@ export const useLogin = (
 };
 
 
-export default async function handleZapCreate (selectedTrigger: {availableActionId: string |number, metadata: unknown}
+export default async function handleZapCreate (selectedTrigger: SelectedAction | Action | null
 
 ,selectedActions: unknown[], zapId: ParamValue){
 
@@ -97,16 +98,30 @@ export default async function handleZapCreate (selectedTrigger: {availableAction
 
   try {
     
+    // Type guard to check for availableActionId
+    const getAvailableTriggerId = (trigger: SelectedAction | Action | null) => {
+      if(!trigger) return
+      if ("availableActionId" in trigger && trigger.availableActionId !== undefined) {
+        return String(trigger.availableActionId);
+      }
+      if ("actionId" in trigger && trigger.actionId !== undefined) {
+        return String(trigger.actionId);
+      }
+      return "";
+    };
+
     const res = await axios.post(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/zap`,
       JSON.stringify({
-        availableTriggerId: String(selectedTrigger.availableActionId),
+        availableTriggerId: getAvailableTriggerId(selectedTrigger),
         triggerMetadata: {},
         actions: selectedActions.map((a) => {
-          const action = a as { availableActionId: string | number; metadata: unknown };
+          const action = a as { availableActionId: string | number; metadata: unknown , sortingOrder: string,name: string };
           return {
             availableActionId: action.availableActionId,
             actionMetadata: action.metadata,
+            name:action.name,
+            sortingOrder:action.sortingOrder
           };
         }),
       }),
@@ -124,3 +139,6 @@ export default async function handleZapCreate (selectedTrigger: {availableAction
     throw err
   }
 }
+
+
+

@@ -101,7 +101,17 @@ export default function ActionsList({ id }: { id?: string }) {
    const setZapTrigger = useStore((state) => state.setZapTrigger);
   const params = useParams()
   const router = useRouter()
-  const trigger = selectedActions.find((action: SelectedAction) => action.sortingOrder === "1")
+  let trigger: SelectedAction | Action | null = null;
+  
+  
+  if(selectedActions.length){
+  
+    trigger = selectedActions.find((action: SelectedAction) => action.sortingOrder === "1") || null;
+  }
+  if(params.id){
+    trigger = actions.find((action: Action) => action.sortingOrder === 0) || trigger;
+  }
+  
   
   useEffect(() => {
     const filteredNodes = nodes.filter((n) => n.id !== "dummy");
@@ -110,7 +120,7 @@ export default function ActionsList({ id }: { id?: string }) {
       
       let label: string | JSX.Element;
       
-      if(actions.length && actions.some(val => val.sortingOrder + 1 === +node.id)){
+      if(actions.length && params.id && actions.some(val => val.sortingOrder + 1 === +node.id)){
         
  
        const match = AvailableActions.find(available =>
@@ -227,22 +237,25 @@ export default function ActionsList({ id }: { id?: string }) {
     addTrailingPlusNode(updatedNodes, updatedEdges);
     setNodes(updatedNodes);
     setEdges(updatedEdges);
+
     if (selectedAction && selectedNode) {
-      
+        
       setSelectedActions({ name: selectedAction.name, sortingOrder: selectedNode.id,metadata: {},availableActionId:selectedAction.id });
     }
-
-    if(trigger){
+    
+    
+    if(trigger && selectedActions.length){
 
       setZapTrigger(trigger);
     }
 
-    
-      async function getVal() {
-        // Only call handleZapCreate if trigger is defined
-          if(trigger){
+    async function getVal() {
+      
+      if(selectedActions.length){
+            
 
             const val = await handleZapCreate(trigger, selectedActions, params.id);
+            
             if (val) {
               router.push(val);
             }
@@ -252,7 +265,7 @@ export default function ActionsList({ id }: { id?: string }) {
       getVal();
       setSelectedNode(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedAction, setSelectedActions, setSelectedNode, trigger, actions, AvailableActions]);
+  }, [selectedAction, setSelectedActions, setSelectedNode, trigger, actions, AvailableActions, selectedActions]);
   
 
   useAddNode({ nodes, edges, setNodes, setEdges });
@@ -308,7 +321,7 @@ export default function ActionsList({ id }: { id?: string }) {
     fetchAvailableActions();
 
     if (id) fetchActions();
-  }, [id]);
+  }, [id, setActions, setAvailableActions]);
 
   const onNodesChange = useCallback(
     (changes: NodeChange<CustomNode>[]) =>

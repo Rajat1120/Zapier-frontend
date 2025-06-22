@@ -191,7 +191,7 @@ export const useAddNode = ({
   const selectedActions = useStore((state) => state.selectedActions);
   const actions = useStore((state) => state.actions);
   const AvailableActions = useStore((state) => state.AvailableActions);
-
+  
   useEffect(() => {
     const listener = (event: Event) => {
       
