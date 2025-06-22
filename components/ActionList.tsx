@@ -81,10 +81,6 @@ const edgeTypes = {
 };
 
 export default function ActionsList({ id }: { id?: string }) {
-  const [actions, setActions] = useState<Action[]>([]);
-  const [AvailableActions, setAvailableActions] = useState<AvailableActions[]>(
-    []
-  );
 
   
 
@@ -95,6 +91,10 @@ export default function ActionsList({ id }: { id?: string }) {
 
   const setSelectedNode = useStore((state) => state.setSelectedNode);
   const setSelectedActions = useStore((state) => state.setSelectedActions);
+  const setAvailableActions = useStore((state) => state.setAvailableActions);
+  const setActions = useStore((state) => state.setActions);
+  const actions  = useStore((state) => state.actions);
+  const AvailableActions = useStore((state) => state.AvailableActions);
   const selectedNode = useStore((state) => state.selectedNode);
   const selectedAction = useStore((state) => state.selectedAction);
   const selectedActions = useStore((state) => state.selectedActions);
@@ -109,14 +109,14 @@ export default function ActionsList({ id }: { id?: string }) {
     const updatedNodes = filteredNodes.map((node) => {
       
       let label: string | JSX.Element;
+      
       if(actions.length && actions.some(val => val.sortingOrder + 1 === +node.id)){
         
  
        const match = AvailableActions.find(available =>
-            actions.some(action => action.actionId === available.id))
+            actions.some((action) => action.actionId === available.id))
           
           
-
            label = (
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             <div
@@ -182,13 +182,16 @@ export default function ActionsList({ id }: { id?: string }) {
                 border: "1px solid #cccccc",
               }}
             >
-              <Image
+             {selectedAction &&
+              <>
+             <Image
                 height={12}
                 width={12}
                 src={selectedAction.image}
                 alt={selectedAction.name}
-              />
+                />
               <span className="font-bold">{selectedAction.name}</span>
+                </> }
             </div>
             <div
               style={{
@@ -228,17 +231,25 @@ export default function ActionsList({ id }: { id?: string }) {
       
       setSelectedActions({ name: selectedAction.name, sortingOrder: selectedNode.id,metadata: {},availableActionId:selectedAction.id });
     }
-      setZapTrigger(trigger)
 
-      async function getVal () {
-        const val = await handleZapCreate(trigger, selectedActions, params.id)
-        if(val){
+    if(trigger){
 
-          router.push(val)
-        }
+      setZapTrigger(trigger);
+    }
 
+    
+      async function getVal() {
+        // Only call handleZapCreate if trigger is defined
+          if(trigger){
+
+            const val = await handleZapCreate(trigger, selectedActions, params.id);
+            if (val) {
+              router.push(val);
+            }
+          }
+        
       }
-      getVal()
+      getVal();
       setSelectedNode(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAction, setSelectedActions, setSelectedNode, trigger, actions, AvailableActions]);
