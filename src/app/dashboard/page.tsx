@@ -9,6 +9,8 @@ import Image from "next/image";
 
 import { DarkButton } from "../../../components/buttons/DarkButton";
 import { AppBar } from "../../../components/AppBar";
+import useStore from "../../../store";
+
 
 const zapIcon =
   "https://img.icons8.com/?size=100&id=VvT7gqRrJ4Bp&format=png&color=000000";
@@ -80,6 +82,8 @@ export default function DashBoard() {
   const { loading, zaps } = useZaps();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
+  const setSelectedActions = useStore((state) => state.setSelectedActions);
+  const setZapTrigger = useStore((state) => state.setZapTrigger);
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -113,6 +117,8 @@ export default function DashBoard() {
             <DarkButton
               onClick={() => {
                 router.push("/zap/create");
+                setSelectedActions(null)
+                setZapTrigger(null)
               }}
             >
               Create
@@ -134,7 +140,7 @@ export default function DashBoard() {
 
 function ZapTable({ zaps }: { zaps: Zap[] }) {
   const router = useRouter();
-  console.log("Zaps:", zaps);
+  
   return (
     <div className="overflow-hidden my-4 rounded-2xl border  max-w-screen-lg w-full">
       <table className="w-full text-left   border-black   border-collapse">

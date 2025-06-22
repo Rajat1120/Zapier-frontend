@@ -3,8 +3,9 @@
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import axios from "axios";
 import { useEffect } from "react";
-import  useStore  from "../store";
+
 import {supabase} from "../utils/supabase"
+import { ParamValue } from "next/dist/server/request/params";
 
 
 export async function handleLogin(
@@ -67,8 +68,10 @@ export const useLogin = (
 
 export default async function handleZapCreate (selectedTrigger: {availableActionId: string |number, metadata: unknown}
 
-,selectedActions: unknown[]){
-    const zapId = useStore.getState().currentZap
+,selectedActions: unknown[], zapId: ParamValue){
+
+ 
+
     if(zapId){
       
       const { data, error } = await supabase
@@ -89,7 +92,8 @@ export default async function handleZapCreate (selectedTrigger: {availableAction
       }
     }
     
-  if(!selectedActions || !selectedTrigger) return
+    
+  if(!selectedActions.length) return
 
   try {
     
@@ -114,7 +118,7 @@ export default async function handleZapCreate (selectedTrigger: {availableAction
       }
     );
     
-    useStore.getState().setCurrentZap(res.data.zapId)
+    return res.data.zapId
   
   }catch(err){
     throw err

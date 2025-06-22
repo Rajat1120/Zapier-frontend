@@ -1,3 +1,4 @@
+
 import { create } from "zustand";
 
 const useStore = create((set) => ({
@@ -7,12 +8,12 @@ const useStore = create((set) => ({
   selectedAction: null,
   selectedActions: [],
   zapTrigger: null,
-  currentZap: null,
+  
 
   increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
   setEmail: (email) => set(() => ({ email })),
   setPassword: (password) => set(() => ({ password })),
-  setCurrentZap: (zapId) => set(() => ({ currentZap: zapId })),
+  
   reset: () => set(() => ({ email: "", password: "" })),
   setSelectedNode: (node) =>
     set(() => ({
@@ -22,6 +23,10 @@ const useStore = create((set) => ({
   setZapTrigger: (action) => set({zapTrigger: action}),
   setSelectedActions: (newAction) =>
   set((state) => {
+    if(!newAction) return {
+      selectedActions: []
+
+    }
     const exists = state.selectedActions.some(
       (action) => action.sortingOrder === newAction.sortingOrder
     );

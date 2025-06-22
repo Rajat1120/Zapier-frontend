@@ -120,8 +120,7 @@ export const handleAddNode = (
   }
 
   addTrailingPlusNode(updatedNodes, updatedEdges);
-  console.log(updatedEdges);
-  console.log(updatedNodes);
+  
   setNodes(updatedNodes);
   setEdges(updatedEdges);
 };
@@ -136,6 +135,7 @@ export const useAddNode = ({
 
   useEffect(() => {
     const listener = (event: Event) => {
+      
       handleAddNode(
         event as CustomEvent,
         edges,

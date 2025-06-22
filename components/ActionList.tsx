@@ -30,6 +30,9 @@ import { useAddNode } from "@/lib/CustomHook";
 import Image from "next/image";
 import Sidebar from "./SideBar";
 import handleZapCreate from "../utils/HelperFunctions";
+import { useParams , useRouter} from "next/navigation";
+
+
 
 type NodeData = {
   label: string | JSX.Element; // Allow both string and JSX elements
@@ -94,7 +97,8 @@ export default function ActionsList({ id }: { id?: string }) {
   const selectedAction = useStore((state) => state.selectedAction);
   const selectedActions = useStore((state) => state.selectedActions);
    const setZapTrigger = useStore((state) => state.setZapTrigger);
-  
+  const params = useParams()
+  const router = useRouter()
   const trigger = selectedActions.find((action: SelectedAction) => action.sortingOrder === "1")
   useEffect(() => {
     const filteredNodes = nodes.filter((n) => n.id !== "dummy");
@@ -165,7 +169,16 @@ export default function ActionsList({ id }: { id?: string }) {
       setSelectedActions({ name: selectedAction.name, sortingOrder: selectedNode.id,metadata: {},availableActionId:selectedAction.id });
     }
       setZapTrigger(trigger)
-      handleZapCreate(trigger, selectedActions)
+
+      async function getVal () {
+        const val = await handleZapCreate(trigger, selectedActions, params.id)
+        if(val){
+
+          router.push(val)
+        }
+
+      }
+      getVal()
       setSelectedNode(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAction, setSelectedActions, setSelectedNode, trigger]);
@@ -205,7 +218,7 @@ export default function ActionsList({ id }: { id?: string }) {
         .select("*")
         .eq("zapId", id); //
 
-      console.log(data, error);
+      
       if (error) setError(error.message);
       else setActions(data);
     };
@@ -214,7 +227,7 @@ export default function ActionsList({ id }: { id?: string }) {
       const { data, error } = await supabase
         .from("AvailableActions")
         .select("*"); //
-      console.log(data, error);
+      
       if (error) setError(error.message);
       else setAvailableActions(data);
     };
