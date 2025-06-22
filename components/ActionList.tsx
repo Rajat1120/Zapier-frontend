@@ -63,7 +63,7 @@ export type StrictEdge = {
 export type Action = {
   id: string;
   zapId: string;
-  adtionId: string;
+  actionId: string;
   metadata: JSON;
   sortingOrder: number;
 };
@@ -86,6 +86,8 @@ export default function ActionsList({ id }: { id?: string }) {
     []
   );
 
+  
+
   const [error, setError] = useState<string | null>(null);
 
   const [nodes, setNodes] = useState<CustomNode[]>(initialNodes);
@@ -100,11 +102,69 @@ export default function ActionsList({ id }: { id?: string }) {
   const params = useParams()
   const router = useRouter()
   const trigger = selectedActions.find((action: SelectedAction) => action.sortingOrder === "1")
+  
   useEffect(() => {
     const filteredNodes = nodes.filter((n) => n.id !== "dummy");
 
     const updatedNodes = filteredNodes.map((node) => {
+      
       let label: string | JSX.Element;
+      if(actions.length && actions.some(val => val.sortingOrder + 1 === +node.id)){
+        
+ 
+       const match = AvailableActions.find(available =>
+            actions.some(action => action.actionId === available.id))
+          
+          
+
+           label = (
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+            <div
+              style={{
+                fontSize: "8px",
+                padding: "2px 6px",
+                backgroundColor: "#ffffff",
+                borderRadius: "4px",
+                fontWeight: "bold",
+                display: "flex",
+                justifyItems: "start",
+                gap: "4px",
+                width: "fit-content",
+                border: "1px solid #cccccc",
+              }}
+            >
+              {match && (
+                <>
+                  <Image
+                    height={12}
+                    width={12}
+                    src={match.image}
+                    alt={match.name}
+                  />
+                  <span className="font-bold">{match.name}</span>
+                </>
+              )}
+            </div>
+            <div
+              style={{
+                fontSize: "10px",
+                color: "#666666",
+                textAlign: "left",
+                fontWeight: "bold",
+              }}
+            >
+              {node.id}. Select the event that starts your zap
+            </div>
+          </div>)
+
+
+            return {
+              ...node,
+                data: { label },
+            }
+                    
+      }
+
       if (selectedNode && node.id === selectedNode.id) {
         label = (
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
@@ -181,7 +241,7 @@ export default function ActionsList({ id }: { id?: string }) {
       getVal()
       setSelectedNode(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedAction, setSelectedActions, setSelectedNode, trigger]);
+  }, [selectedAction, setSelectedActions, setSelectedNode, trigger, actions, AvailableActions]);
   
 
   useAddNode({ nodes, edges, setNodes, setEdges });
@@ -230,6 +290,8 @@ export default function ActionsList({ id }: { id?: string }) {
       
       if (error) setError(error.message);
       else setAvailableActions(data);
+      
+      
     };
 
     fetchAvailableActions();
