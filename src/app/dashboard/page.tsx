@@ -84,6 +84,7 @@ export default function DashBoard() {
   const [isClient, setIsClient] = useState(false);
   const setSelectedActions = useStore((state) => state.setSelectedActions);
   const setZapTrigger = useStore((state) => state.setZapTrigger);
+  const setActions = useStore((state) => state.setActions);
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -119,6 +120,7 @@ export default function DashBoard() {
                 router.push("/zap/create");
                 setSelectedActions(null)
                 setZapTrigger(null)
+                setActions([])
               }}
             >
               Create

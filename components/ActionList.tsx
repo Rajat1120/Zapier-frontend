@@ -25,12 +25,13 @@ import CustomEdge from "../utils/CustomEdge";
 
 import useStore from "../store";
 import { addTrailingPlusNode } from "@/lib/utils";
-import { initialNodes } from "@/lib/reactFlow";
+import { generateInitialNodes, icon } from "@/lib/reactFlow";
 import { useAddNode } from "@/lib/CustomHook";
 import Image from "next/image";
 import Sidebar from "./SideBar";
 import handleZapCreate from "../utils/HelperFunctions";
 import { useParams , useRouter} from "next/navigation";
+
 
 
 
@@ -80,13 +81,15 @@ const edgeTypes = {
   custom: CustomEdge,
 };
 
+
+
 export default function ActionsList() {
 
   
 
   const [error, setError] = useState<string | null>(null);
 
-  const [nodes, setNodes] = useState<CustomNode[]>(initialNodes);
+  const [nodes, setNodes] = useState<CustomNode[]>(generateInitialNodes(2));
   const [edges, setEdges] = useState<StrictEdge[]>(initialEdges);
 
   const setSelectedNode = useStore((state) => state.setSelectedNode);
@@ -112,28 +115,37 @@ export default function ActionsList() {
     trigger = actions.find((action: Action) => action.sortingOrder === 0) || trigger;
   }
   
+
   
   useEffect(() => {
-    const filteredNodes = nodes.filter((n) => n.id !== "dummy");
+    let filteredNodes: CustomNode[]
+      if(actions.length){
+       filteredNodes = generateInitialNodes(actions.length).filter((n) => n.id !== "dummy");
+        
+      }else{
+
+        filteredNodes = nodes.filter((n) => n.id !== "dummy");  
+      }
+      
 
     const updatedNodes = filteredNodes.map((node) => {
       
       let label: string | JSX.Element;
       
-      if(actions.length && params.id && actions.some(val => val.sortingOrder + 1 === +node.id)){
+      if(actions.length && params.id && actions.some(val => val.sortingOrder  === +node.id)){
+        const curNode = actions.find(val => val.sortingOrder  === +node.id)
         
- 
        const match = AvailableActions.find(available =>
-            actions.some((action) => action.actionId === available.id))
-          
-          
+            curNode?.actionId === available.id)
+            
+
            label = (
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             <div
               style={{
                 fontSize: "8px",
                 padding: "2px 6px",
-                backgroundColor: "#ffffff",
+                backgroundColor:  `${match?.id === "action" ? "#eee" : "#ffffff"}` ,
                 borderRadius: "4px",
                 fontWeight: "bold",
                 display: "flex",
@@ -144,6 +156,7 @@ export default function ActionsList() {
               }}
             >
               {match && (
+                match.id === "action" ? <div className="flex bg-[#eee] gap-1" >{icon} {node.id === "1" ? "Trigger" : "Action"}</div> :
                 <>
                   <Image
                     height={12}
@@ -252,9 +265,17 @@ export default function ActionsList() {
     async function getVal() {
       
       if(selectedActions.length){
-            
-
-            const val = await handleZapCreate(trigger, selectedActions, params.id);
+        
+        const newActions = filteredNodes.map((node) => {
+        const matchedAction = selectedActions.find((val) => val.sortingOrder === node.id);
+        if (matchedAction) {
+          return { ...matchedAction };
+        }else{
+          return {name: "Action", availableActionId: "action", metadata: {}, sortingOrder: node.id}
+        }
+        
+      })
+            const val = await handleZapCreate(trigger, newActions, params.id);
             
             if (val) {
               router.push(val);

@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "img.icons8.com",
       },
+       {
+        protocol: "https",
+        hostname: "encrypted-tbn0.gstatic.com",
+      },
       {
         protocol: "https",
         hostname: "zapier-images.imgix.net",
