@@ -164,13 +164,7 @@ function ZapTable({ zaps }: { zaps: Zap[] }) {
                 </button>
               </td>
               <td className="p-2 flex items-center space-x-2">
-                <Image
-                  alt="Trigger"
-                  width={30}
-                  height={30}
-                  src={z.trigger.type.image || zapIcon}
-                  className="w-[30px] h-[30px]"
-                />
+               
                 {z.actions.map((x, j) => (
                   <Image
                     key={j}

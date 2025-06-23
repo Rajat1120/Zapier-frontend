@@ -120,7 +120,7 @@ export default async function handleZapCreate (selectedTrigger: SelectedAction |
           return {
             availableActionId: action.availableActionId,
             actionMetadata: action.metadata,
-            name:action.name,
+            
             sortingOrder:action.sortingOrder
           };
         }),

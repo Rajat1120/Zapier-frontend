@@ -80,7 +80,7 @@ const edgeTypes = {
   custom: CustomEdge,
 };
 
-export default function ActionsList({ id }: { id?: string }) {
+export default function ActionsList() {
 
   
 
@@ -300,7 +300,7 @@ export default function ActionsList({ id }: { id?: string }) {
       const { data, error } = await supabase
         .from("Action")
         .select("*")
-        .eq("zapId", id); //
+        .eq("zapId", params.id); //
 
       
       if (error) setError(error.message);
@@ -320,8 +320,8 @@ export default function ActionsList({ id }: { id?: string }) {
 
     fetchAvailableActions();
 
-    if (id) fetchActions();
-  }, [id, setActions, setAvailableActions]);
+    if (params.id) fetchActions();
+  }, [params.id, setActions, setAvailableActions]);
 
   const onNodesChange = useCallback(
     (changes: NodeChange<CustomNode>[]) =>
@@ -354,7 +354,7 @@ export default function ActionsList({ id }: { id?: string }) {
     <div className="h-full w-full">
       <div className="h-12  w-full border-b-[0.5px] border-b-black flex items-center justify-end  px-4">
         <button className="bg-[#695be8] text-white font-bold px-2 py-1 rounded cursor-pointer">
-          {id ? "Edit zap" : "Publish"}
+          {params.id ? "Edit zap" : "Publish"}
         </button>
       </div>
       <Authentication></Authentication>

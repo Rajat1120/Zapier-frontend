@@ -1,12 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useParams } from "next/navigation";
+
 import ActionsList from "../../../../components/ActionList";
 import Image from "next/image";
 
 export default function ZapPage() {
-  const params = useParams();
+  
   const router = useRouter();
   return (
     <div className="h-full w-full flex">
@@ -25,7 +25,7 @@ export default function ZapPage() {
       </div>
       <div className="h-full w-full">
         <ActionsList
-          id={Array.isArray(params.id) ? params.id[0] : params.id}
+          
         ></ActionsList>
         ;
       </div>
