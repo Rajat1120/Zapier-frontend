@@ -6,7 +6,6 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 import type { Connection } from "@xyflow/react";
 
-
 import {
   addEdge,
   applyEdgeChanges,
@@ -30,10 +29,7 @@ import { useAddNode } from "@/lib/CustomHook";
 import Image from "next/image";
 import Sidebar from "./SideBar";
 import handleZapCreate from "../utils/HelperFunctions";
-import { useParams , useRouter} from "next/navigation";
-
-
-
+import { useParams, useRouter } from "next/navigation";
 
 type NodeData = {
   label: string | JSX.Element; // Allow both string and JSX elements
@@ -49,8 +45,8 @@ export type CustomNode = {
 
 export type SelectedAction = {
   name: string;
-  sortingOrder: string; 
-  metadata: unknown; 
+  sortingOrder: string;
+  metadata: unknown;
   availableActionId: string;
 };
 
@@ -81,12 +77,7 @@ const edgeTypes = {
   custom: CustomEdge,
 };
 
-
-
 export default function ActionsList() {
-
-  
-
   const [error, setError] = useState<string | null>(null);
 
   const [nodes, setNodes] = useState<CustomNode[]>(generateInitialNodes(2));
@@ -96,56 +87,60 @@ export default function ActionsList() {
   const setSelectedActions = useStore((state) => state.setSelectedActions);
   const setAvailableActions = useStore((state) => state.setAvailableActions);
   const setActions = useStore((state) => state.setActions);
-  const actions  = useStore((state) => state.actions);
+  const actions = useStore((state) => state.actions);
   const AvailableActions = useStore((state) => state.AvailableActions);
   const selectedNode = useStore((state) => state.selectedNode);
   const selectedAction = useStore((state) => state.selectedAction);
   const selectedActions = useStore((state) => state.selectedActions);
-   const setZapTrigger = useStore((state) => state.setZapTrigger);
-  const params = useParams()
-  const router = useRouter()
+  const setZapTrigger = useStore((state) => state.setZapTrigger);
+  const params = useParams();
+  const router = useRouter();
   let trigger: SelectedAction | Action | null = null;
-  
-  
-  if(selectedActions.length){
-  
-    trigger = selectedActions.find((action: SelectedAction) => action.sortingOrder === "1") || null;
-  }
-  if(params.id){
-    trigger = actions.find((action: Action) => action.sortingOrder === 0) || trigger;
-  }
-  
 
-  
+  if (selectedActions.length) {
+    trigger =
+      selectedActions.find(
+        (action: SelectedAction) => action.sortingOrder === "1"
+      ) || null;
+  }
+  if (params.id) {
+    trigger =
+      actions.find((action: Action) => action.sortingOrder === 0) || trigger;
+  }
+
   useEffect(() => {
-    let filteredNodes: CustomNode[]
-      if(actions.length){
-       filteredNodes = generateInitialNodes(actions.length).filter((n) => n.id !== "dummy");
-        
-      }else{
+    let filteredNodes: CustomNode[];
+    if (actions.length) {
+      filteredNodes = generateInitialNodes(actions.length).filter(
+        (n) => n.id !== "dummy"
+      );
+    } else {
+      filteredNodes = nodes.filter((n) => n.id !== "dummy");
+    }
 
-        filteredNodes = nodes.filter((n) => n.id !== "dummy");  
-      }
-      
-
-    const updatedNodes = filteredNodes.map((node) => {
-      
+    const updatedNodes = filteredNodes.map((node, index) => {
       let label: string | JSX.Element;
-      
-      if(actions.length && params.id && actions.some(val => val.sortingOrder  === +node.id)){
-        const curNode = actions.find(val => val.sortingOrder  === +node.id)
-        
-       const match = AvailableActions.find(available =>
-            curNode?.actionId === available.id)
-            
 
-           label = (
+      if (
+        actions.length &&
+        params.id &&
+        actions.some((val) => val.sortingOrder === +node.id)
+      ) {
+        const curNode = actions.find((val) => val.sortingOrder === +node.id);
+
+        const match = AvailableActions.find(
+          (available) => curNode?.actionId === available.id
+        );
+
+        label = (
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             <div
               style={{
                 fontSize: "8px",
                 padding: "2px 6px",
-                backgroundColor:  `${match?.id === "action" ? "#eee" : "#ffffff"}` ,
+                backgroundColor: `${
+                  match?.id === "action" ? "#eee" : "#ffffff"
+                }`,
                 borderRadius: "4px",
                 fontWeight: "bold",
                 display: "flex",
@@ -155,18 +150,22 @@ export default function ActionsList() {
                 border: "1px solid #cccccc",
               }}
             >
-              {match && (
-                match.id === "action" ? <div className="flex bg-[#eee] gap-1" >{icon} {node.id === "1" ? "Trigger" : "Action"}</div> :
-                <>
-                  <Image
-                    height={12}
-                    width={12}
-                    src={match.image}
-                    alt={match.name}
-                  />
-                  <span className="font-bold">{match.name}</span>
-                </>
-              )}
+              {match &&
+                (match.id === "action" ? (
+                  <div className="flex bg-[#eee] gap-1">
+                    {icon} {node.id === "1" ? "Trigger" : "Action"}
+                  </div>
+                ) : (
+                  <>
+                    <Image
+                      height={12}
+                      width={12}
+                      src={match.image}
+                      alt={match.name}
+                    />
+                    <span className="font-bold">{match.name}</span>
+                  </>
+                ))}
             </div>
             <div
               style={{
@@ -178,17 +177,22 @@ export default function ActionsList() {
             >
               {node.id}. Select the event that starts your zap
             </div>
-          </div>)
+          </div>
+        );
 
-
-            return {
-              ...node,
-                data: { label },
-            }
-                    
+        return {
+          ...node,
+          data: { label },
+        };
       }
 
-      if (selectedNode && node.id === selectedNode.id) {
+      if (
+        selectedNode &&
+        Number(index + 1) ===
+          Number(
+            filteredNodes.findIndex((val) => val.id === selectedNode.id) + 1
+          )
+      ) {
         label = (
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             <div
@@ -205,16 +209,17 @@ export default function ActionsList() {
                 border: "1px solid #cccccc",
               }}
             >
-             {selectedAction &&
-              <>
-             <Image
-                height={12}
-                width={12}
-                src={selectedAction.image}
-                alt={selectedAction.name}
-                />
-              <span className="font-bold">{selectedAction.name}</span>
-                </> }
+              {selectedAction && (
+                <>
+                  <Image
+                    height={12}
+                    width={12}
+                    src={selectedAction.image}
+                    alt={selectedAction.name}
+                  />
+                  <span className="font-bold">{selectedAction.name}</span>
+                </>
+              )}
             </div>
             <div
               style={{
@@ -224,7 +229,7 @@ export default function ActionsList() {
                 fontWeight: "bold",
               }}
             >
-              {selectedNode.id}. Select the event that starts your zap
+              {index + 1}. Select the event that starts your zap
             </div>
           </div>
         );
@@ -236,6 +241,7 @@ export default function ActionsList() {
         data: { label },
       };
     });
+
     const updatedEdges = [];
 
     for (let i = 0; i < updatedNodes.length - 1; i++) {
@@ -252,42 +258,57 @@ export default function ActionsList() {
     setEdges(updatedEdges);
 
     if (selectedAction && selectedNode) {
-        
-      setSelectedActions({ name: selectedAction.name, sortingOrder: selectedNode.id,metadata: {},availableActionId:selectedAction.id });
+      setSelectedActions({
+        name: selectedAction.name,
+        sortingOrder: String(
+          filteredNodes.findIndex((val) => val.id === selectedNode.id) + 1
+        ),
+        metadata: {},
+        availableActionId: selectedAction.id,
+      });
     }
-    
-    
-    if(trigger && selectedActions.length){
 
+    if (trigger && selectedActions.length) {
       setZapTrigger(trigger);
     }
 
     async function getVal() {
-      
-      if(selectedActions.length){
-        
-        const newActions = filteredNodes.map((node) => {
-        const matchedAction = selectedActions.find((val) => val.sortingOrder === node.id);
-        if (matchedAction) {
-          return { ...matchedAction };
-        }else{
-          return {name: "Action", availableActionId: "action", metadata: {}, sortingOrder: node.id}
-        }
-        
-      })
-            const val = await handleZapCreate(trigger, newActions, params.id);
-            
-            if (val) {
-              router.push(val);
-            }
+      if (selectedActions.length) {
+        const newActions = filteredNodes.map((node, index) => {
+          const matchedAction = selectedActions.find(
+            (val) => Number(val.sortingOrder) === Number(index)
+          );
+          if (matchedAction) {
+            return { ...matchedAction };
+          } else {
+            return {
+              name: "Action",
+              availableActionId: "action",
+              metadata: {},
+              sortingOrder: node.id,
+            };
           }
-        
+        });
+
+        const val = await handleZapCreate(trigger, newActions, params.id);
+
+        if (val) {
+          router.push(val);
+        }
       }
-      getVal();
-      setSelectedNode(null);
+    }
+    getVal();
+    setSelectedNode(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedAction, setSelectedActions, setSelectedNode, trigger, actions, AvailableActions, selectedActions]);
-  
+  }, [
+    selectedAction,
+    setSelectedActions,
+    setSelectedNode,
+    trigger,
+    actions,
+    AvailableActions,
+    selectedActions,
+  ]);
 
   useAddNode({ nodes, edges, setNodes, setEdges });
 
@@ -323,20 +344,18 @@ export default function ActionsList() {
         .select("*")
         .eq("zapId", params.id); //
 
-      
       if (error) setError(error.message);
       else setActions(data);
     };
+
     const fetchAvailableActions = async () => {
       const supabase = createClientComponentClient();
       const { data, error } = await supabase
         .from("AvailableActions")
         .select("*"); //
-      
+
       if (error) setError(error.message);
       else setAvailableActions(data);
-      
-      
     };
 
     fetchAvailableActions();
@@ -405,8 +424,7 @@ export default function ActionsList() {
           AvailableActions={AvailableActions}
         ></ZapModal>
       )}
-   {selectedNode && <Sidebar></Sidebar>}
-       
+      {selectedNode && <Sidebar></Sidebar>}
     </div>
   );
 }

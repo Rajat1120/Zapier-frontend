@@ -4,14 +4,12 @@ import useStore from "../store";
 import type { Node as FlowNode } from "@xyflow/react";
 import Image from "next/image";
 
-
 type Props = {
   actions: Action[];
   selectedNode: FlowNode | null;
   setSelectedNode: (node: FlowNode | null) => void;
   AvailableActions: AvailableActions[];
 };
-
 
 const builtInTools = [
   {
@@ -58,9 +56,9 @@ export default function ZapModal({
 }: Props) {
   const modalRef = useRef<HTMLDivElement>(null);
   const setSelectedAction = useStore((state) => state.setSelectedAction);
-  
+
   const setSelectedNode = useStore((state) => state.setSelectedNode);
-  
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -74,10 +72,9 @@ export default function ZapModal({
     window.addEventListener("mousedown", handleClickOutside);
     return () => {
       window.removeEventListener("mousedown", handleClickOutside);
-     
     };
   }, [setSelectedNode]);
-  
+
   if (!selectedNode) return null;
   return (
     <div
