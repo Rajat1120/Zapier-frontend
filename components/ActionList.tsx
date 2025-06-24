@@ -1,6 +1,6 @@
 "use client";
 
-import { JSX, useCallback, useEffect, useState } from "react";
+import { JSX, useCallback, useEffect, useState, useRef } from "react";
 
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
@@ -15,6 +15,8 @@ import {
   NodeChange,
   EdgeChange,
   ReactFlow,
+  useReactFlow,
+  ReactFlowProvider,
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
@@ -276,7 +278,7 @@ export default function ActionsList() {
       if (selectedActions.length) {
         const newActions = filteredNodes.map((node, index) => {
           const matchedAction = selectedActions.find(
-            (val) => Number(val.sortingOrder) === Number(index)
+            (val) => Number(val.sortingOrder) === Number(index + 1)
           );
           if (matchedAction) {
             return { ...matchedAction };
@@ -390,41 +392,82 @@ export default function ActionsList() {
     []
   );
 
-  return (
-    <div className="h-full w-full">
-      <div className="h-12  w-full border-b-[0.5px] border-b-black flex items-center justify-end  px-4">
-        <button className="bg-[#695be8] text-white font-bold px-2 py-1 rounded cursor-pointer">
-          {params.id ? "Edit zap" : "Publish"}
-        </button>
-      </div>
-      <Authentication></Authentication>
-      <div style={{ height: "100%", width: "100%" }}>
-        <ReactFlow
-          nodes={nodes}
-          onNodesChange={onNodesChange}
-          edges={edges}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          nodesDraggable={false}
-          edgeTypes={edgeTypes}
-          fitView
-          onNodeClick={(_, node) => setSelectedNode(node)}
-        >
-          <Background />
-          <Controls />
-        </ReactFlow>
-      </div>
+  const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
-      {error && <p>Error: {error}</p>}
-      {selectedNode && (
-        <ZapModal
-          actions={actions}
-          selectedNode={selectedNode}
-          setSelectedNode={setSelectedNode}
-          AvailableActions={AvailableActions}
-        ></ZapModal>
-      )}
-      {selectedNode && <Sidebar></Sidebar>}
-    </div>
+  return (
+    <ReactFlowProvider>
+      <div className="h-full w-full">
+        <div className="h-12  w-full border-b-[0.5px] border-b-black flex items-center justify-end  px-4">
+          <button className="bg-[#695be8] text-white font-bold px-2 py-1 rounded cursor-pointer">
+            {params.id ? "Edit zap" : "Publish"}
+          </button>
+        </div>
+        <Authentication></Authentication>
+        <div ref={reactFlowWrapper} style={{ height: "100%", width: "100%" }}>
+          <ReactFlow
+            nodes={nodes}
+            onNodesChange={onNodesChange}
+            edges={edges}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            nodesDraggable={false}
+            edgeTypes={edgeTypes}
+            fitView
+            onNodeClick={(_, node) => setSelectedNode(node)}
+            zoomOnScroll={false}
+          >
+            {(() => {
+              const PanWrapper = () => {
+                const { setViewport, getViewport } = useReactFlow();
+
+                useEffect(() => {
+                  const handleWheel = (event: WheelEvent) => {
+                    if (event.ctrlKey) return;
+                    event.preventDefault();
+
+                    const { x, y, zoom } = getViewport();
+                    setViewport({
+                      x: x - event.deltaX,
+                      y: y - event.deltaY,
+                      zoom,
+                    });
+                  };
+
+                  const wrapper = reactFlowWrapper.current;
+                  if (wrapper) {
+                    wrapper.addEventListener("wheel", handleWheel, {
+                      passive: false,
+                    });
+                  }
+
+                  return () => {
+                    if (wrapper) {
+                      wrapper.removeEventListener("wheel", handleWheel);
+                    }
+                  };
+                }, [getViewport, setViewport]);
+
+                return null;
+              };
+
+              return <PanWrapper />;
+            })()}
+            <Background />
+            <Controls />
+          </ReactFlow>
+        </div>
+
+        {error && <p>Error: {error}</p>}
+        {selectedNode && (
+          <ZapModal
+            actions={actions}
+            selectedNode={selectedNode}
+            setSelectedNode={setSelectedNode}
+            AvailableActions={AvailableActions}
+          ></ZapModal>
+        )}
+        {selectedNode && <Sidebar></Sidebar>}
+      </div>
+    </ReactFlowProvider>
   );
 }

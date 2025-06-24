@@ -1,8 +1,14 @@
 import { useEffect } from "react";
 import { addTrailingPlusNode } from "./utils";
-import { Action, AvailableActions, CustomNode, StrictEdge } from "../../components/ActionList";
+import {
+  Action,
+  AvailableActions,
+  CustomNode,
+  StrictEdge,
+} from "../../components/ActionList";
 import useStore from "../../store";
 import Image from "next/image";
+import { icon } from "./reactFlow";
 
 type UseAddNodeParams = {
   nodes: CustomNode[];
@@ -19,8 +25,8 @@ export const handleAddNode = (
   setNodes: React.Dispatch<React.SetStateAction<CustomNode[]>>,
   setEdges: React.Dispatch<React.SetStateAction<StrictEdge[]>>,
   selectedActions: { sortingOrder: string | number; name: string }[],
-   actions: Action[],
-        AvailableActions: AvailableActions[]
+  actions: Action[],
+  AvailableActions: AvailableActions[]
 ) => {
   const { edgeId } = event?.detail;
   const edgeToSplit = edges?.find((e) => e.id === edgeId);
@@ -61,58 +67,67 @@ export const handleAddNode = (
       (val) => Number(val.sortingOrder) === Number(node.id)
     );
 
-    if(actions.length && actions.some(val => val.sortingOrder + 1 === +node.id)){
+    if (
+      actions.length &&
+      actions.some((val) => val.sortingOrder === +node.id)
+    ) {
+      const curNode = actions.find((val) => val.sortingOrder === +node.id);
 
-       const match = AvailableActions.find(available =>
-            actions.some(action => action.actionId === available.id))
+      const match = AvailableActions.find(
+        (available) => curNode?.actionId === available.id
+      );
 
+      const label = (
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div
+            style={{
+              fontSize: "8px",
+              padding: "2px 6px",
+              backgroundColor: `${match?.id === "action" ? "#eee" : "#ffffff"}`,
+              borderRadius: "4px",
+              fontWeight: "bold",
+              display: "flex",
+              justifyItems: "start",
+              gap: "4px",
+              width: "fit-content",
+              border: "1px solid #cccccc",
+            }}
+          >
+            {match &&
+              (match.id === "action" ? (
+                <div className="flex bg-[#eee] gap-1">
+                  {icon} {node.id === "1" ? "Trigger" : "Action"}
+                </div>
+              ) : (
+                <>
+                  <Image
+                    height={12}
+                    width={12}
+                    src={match.image}
+                    alt={match.name}
+                  />
+                  <span className="font-bold">{match.name}</span>
+                </>
+              ))}
+          </div>
+          <div
+            style={{
+              fontSize: "10px",
+              color: "#666666",
+              textAlign: "left",
+              fontWeight: "bold",
+            }}
+          >
+            {index + 1}. Select the event that starts your zap
+          </div>
+        </div>
+      );
 
-
-               const label = (
-                      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                        <div
-                          style={{
-                            fontSize: "8px",
-                            padding: "2px 6px",
-                            backgroundColor: "#ffffff",
-                            borderRadius: "4px",
-                            fontWeight: "bold",
-                            display: "flex",
-                            justifyItems: "start",
-                            gap: "4px",
-                            width: "fit-content",
-                            border: "1px solid #cccccc",
-                          }}
-                        >
-                          {match && (
-                            <>
-                              <Image
-                                height={12}
-                                width={12}
-                                src={match.image}
-                                alt={match.name}
-                              />
-                              <span className="font-bold">{match.name}</span>
-                            </>
-                          )}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "10px",
-                            color: "#666666",
-                            textAlign: "left",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          {node.id}. Select the event that starts your zap
-                        </div>
-                      </div>)
-            
-            
-                        return {
-                          ...node,
-                            data: { label },
-                        }
+      return {
+        ...node,
+        position: { x: 0, y: index * verticalGap },
+        data: { label },
+      };
     }
 
     //if already selected , only update the label
@@ -177,7 +192,7 @@ export const handleAddNode = (
   }
 
   addTrailingPlusNode(updatedNodes, updatedEdges);
-  
+
   setNodes(updatedNodes);
   setEdges(updatedEdges);
 };
@@ -191,20 +206,18 @@ export const useAddNode = ({
   const selectedActions = useStore((state) => state.selectedActions);
   const actions = useStore((state) => state.actions);
   const AvailableActions = useStore((state) => state.AvailableActions);
-  
+
   useEffect(() => {
     const listener = (event: Event) => {
-      
       handleAddNode(
         event as CustomEvent,
         edges,
         nodes,
         setNodes,
         setEdges,
-        selectedActions, 
+        selectedActions,
         actions,
         AvailableActions
-
       );
     };
 
@@ -213,7 +226,15 @@ export const useAddNode = ({
     return () => {
       window.removeEventListener("add-node", listener);
     };
-  }, [nodes, edges, setNodes, setEdges, selectedActions, AvailableActions, actions]);
+  }, [
+    nodes,
+    edges,
+    setNodes,
+    setEdges,
+    selectedActions,
+    AvailableActions,
+    actions,
+  ]);
 };
 
 function updateLabel(id: string, index: number) {

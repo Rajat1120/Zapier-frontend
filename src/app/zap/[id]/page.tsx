@@ -6,7 +6,6 @@ import ActionsList from "../../../../components/ActionList";
 import Image from "next/image";
 
 export default function ZapPage() {
-  
   const router = useRouter();
   return (
     <div className="h-full w-full flex">
@@ -24,10 +23,7 @@ export default function ZapPage() {
         />
       </div>
       <div className="h-full w-full">
-        <ActionsList
-          
-        ></ActionsList>
-        ;
+        <ActionsList></ActionsList>;
       </div>
     </div>
   );
