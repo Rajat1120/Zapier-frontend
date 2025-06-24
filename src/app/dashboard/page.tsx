@@ -11,7 +11,6 @@ import { DarkButton } from "../../../components/buttons/DarkButton";
 import { AppBar } from "../../../components/AppBar";
 import useStore from "../../../store";
 
-
 const zapIcon =
   "https://img.icons8.com/?size=100&id=VvT7gqRrJ4Bp&format=png&color=000000";
 
@@ -118,9 +117,9 @@ export default function DashBoard() {
             <DarkButton
               onClick={() => {
                 router.push("/zap/create");
-                setSelectedActions(null)
-                setZapTrigger(null)
-                setActions([])
+                setSelectedActions(null);
+                setZapTrigger(null);
+                setActions([]);
               }}
             >
               Create
@@ -142,7 +141,9 @@ export default function DashBoard() {
 
 function ZapTable({ zaps }: { zaps: Zap[] }) {
   const router = useRouter();
-  
+
+  const setSelectedActions = useStore((state) => state.setSelectedActions);
+
   return (
     <div className="overflow-hidden my-4 rounded-2xl border  max-w-screen-lg w-full">
       <table className="w-full text-left   border-black   border-collapse">
@@ -160,13 +161,15 @@ function ZapTable({ zaps }: { zaps: Zap[] }) {
               <td className="p-2">
                 <button
                   className="cursor-pointer"
-                  onClick={() => router.push(`/zap/${z.id}`)}
+                  onClick={() => {
+                    router.push(`/zap/${z.id}`);
+                    setSelectedActions(null);
+                  }}
                 >
                   zap name
                 </button>
               </td>
               <td className="p-2 flex items-center space-x-2">
-               
                 {z.actions.map((x, j) => (
                   <Image
                     key={j}

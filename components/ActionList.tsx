@@ -31,7 +31,7 @@ import { useAddNode } from "@/lib/CustomHook";
 import Image from "next/image";
 import Sidebar from "./SideBar";
 import handleZapCreate from "../utils/HelperFunctions";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 
 type NodeData = {
   label: string | JSX.Element; // Allow both string and JSX elements
@@ -275,7 +275,7 @@ export default function ActionsList() {
     }
 
     async function getVal() {
-      if (selectedActions.length) {
+      if (selectedActions.length && !params.id) {
         const newActions = filteredNodes.map((node, index) => {
           const matchedAction = selectedActions.find(
             (val) => Number(val.sortingOrder) === Number(index + 1)
@@ -292,7 +292,7 @@ export default function ActionsList() {
           }
         });
 
-        const val = await handleZapCreate(trigger, newActions, params.id);
+        const val = await handleZapCreate(trigger, newActions);
 
         if (val) {
           router.push(val);
@@ -392,8 +392,9 @@ export default function ActionsList() {
     []
   );
 
-  const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const pathName = usePathname();
 
+  const reactFlowWrapper = useRef<HTMLDivElement>(null);
   return (
     <ReactFlowProvider>
       <div className="h-full w-full">
@@ -466,9 +467,17 @@ export default function ActionsList() {
             AvailableActions={AvailableActions}
           ></ZapModal>
         )}
-        {selectedNode && !inActionTable(selectedNode.id, actions) && (
-          <Sidebar></Sidebar>
+        {pathName === "/zap/create" && selectedNode && (
+          <ZapModal
+            actions={actions}
+            selectedNode={selectedNode}
+            setSelectedNode={setSelectedNode}
+            AvailableActions={AvailableActions}
+          ></ZapModal>
         )}
+        {params.id &&
+          selectedNode &&
+          !inActionTable(selectedNode.id, actions) && <Sidebar></Sidebar>}
       </div>
     </ReactFlowProvider>
   );

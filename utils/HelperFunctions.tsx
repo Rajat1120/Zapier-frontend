@@ -4,7 +4,6 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import axios from "axios";
 import { useEffect } from "react";
 
-import { supabase } from "../utils/supabase";
 import { ParamValue } from "next/dist/server/request/params";
 import { Action, SelectedAction } from "../components/ActionList";
 
@@ -68,28 +67,8 @@ export const useLogin = (
 export default async function handleZapCreate(
   selectedTrigger: SelectedAction | Action | null,
 
-  selectedActions: unknown[],
-  zapId: ParamValue
+  selectedActions: unknown[]
 ) {
-  if (zapId) {
-    const { data, error } = await supabase
-      .from("Zap")
-      .select("id")
-      .eq("id", zapId)
-      .single();
-
-    if (error) {
-      if (error.code === "PGRST116") {
-        console.log("Zap not found");
-      } else {
-        console.error("Supabase error:", error.message);
-      }
-    } else {
-      console.log("Zap exists:", data);
-      return;
-    }
-  }
-
   if (!selectedActions.length) return;
 
   try {

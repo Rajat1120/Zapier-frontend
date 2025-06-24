@@ -81,8 +81,8 @@ export const handleAddNode = (
       });
 
     async function help() {
-      const res = await updateZap(params, newNodes);
-      console.log(res);
+      if (!params?.length) return;
+      await updateZap(params, newNodes);
     }
 
     help();
