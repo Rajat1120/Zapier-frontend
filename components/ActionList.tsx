@@ -458,7 +458,7 @@ export default function ActionsList() {
         </div>
 
         {error && <p>Error: {error}</p>}
-        {selectedNode && (
+        {selectedNode && inActionTable(selectedNode.id, actions) && (
           <ZapModal
             actions={actions}
             selectedNode={selectedNode}
@@ -466,8 +466,15 @@ export default function ActionsList() {
             AvailableActions={AvailableActions}
           ></ZapModal>
         )}
-        {selectedNode && <Sidebar></Sidebar>}
+        {selectedNode && !inActionTable(selectedNode.id, actions) && (
+          <Sidebar></Sidebar>
+        )}
       </div>
     </ReactFlowProvider>
   );
+}
+
+function inActionTable(id: string, actions: Action[]) {
+  const node = actions.find((val: Action) => val.sortingOrder === Number(id));
+  return Boolean(node?.actionId === "action");
 }

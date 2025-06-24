@@ -160,27 +160,31 @@ export default function ZapModal({
                 Your top apps
               </h4>
               <div>
-                {AvailableActions.map((action) => (
-                  <div
-                    key={action.id}
-                    className="flex items-center gap-2 min-w-[200px] py-2 px-2 font-bold cursor-pointer hover:bg-[#f7f6fd]"
-                    onClick={() => {
-                      setSelectedAction(action);
-                    }}
-                  >
-                    <Image
-                      src={action.image}
-                      width={20}
-                      height={20}
-                      alt=""
-                      style={{
-                        display: "block",
-                        objectFit: "contain",
+                {AvailableActions.map((action) => {
+                  if (action.name === "Action") return null;
+
+                  return (
+                    <div
+                      key={action.id}
+                      className="flex items-center gap-2 min-w-[200px] py-2 px-2 font-bold cursor-pointer hover:bg-[#f7f6fd]"
+                      onClick={() => {
+                        setSelectedAction(action);
                       }}
-                    />
-                    <span className="leading-none">{action.name}</span>
-                  </div>
-                ))}
+                    >
+                      <Image
+                        src={action.image}
+                        width={20}
+                        height={20}
+                        alt=""
+                        style={{
+                          display: "block",
+                          objectFit: "contain",
+                        }}
+                      />
+                      <span className="leading-none">{action.name}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
             <div
