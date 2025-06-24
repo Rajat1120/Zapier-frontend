@@ -9,6 +9,9 @@ import {
 import useStore from "../../store";
 import Image from "next/image";
 import { icon } from "./reactFlow";
+import { useParams } from "next/navigation";
+import { ParamValue } from "next/dist/server/request/params";
+import { updateZap } from "../../utils/HelperFunctions";
 
 type UseAddNodeParams = {
   nodes: CustomNode[];
@@ -26,7 +29,8 @@ export const handleAddNode = (
   setEdges: React.Dispatch<React.SetStateAction<StrictEdge[]>>,
   selectedActions: { sortingOrder: string | number; name: string }[],
   actions: Action[],
-  AvailableActions: AvailableActions[]
+  AvailableActions: AvailableActions[],
+  params: ParamValue
 ) => {
   const { edgeId } = event?.detail;
   const edgeToSplit = edges?.find((e) => e.id === edgeId);
@@ -62,6 +66,28 @@ export const handleAddNode = (
   newNodeList.splice(insertIndex, 0, newNode);
 
   const verticalGap = 100;
+  if (newNodeList.length > actions.length) {
+    const newNodes = newNodeList
+      .filter(
+        (val) =>
+          !actions.some((action) => action.sortingOrder === Number(val.id))
+      )
+      .map((node) => {
+        return {
+          metadata: {},
+          actionId: "action",
+          sortingOrder: Number(node.id),
+        };
+      });
+
+    async function help() {
+      const res = await updateZap(params, newNodes);
+      console.log(res);
+    }
+
+    help();
+  }
+
   const updatedNodes = newNodeList.map((node, index) => {
     const isSelected = selectedActions.find(
       (val) => Number(val.sortingOrder) === Number(node.id)
@@ -206,7 +232,7 @@ export const useAddNode = ({
   const selectedActions = useStore((state) => state.selectedActions);
   const actions = useStore((state) => state.actions);
   const AvailableActions = useStore((state) => state.AvailableActions);
-
+  const params = useParams();
   useEffect(() => {
     const listener = (event: Event) => {
       handleAddNode(
@@ -217,7 +243,8 @@ export const useAddNode = ({
         setEdges,
         selectedActions,
         actions,
-        AvailableActions
+        AvailableActions,
+        params.id
       );
     };
 
@@ -234,6 +261,7 @@ export const useAddNode = ({
     selectedActions,
     AvailableActions,
     actions,
+    params.id,
   ]);
 };
 

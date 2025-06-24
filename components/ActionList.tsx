@@ -397,8 +397,8 @@ export default function ActionsList() {
   return (
     <ReactFlowProvider>
       <div className="h-full w-full">
-        <div className="h-12  w-full border-b-[0.5px] border-b-black flex items-center justify-end  px-4">
-          <button className="bg-[#695be8] text-white font-bold px-2 py-1 rounded cursor-pointer">
+        <div className="h-12 fixed top-0 z-10 w-full border-b-[0.5px] py-2 px-12 bg-[#fdf7f2] border-b-black flex items-center justify-end  ">
+          <button className="bg-[#695be8] text-white font-bold px-2 py-1  rounded cursor-pointer">
             {params.id ? "Edit zap" : "Publish"}
           </button>
         </div>

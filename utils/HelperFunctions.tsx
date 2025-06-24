@@ -4,10 +4,9 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import axios from "axios";
 import { useEffect } from "react";
 
-import {supabase} from "../utils/supabase"
+import { supabase } from "../utils/supabase";
 import { ParamValue } from "next/dist/server/request/params";
 import { Action, SelectedAction } from "../components/ActionList";
-
 
 export async function handleLogin(
   email: string,
@@ -66,42 +65,41 @@ export const useLogin = (
   }, [router, email, password]);
 };
 
+export default async function handleZapCreate(
+  selectedTrigger: SelectedAction | Action | null,
 
-export default async function handleZapCreate (selectedTrigger: SelectedAction | Action | null
-
-,selectedActions: unknown[], zapId: ParamValue){
-
- 
-
-    if(zapId){
-      
-      const { data, error } = await supabase
+  selectedActions: unknown[],
+  zapId: ParamValue
+) {
+  if (zapId) {
+    const { data, error } = await supabase
       .from("Zap")
       .select("id")
       .eq("id", zapId)
       .single();
-      
-      if (error) {
-        if (error.code === "PGRST116") {
-          console.log("Zap not found");
-        } else {
-          console.error("Supabase error:", error.message);
-        }
+
+    if (error) {
+      if (error.code === "PGRST116") {
+        console.log("Zap not found");
       } else {
-        console.log("Zap exists:", data);
-        return
+        console.error("Supabase error:", error.message);
       }
+    } else {
+      console.log("Zap exists:", data);
+      return;
     }
-    
-    
-  if(!selectedActions.length) return
+  }
+
+  if (!selectedActions.length) return;
 
   try {
-    
     // Type guard to check for availableActionId
     const getAvailableTriggerId = (trigger: SelectedAction | Action | null) => {
-      if(!trigger) return
-      if ("availableActionId" in trigger && trigger.availableActionId !== undefined) {
+      if (!trigger) return;
+      if (
+        "availableActionId" in trigger &&
+        trigger.availableActionId !== undefined
+      ) {
         return String(trigger.availableActionId);
       }
       if ("actionId" in trigger && trigger.actionId !== undefined) {
@@ -116,29 +114,60 @@ export default async function handleZapCreate (selectedTrigger: SelectedAction |
         availableTriggerId: getAvailableTriggerId(selectedTrigger),
         triggerMetadata: {},
         actions: selectedActions.map((a) => {
-          const action = a as { availableActionId: string | number; metadata: unknown , sortingOrder: string,name: string };
+          const action = a as {
+            availableActionId: string | number;
+            metadata: unknown;
+            sortingOrder: string;
+            name: string;
+          };
           return {
             availableActionId: action.availableActionId,
             actionMetadata: action.metadata,
-            
-            sortingOrder:action.sortingOrder
+
+            sortingOrder: action.sortingOrder,
           };
         }),
       }),
       {
         headers: {
           Authorization: localStorage.getItem("token"),
-           'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
       }
     );
-    
-    return res.data.zapId
-  
-  }catch(err){
-    throw err
+
+    return res.data.zapId;
+  } catch (err) {
+    throw err;
   }
 }
 
+export async function updateZap(id: ParamValue, selectedActions: unknown[]) {
+  try {
+    const res = await axios.post(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/zap/${id}`,
+      JSON.stringify({
+        zapId: id,
+        actions: selectedActions.map((a) => {
+          const action = a as {
+            metadata: JSON;
+            actionId: string;
 
+            sortingOrder: number;
+          };
+          return action;
+        }),
+      }),
+      {
+        headers: {
+          Authorization: localStorage.getItem("token"),
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
+    return res;
+  } catch (err) {
+    throw err;
+  }
+}

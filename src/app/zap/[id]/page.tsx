@@ -23,7 +23,7 @@ export default function ZapPage() {
         />
       </div>
       <div className="h-full w-full">
-        <ActionsList></ActionsList>;
+        <ActionsList></ActionsList>
       </div>
     </div>
   );
