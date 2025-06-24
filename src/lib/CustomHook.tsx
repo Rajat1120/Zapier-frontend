@@ -5,7 +5,8 @@ import {
   AvailableActions,
   CustomNode,
   StrictEdge,
-} from "../../components/ActionList";
+  UpdatedAction,
+} from "../../src/lib/type";
 import useStore from "../../store";
 import Image from "next/image";
 import { icon } from "./reactFlow";
@@ -66,19 +67,9 @@ export const handleAddNode = (
   newNodeList.splice(insertIndex, 0, newNode);
 
   const verticalGap = 100;
+  let newNodes: UpdatedAction[];
   if (newNodeList.length > actions.length) {
-    const newNodes = newNodeList
-      .filter(
-        (val) =>
-          !actions.some((action) => action.sortingOrder === Number(val.id))
-      )
-      .map((node) => {
-        return {
-          metadata: {},
-          actionId: "action",
-          sortingOrder: Number(node.id),
-        };
-      });
+    newNodes = updateActionsAfterInsert(actions, newNodeList);
 
     async function help() {
       if (!params?.length) return;
@@ -97,7 +88,7 @@ export const handleAddNode = (
       actions.length &&
       actions.some((val) => val.sortingOrder === +node.id)
     ) {
-      const curNode = actions.find((val) => val.sortingOrder === +node.id);
+      const curNode = newNodes.find((val) => val.sortingOrder === +node.id);
 
       const match = AvailableActions.find(
         (available) => curNode?.actionId === available.id
@@ -360,4 +351,51 @@ function updateLabel(id: string, index: number) {
   }
 
   return label;
+}
+
+function updateActionsAfterInsert(
+  actions: Action[],
+  newNodeList: CustomNode[]
+) {
+  const maxOldId = actions.length; // assuming old IDs were 1-based and sequential
+  let insertedIndex = -1;
+  let newItem = null;
+
+  // Step 1: Find the index and item of the newly inserted node
+  for (let i = 0; i < newNodeList.length; i++) {
+    if (+newNodeList[i].id > maxOldId) {
+      insertedIndex = i;
+      newItem = newNodeList[i];
+      break;
+    }
+  }
+
+  if (insertedIndex === -1 || !newItem) {
+    console.log("No new item found");
+    return actions;
+  }
+
+  // Step 2: Update existing actions' indexes
+
+  const updatedActions = actions.map((action) => {
+    return {
+      actionId: action.actionId,
+      metadata: action.metadata,
+      sortingOrder: action.sortingOrder,
+      index: action.index >= insertedIndex ? action.index + 1 : action.index,
+    };
+  });
+
+  // Step 3: Add the new item as an action at the correct position
+  const newAction = {
+    actionId: "action",
+    metadata: JSON.parse("{}"),
+    sortingOrder: +newItem.id,
+    index: insertedIndex,
+  };
+
+  // Step 4: Insert at correct position
+  updatedActions.splice(insertedIndex, 0, newAction);
+
+  return updatedActions;
 }

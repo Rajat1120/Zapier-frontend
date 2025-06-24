@@ -5,7 +5,7 @@ import axios from "axios";
 import { useEffect } from "react";
 
 import { ParamValue } from "next/dist/server/request/params";
-import { Action, SelectedAction } from "../components/ActionList";
+import { Action, SelectedAction } from "@/lib/type";
 
 export async function handleLogin(
   email: string,
@@ -98,10 +98,12 @@ export default async function handleZapCreate(
             metadata: unknown;
             sortingOrder: string;
             name: string;
+            index: number;
           };
           return {
             availableActionId: action.availableActionId,
             actionMetadata: action.metadata,
+            index: action.index,
 
             sortingOrder: action.sortingOrder,
           };
@@ -131,7 +133,7 @@ export async function updateZap(id: ParamValue, selectedActions: unknown[]) {
           const action = a as {
             metadata: JSON;
             actionId: string;
-
+            index: number;
             sortingOrder: number;
           };
           return action;

@@ -32,46 +32,7 @@ import Image from "next/image";
 import Sidebar from "./SideBar";
 import handleZapCreate from "../utils/HelperFunctions";
 import { useParams, usePathname, useRouter } from "next/navigation";
-
-type NodeData = {
-  label: string | JSX.Element; // Allow both string and JSX elements
-};
-
-export type CustomNode = {
-  id: string;
-  position: { x: number; y: number };
-  data: NodeData;
-  connectable: boolean;
-  style: { width: number; height: number };
-};
-
-export type SelectedAction = {
-  name: string;
-  sortingOrder: string;
-  metadata: unknown;
-  availableActionId: string;
-};
-
-export type StrictEdge = {
-  id: string;
-  source: string;
-  target: string;
-  type: string; // not optional
-};
-
-export type Action = {
-  id: string;
-  zapId: string;
-  actionId: string;
-  metadata: JSON;
-  sortingOrder: number;
-};
-
-export type AvailableActions = {
-  id: string;
-  name: string;
-  image: string;
-};
+import { Action, CustomNode, SelectedAction, StrictEdge } from "@/lib/type";
 
 const initialEdges = [{ id: "e1-2", source: "1", target: "2", type: "custom" }];
 
@@ -128,7 +89,7 @@ export default function ActionsList() {
         params.id &&
         actions.some((val) => val.sortingOrder === +node.id)
       ) {
-        const curNode = actions.find((val) => val.sortingOrder === +node.id);
+        const curNode = actions.find((val) => val.index === index);
 
         const match = AvailableActions.find(
           (available) => curNode?.actionId === available.id
@@ -281,13 +242,14 @@ export default function ActionsList() {
             (val) => Number(val.sortingOrder) === Number(index + 1)
           );
           if (matchedAction) {
-            return { ...matchedAction };
+            return { ...matchedAction, sortingOrder: node.id, index };
           } else {
             return {
               name: "Action",
               availableActionId: "action",
               metadata: {},
               sortingOrder: node.id,
+              index,
             };
           }
         });
