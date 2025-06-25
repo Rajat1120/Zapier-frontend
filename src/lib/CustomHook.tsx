@@ -4,6 +4,7 @@ import {
   Action,
   AvailableActions,
   CustomNode,
+  SelectedAction,
   StrictEdge,
   UpdatedAction,
 } from "../../src/lib/type";
@@ -13,6 +14,7 @@ import { icon } from "./reactFlow";
 import { useParams } from "next/navigation";
 import { ParamValue } from "next/dist/server/request/params";
 import { updateZap } from "../../utils/HelperFunctions";
+import { JSX } from "react";
 
 type UseAddNodeParams = {
   nodes: CustomNode[];
@@ -28,10 +30,12 @@ export const handleAddNode = (
 
   setNodes: React.Dispatch<React.SetStateAction<CustomNode[]>>,
   setEdges: React.Dispatch<React.SetStateAction<StrictEdge[]>>,
-  selectedActions: { sortingOrder: string | number; name: string }[],
+  selectedActions: SelectedAction[],
   actions: Action[],
   AvailableActions: AvailableActions[],
-  params: ParamValue
+  params: ParamValue,
+  selectedAction: SelectedAction,
+  filterNodes: CustomNode[]
 ) => {
   const { edgeId } = event?.detail;
   const edgeToSplit = edges?.find((e) => e.id === edgeId);
@@ -67,6 +71,7 @@ export const handleAddNode = (
   newNodeList.splice(insertIndex, 0, newNode);
 
   const verticalGap = 100;
+
   let newNodes: UpdatedAction[];
   if (newNodeList.length > actions.length) {
     newNodes = updateActionsAfterInsert(actions, newNodeList);
@@ -79,22 +84,98 @@ export const handleAddNode = (
     help();
   }
 
-  const updatedNodes = newNodeList.map((node, index) => {
-    const isSelected = selectedActions.find(
-      (val) => Number(val.sortingOrder) === Number(node.id)
-    );
+  let trigger: SelectedAction | Action | null = null;
+
+  if (selectedActions.length) {
+    trigger =
+      selectedActions.find((action: SelectedAction) => action.index === 0) ||
+      null;
+  }
+
+  if (params) {
+    trigger = actions.find((action: Action) => action.index === 0) || trigger;
+  }
+
+  const updatedNodes = filterNodes.map((node, index) => {
+    let label: string | JSX.Element;
+
+    if (trigger && trigger.index === index) {
+      const inSelectedAction = selectedActions?.some(
+        (val) => val.index === trigger.index
+      );
+      const triggerFromSelectedAction = selectedActions?.find(
+        (val) => val.index === trigger.index
+      );
+      let match;
+      if (inSelectedAction) {
+        match = AvailableActions.find(
+          (available) =>
+            triggerFromSelectedAction?.availableActionId === available.id
+        );
+      }
+      label = (
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div
+            style={{
+              fontSize: "8px",
+              padding: "2px 6px",
+              backgroundColor: `${match ? "#ffffff" : "#eee"}`,
+              borderRadius: "4px",
+              fontWeight: "bold",
+              display: "flex",
+              justifyItems: "start",
+              gap: "4px",
+              width: "fit-content",
+              border: "1px solid #cccccc",
+            }}
+          >
+            {match ? (
+              <>
+                <Image
+                  height={12}
+                  width={12}
+                  src={match.image}
+                  alt={match.name}
+                />
+                <span className="font-bold">{match.name}</span>
+              </>
+            ) : (
+              <>{icon} Trigger</>
+            )}
+          </div>
+          <div
+            style={{
+              fontSize: "10px",
+              color: "#666666",
+              textAlign: "left",
+              fontWeight: "bold",
+            }}
+          >
+            {trigger.index + 1}. Select the event that starts your zap
+          </div>
+        </div>
+      );
+
+      return {
+        ...node,
+        data: { label },
+        position: { x: 0, y: index * verticalGap },
+      };
+    }
 
     if (
       actions.length &&
-      actions.some((val) => val.sortingOrder === +node.id)
+      params &&
+      actions.some((val) => val.sortingOrder === +node.id) &&
+      !selectedActions.some((val) => val.index === index)
     ) {
-      const curNode = newNodes.find((val) => val.sortingOrder === +node.id);
+      const curNode = actions.find((val) => val.index === index);
 
       const match = AvailableActions.find(
         (available) => curNode?.actionId === available.id
       );
 
-      const label = (
+      label = (
         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
           <div
             style={{
@@ -113,7 +194,7 @@ export const handleAddNode = (
             {match &&
               (match.id === "action" ? (
                 <div className="flex bg-[#eee] gap-1">
-                  {icon} {node.id === "1" ? "Trigger" : "Action"}
+                  {icon} {index === 0 ? "Trigger" : "Action"}
                 </div>
               ) : (
                 <>
@@ -135,65 +216,74 @@ export const handleAddNode = (
               fontWeight: "bold",
             }}
           >
-            {index + 1}. Select the event that starts your zap
+            {node.id}. Select the event that runs your zap
           </div>
         </div>
       );
 
       return {
         ...node,
-        position: { x: 0, y: index * verticalGap },
         data: { label },
+        position: { x: 0, y: index * verticalGap },
       };
+    } else if (
+      selectedActions.length &&
+      selectedActions.some((val) => val.index === index)
+    ) {
+      const curSelectedAction = selectedActions.find(
+        (val) => val.index === index
+      );
+      const match = AvailableActions.find(
+        (available) => curSelectedAction?.availableActionId === available.id
+      );
+
+      label = (
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div
+            style={{
+              fontSize: "8px",
+              padding: "2px 6px",
+              backgroundColor: "#ffffff",
+              borderRadius: "4px",
+              fontWeight: "bold",
+              display: "flex",
+              justifyItems: "start",
+              gap: "4px",
+              width: "fit-content",
+              border: "1px solid #cccccc",
+            }}
+          >
+            {selectedAction && match && (
+              <>
+                <Image
+                  height={12}
+                  width={12}
+                  src={match.image}
+                  alt={match.name}
+                />
+                <span className="font-bold">{match.name}</span>
+              </>
+            )}
+          </div>
+          <div
+            style={{
+              fontSize: "10px",
+              color: "#666666",
+              textAlign: "left",
+              fontWeight: "bold",
+            }}
+          >
+            {index + 1}. Select the event that starts your zap
+          </div>
+        </div>
+      );
+    } else {
+      label = node.data.label;
     }
-
-    //if already selected , only update the label
-    if (isSelected) {
-      const originalLabel = node.data.label;
-
-      // Clone the two children only if originalLabel is a valid React element
-      if (
-        typeof originalLabel === "object" &&
-        originalLabel !== null &&
-        "props" in originalLabel &&
-        Array.isArray(originalLabel.props.children)
-      ) {
-        const [topDiv, bottomDiv] = originalLabel.props.children;
-
-        // Replace the number inside the second child
-        const newBottomDiv = {
-          ...bottomDiv,
-          props: {
-            ...bottomDiv.props,
-            children: [
-              `${index + 1}`,
-              ". Select the event that starts your zap",
-            ],
-          },
-        };
-
-        const newLabel = {
-          ...originalLabel,
-          props: {
-            ...originalLabel.props,
-            children: [topDiv, newBottomDiv],
-          },
-        };
-
-        return {
-          ...node,
-          position: { x: 0, y: index * verticalGap },
-          data: { ...node.data, label: newLabel },
-        };
-      }
-    }
-
-    const label = updateLabel(node.id, index);
-
     return {
       ...node,
-      position: { x: 0, y: index * verticalGap },
       data: { label },
+      position: { x: 0, y: index * verticalGap },
     };
   });
 
@@ -212,6 +302,8 @@ export const handleAddNode = (
 
   setNodes(updatedNodes);
   setEdges(updatedEdges);
+
+  return newNodeList;
 };
 
 export const useAddNode = ({
@@ -224,9 +316,12 @@ export const useAddNode = ({
   const actions = useStore((state) => state.actions);
   const AvailableActions = useStore((state) => state.AvailableActions);
   const params = useParams();
+  const selectedAction = useStore((state) => state.selectedAction);
+  const filterNodes = useStore((state) => state.filterNodes);
+  const setFilterNodes = useStore((state) => state.setFilterNodes);
   useEffect(() => {
     const listener = (event: Event) => {
-      handleAddNode(
+      const val = handleAddNode(
         event as CustomEvent,
         edges,
         nodes,
@@ -235,8 +330,13 @@ export const useAddNode = ({
         selectedActions,
         actions,
         AvailableActions,
-        params.id
+        params.id,
+        selectedAction,
+        filterNodes
       );
+      if (val) {
+        setFilterNodes(val);
+      }
     };
 
     window.addEventListener("add-node", listener);
@@ -253,105 +353,11 @@ export const useAddNode = ({
     AvailableActions,
     actions,
     params.id,
+    selectedAction,
+    filterNodes,
+    setFilterNodes,
   ]);
 };
-
-function updateLabel(id: string, index: number) {
-  let label;
-  if (id === "1") {
-    label = (
-      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-        <div
-          style={{
-            fontSize: "8px",
-            padding: "2px 6px",
-            backgroundColor: "#eee",
-            borderRadius: "4px",
-            fontWeight: "bold",
-            display: "flex",
-            justifyItems: "start",
-            gap: "4px",
-            width: "fit-content",
-            border: "1px solid black",
-          }}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            height="14"
-            width="14"
-            color="GrayWarm8"
-            name="miscBolt"
-          >
-            <path
-              fill="#2D2E2E"
-              d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm4.87-11L11 18v-5H7.13L13 6v5h3.87Z"
-            ></path>
-          </svg>
-          Trigger
-        </div>
-        <div
-          style={{
-            fontSize: "10px",
-            color: "#666666",
-            textAlign: "left",
-            fontWeight: "bold",
-          }}
-        >
-          1. Select the event that starts your zap
-        </div>
-      </div>
-    );
-  } else {
-    label = (
-      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-        <div
-          style={{
-            fontSize: "8px",
-            padding: "2px 6px",
-            backgroundColor: "#eee",
-            borderRadius: "4px",
-            fontWeight: "bold",
-            display: "flex",
-            justifyItems: "start",
-            gap: "4px",
-            width: "fit-content",
-            border: "1px solid black",
-          }}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            height="14"
-            width="14"
-            color="GrayWarm8"
-            name="miscBolt"
-          >
-            <path
-              fill="#2D2E2E"
-              d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm4.87-11L11 18v-5H7.13L13 6v5h3.87Z"
-            ></path>
-          </svg>
-          Action
-        </div>
-        <div
-          style={{
-            fontSize: "10px",
-            color: "#666666",
-            textAlign: "left",
-            fontWeight: "bold",
-          }}
-        >
-          {index + 1}. Select the event for your zap to run
-        </div>
-      </div>
-    );
-  }
-
-  return label;
-}
 
 function updateActionsAfterInsert(
   actions: Action[],

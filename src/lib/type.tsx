@@ -17,6 +17,7 @@ export type SelectedAction = {
   sortingOrder: string;
   metadata: unknown;
   availableActionId: string;
+  index: number;
 };
 
 export type UpdatedAction = {

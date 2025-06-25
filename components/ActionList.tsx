@@ -51,6 +51,8 @@ export default function ActionsList() {
   const setAvailableActions = useStore((state) => state.setAvailableActions);
   const setActions = useStore((state) => state.setActions);
   const actions = useStore((state) => state.actions);
+  const filterNodes = useStore((state) => state.filterNodes);
+  const setFilterNodes = useStore((state) => state.setFilterNodes);
   const AvailableActions = useStore((state) => state.AvailableActions);
   const selectedNode = useStore((state) => state.selectedNode);
   const selectedAction = useStore((state) => state.selectedAction);
@@ -62,32 +64,95 @@ export default function ActionsList() {
 
   if (selectedActions.length) {
     trigger =
-      selectedActions.find(
-        (action: SelectedAction) => action.sortingOrder === "1"
-      ) || null;
+      selectedActions.find((action: SelectedAction) => action.index === 0) ||
+      null;
   }
   if (params.id) {
-    trigger =
-      actions.find((action: Action) => action.sortingOrder === 0) || trigger;
+    trigger = actions.find((action: Action) => action.index === 0) || trigger;
   }
 
   useEffect(() => {
-    let filteredNodes: CustomNode[];
     if (actions.length) {
-      filteredNodes = generateInitialNodes(actions.length).filter(
-        (n) => n.id !== "dummy"
+      setFilterNodes(
+        generateInitialNodes(actions.length).filter((n) => n.id !== "dummy")
       );
     } else {
-      filteredNodes = nodes.filter((n) => n.id !== "dummy");
+      setFilterNodes(nodes.filter((n) => n.id !== "dummy"));
     }
+  }, [actions.length]);
 
-    const updatedNodes = filteredNodes.map((node, index) => {
+  useEffect(() => {
+    const updatedNodes = filterNodes.map((node, index) => {
       let label: string | JSX.Element;
+
+      if (trigger && trigger.index === index) {
+        const inSelectedAction = selectedActions?.some(
+          (val) => val.index === trigger.index
+        );
+        const triggerFromSelectedAction = selectedActions?.find(
+          (val) => val.index === trigger.index
+        );
+        let match;
+        if (inSelectedAction) {
+          match = AvailableActions.find(
+            (available) =>
+              triggerFromSelectedAction?.availableActionId === available.id
+          );
+        }
+        label = (
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+            <div
+              style={{
+                fontSize: "8px",
+                padding: "2px 6px",
+                backgroundColor: `${match ? "#ffffff" : "#eee"}`,
+                borderRadius: "4px",
+                fontWeight: "bold",
+                display: "flex",
+                justifyItems: "start",
+                gap: "4px",
+                width: "fit-content",
+                border: "1px solid #cccccc",
+              }}
+            >
+              {match ? (
+                <>
+                  <Image
+                    height={12}
+                    width={12}
+                    src={match.image}
+                    alt={match.name}
+                  />
+                  <span className="font-bold">{match.name}</span>
+                </>
+              ) : (
+                <>{icon} Trigger</>
+              )}
+            </div>
+            <div
+              style={{
+                fontSize: "10px",
+                color: "#666666",
+                textAlign: "left",
+                fontWeight: "bold",
+              }}
+            >
+              {trigger.index + 1}. Select the event that starts your zap
+            </div>
+          </div>
+        );
+
+        return {
+          ...node,
+          data: { label },
+        };
+      }
 
       if (
         actions.length &&
         params.id &&
-        actions.some((val) => val.sortingOrder === +node.id)
+        actions.some((val) => val.sortingOrder === +node.id) &&
+        !selectedActions.some((val) => val.index === index)
       ) {
         const curNode = actions.find((val) => val.index === index);
 
@@ -116,7 +181,7 @@ export default function ActionsList() {
               {match &&
                 (match.id === "action" ? (
                   <div className="flex bg-[#eee] gap-1">
-                    {icon} {node.id === "1" ? "Trigger" : "Action"}
+                    {icon} {index === 0 ? "Trigger" : "Action"}
                   </div>
                 ) : (
                   <>
@@ -138,7 +203,7 @@ export default function ActionsList() {
                 fontWeight: "bold",
               }}
             >
-              {node.id}. Select the event that starts your zap
+              {node.id}. Select the event that runs your zap
             </div>
           </div>
         );
@@ -147,15 +212,17 @@ export default function ActionsList() {
           ...node,
           data: { label },
         };
-      }
-
-      if (
-        selectedNode &&
-        Number(index + 1) ===
-          Number(
-            filteredNodes.findIndex((val) => val.id === selectedNode.id) + 1
-          )
+      } else if (
+        selectedActions.length &&
+        selectedActions.some((val) => val.index === index)
       ) {
+        const curSelectedAction = selectedActions.find(
+          (val) => val.index === index
+        );
+        const match = AvailableActions.find(
+          (available) => curSelectedAction?.availableActionId === available.id
+        );
+
         label = (
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             <div
@@ -172,15 +239,15 @@ export default function ActionsList() {
                 border: "1px solid #cccccc",
               }}
             >
-              {selectedAction && (
+              {selectedAction && match && (
                 <>
                   <Image
                     height={12}
                     width={12}
-                    src={selectedAction.image}
-                    alt={selectedAction.name}
+                    src={match.image}
+                    alt={match.name}
                   />
-                  <span className="font-bold">{selectedAction.name}</span>
+                  <span className="font-bold">{match.name}</span>
                 </>
               )}
             </div>
@@ -215,29 +282,31 @@ export default function ActionsList() {
         type: "custom",
       });
     }
-
-    addTrailingPlusNode(updatedNodes, updatedEdges);
-    setNodes(updatedNodes);
-    setEdges(updatedEdges);
+    if (updatedNodes.length && updatedEdges.length) {
+      addTrailingPlusNode(updatedNodes, updatedEdges);
+      setNodes(updatedNodes);
+      setEdges(updatedEdges);
+    }
 
     if (selectedAction && selectedNode) {
       setSelectedActions({
         name: selectedAction.name,
         sortingOrder: String(
-          filteredNodes.findIndex((val) => val.id === selectedNode.id) + 1
+          filterNodes.findIndex((val) => val.id === selectedNode.id) + 1
         ),
         metadata: {},
         availableActionId: selectedAction.id,
+        index: filterNodes.findIndex((val) => val.id === selectedNode.id),
       });
     }
 
-    if (trigger && selectedActions.length) {
+    if (trigger) {
       setZapTrigger(trigger);
     }
 
     async function getVal() {
       if (selectedActions.length && !params.id) {
-        const newActions = filteredNodes.map((node, index) => {
+        const newActions = filterNodes.map((node, index) => {
           const matchedAction = selectedActions.find(
             (val) => Number(val.sortingOrder) === Number(index + 1)
           );
@@ -272,6 +341,7 @@ export default function ActionsList() {
     actions,
     AvailableActions,
     selectedActions,
+    filterNodes.length,
   ]);
 
   useAddNode({ nodes, edges, setNodes, setEdges });

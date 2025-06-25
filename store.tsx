@@ -1,7 +1,12 @@
 import { create } from "zustand";
 
-import type {Action, AvailableActions, SelectedAction} from "./components/ActionList"
 import type { Node } from "@xyflow/react";
+import {
+  CustomNode,
+  Action,
+  AvailableActions,
+  SelectedAction,
+} from "@/lib/type";
 
 type StoreState = {
   email: string;
@@ -9,9 +14,10 @@ type StoreState = {
   selectedNode: Node | null;
   selectedAction: AvailableActions | null;
   selectedActions: SelectedAction[];
-  zapTrigger: SelectedAction |Action | null;
+  zapTrigger: SelectedAction | Action | null;
   actions: Action[];
   AvailableActions: AvailableActions[];
+  filterNodes: CustomNode[];
 
   setEmail: (email: string) => void;
   setPassword: (password: string) => void;
@@ -20,8 +26,9 @@ type StoreState = {
   reset: () => void;
   setSelectedNode: (node: Node | null) => void;
   setSelectedAction: (action: AvailableActions) => void;
-  setZapTrigger: (action: SelectedAction |Action | null ) => void;
+  setZapTrigger: (action: SelectedAction | Action | null) => void;
   setSelectedActions: (newAction: SelectedAction | null) => void;
+  setFilterNodes: (filterNodes: CustomNode[]) => void;
 };
 
 const useStore = create<StoreState>((set) => ({
@@ -33,21 +40,23 @@ const useStore = create<StoreState>((set) => ({
   zapTrigger: null,
   actions: [],
   AvailableActions: [],
+  filterNodes: [],
   setEmail: (email) => set(() => ({ email })),
   setPassword: (password) => set(() => ({ password })),
   setActions: (val) => set(() => ({ actions: val })),
   setAvailableActions: (val) => set(() => ({ AvailableActions: val })),
   reset: () => set(() => ({ email: "", password: "" })),
+  setFilterNodes: (nodes) => set(() => ({ filterNodes: nodes })),
   setSelectedNode: (node) => set(() => ({ selectedNode: node ?? null })),
   setSelectedAction: (action) => set(() => ({ selectedAction: action })),
-  setZapTrigger: (action: SelectedAction | Action | null) => set(() => ({ zapTrigger: action })),
+  setZapTrigger: (action: SelectedAction | Action | null) =>
+    set(() => ({ zapTrigger: action })),
   setSelectedActions: (newAction) =>
     set((state) => {
       if (!newAction) return { selectedActions: [] };
       const exists = state.selectedActions.some(
         (action) => action.sortingOrder === newAction.sortingOrder
       );
-      
 
       return {
         selectedActions: exists
