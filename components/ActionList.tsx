@@ -4,7 +4,7 @@ import { JSX, useCallback, useEffect, useState, useRef } from "react";
 
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
-import type { Connection } from "@xyflow/react";
+import type { Connection, Node } from "@xyflow/react";
 
 import {
   addEdge,
@@ -58,25 +58,11 @@ export default function ActionsList() {
   const selectedAction = useStore((state) => state.selectedAction);
   const selectedActions = useStore((state) => state.selectedActions);
   const setZapTrigger = useStore((state) => state.setZapTrigger);
-  const [curNodeIdx, setCurNodeIdx] = useState(null);
+  const [curNodeIdx, setCurNodeIdx] = useState<number | null>(null);
   const params = useParams();
   const router = useRouter();
   const pathName = usePathname();
 
-  /*   useEffect(() => {
-    if (pathName === "/zap/create") {
-      setFilterNodes(nodes);
-    } else if (nodes.length > actions.length) {
-      console.log("run");
-
-      //setFilterNodes(nodes);
-      setFilterNodes(nodes);
-    } else {
-      setFilterNodes(
-        generateInitialNodes(actions.length).filter((n) => n.id !== "dummy")
-      );
-    }
-  }, [actions.length, nodes.length, pathName, setFilterNodes]); */
   const newNodes = useRef([]);
 
   newNodes.current = filterNodes;
@@ -107,7 +93,7 @@ export default function ActionsList() {
 
       setActions(updatedActions);
     }
-  }, [selectedActions]);
+  }, [selectedActions.length, selectedActions, actions.length, setActions]);
 
   useEffect(() => {
     const updatedNodes = newNodes.current.map((node, index) => {
@@ -161,7 +147,7 @@ export default function ActionsList() {
                   <span className="font-bold">{match.name}</span>
                 </>
               ) : (
-                <>{icon} Trigger</>
+                <div className="flex bg-[#eee] gap-1">{icon}Trigger</div>
               )}
             </div>
             <div
@@ -216,7 +202,8 @@ export default function ActionsList() {
               {match ? (
                 match.id === "action" ? (
                   <div className="flex bg-[#eee] gap-1">
-                    {icon} {index === 0 ? "Trigger" : "Action"}
+                    {icon}
+                    {index === 0 ? "Trigger" : "Action"}
                   </div>
                 ) : (
                   <>
@@ -230,7 +217,7 @@ export default function ActionsList() {
                   </>
                 )
               ) : (
-                <div className="flex bg-[#eee] gap-1">{icon} Action</div>
+                <div className="flex bg-[#eee] gap-1">{icon}Action</div>
               )}
             </div>
             <div
@@ -270,7 +257,7 @@ export default function ActionsList() {
                 border: "1px solid #cccccc",
               }}
             >
-              <div className="flex bg-[#eee] gap-1">{icon} Action</div>
+              <div className="flex bg-[#eee] gap-1">{icon}Action</div>
             </div>
             <div
               style={{
@@ -479,6 +466,29 @@ export default function ActionsList() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  function inActionTable(selectedNode: Node) {
+    console.log(selectedNode);
+    //tsignore
+    const labelChildren =
+      selectedNode?.data?.label?.props?.children?.[0]?.props?.children?.props
+        ?.children?.[2] ??
+      selectedNode?.data?.label?.props?.children?.[0]?.props?.children?.props
+        ?.children?.[1];
+    if (labelChildren === "Action" || labelChildren === "Trigger") {
+      console.log("it's Action or Trigger");
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  const findCurNodeIdx = useCallback(
+    (node: Node) => {
+      return nodes.findIndex((val) => val.id === node.id);
+    },
+    [nodes.length]
+  );
+
   useEffect(() => {
     const fetchActions = async () => {
       const supabase = createClientComponentClient();
@@ -555,7 +565,7 @@ export default function ActionsList() {
             fitView
             onNodeClick={(_, node) => {
               setSelectedNode(node);
-              setCurNodeIdx(nodes.findIndex((val) => val.id === node.id));
+              setCurNodeIdx(findCurNodeIdx(node));
             }}
             zoomOnScroll={false}
           >
@@ -601,14 +611,7 @@ export default function ActionsList() {
         </div>
 
         {error && <p>Error: {error}</p>}
-        {selectedNode && inActionTable(selectedNode.id, actions) && (
-          <ZapModal
-            actions={actions}
-            selectedNode={selectedNode}
-            setSelectedNode={setSelectedNode}
-            AvailableActions={AvailableActions}
-          ></ZapModal>
-        )}
+
         {pathName === "/zap/create" && selectedNode && (
           <ZapModal
             actions={actions}
@@ -617,15 +620,17 @@ export default function ActionsList() {
             AvailableActions={AvailableActions}
           ></ZapModal>
         )}
-        {params.id &&
-          selectedNode &&
-          !inActionTable(selectedNode.id, actions) && <Sidebar></Sidebar>}
+        {params.id && selectedNode && !inActionTable(selectedNode) ? (
+          <Sidebar></Sidebar>
+        ) : (
+          <ZapModal
+            actions={actions}
+            selectedNode={selectedNode}
+            setSelectedNode={setSelectedNode}
+            AvailableActions={AvailableActions}
+          ></ZapModal>
+        )}
       </div>
     </ReactFlowProvider>
   );
-}
-
-function inActionTable(id: string, actions: Action[]) {
-  const node = actions.find((val: Action) => val.sortingOrder === Number(id));
-  return Boolean(node?.actionId === "action");
 }
