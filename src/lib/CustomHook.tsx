@@ -35,7 +35,9 @@ export const handleAddNode = (
   AvailableActions: AvailableActions[],
   params: ParamValue,
   selectedAction: SelectedAction,
-  filterNodes: CustomNode[]
+  filterNodes: CustomNode[],
+  setActions: React.Dispatch<React.SetStateAction<UpdatedAction[]>>,
+  setSelectedActions
 ) => {
   const { edgeId } = event?.detail;
   const edgeToSplit = edges?.find((e) => e.id === edgeId);
@@ -73,12 +75,16 @@ export const handleAddNode = (
   const verticalGap = 100;
 
   let newNodes: UpdatedAction[];
-  if (newNodeList.length > actions.length) {
+
+  if (newNodeList.length > actions.length && params?.length) {
+    setSelectedActions(null);
     newNodes = updateActionsAfterInsert(actions, newNodeList);
+    setActions(newNodes);
 
     async function help() {
       if (!params?.length) return;
-      await updateZap(params, newNodes);
+
+      //await updateZap(params, newNodes);
     }
 
     help();
@@ -96,7 +102,7 @@ export const handleAddNode = (
     trigger = actions.find((action: Action) => action.index === 0) || trigger;
   }
 
-  const updatedNodes = filterNodes.map((node, index) => {
+  const updatedNodes = newNodeList.map((node, index) => {
     let label: string | JSX.Element;
 
     if (trigger && trigger.index === index) {
@@ -313,12 +319,14 @@ export const useAddNode = ({
   setEdges,
 }: UseAddNodeParams) => {
   const selectedActions = useStore((state) => state.selectedActions);
+  const setSelectedActions = useStore((state) => state.setSelectedActions);
   const actions = useStore((state) => state.actions);
   const AvailableActions = useStore((state) => state.AvailableActions);
   const params = useParams();
   const selectedAction = useStore((state) => state.selectedAction);
   const filterNodes = useStore((state) => state.filterNodes);
   const setFilterNodes = useStore((state) => state.setFilterNodes);
+  const setActions = useStore((state) => state.setActions);
   useEffect(() => {
     const listener = (event: Event) => {
       const val = handleAddNode(
@@ -332,7 +340,9 @@ export const useAddNode = ({
         AvailableActions,
         params.id,
         selectedAction,
-        filterNodes
+        filterNodes,
+        setActions,
+        setSelectedActions
       );
       if (val) {
         setFilterNodes(val);

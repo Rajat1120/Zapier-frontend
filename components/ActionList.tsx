@@ -58,47 +58,82 @@ export default function ActionsList() {
   const selectedAction = useStore((state) => state.selectedAction);
   const selectedActions = useStore((state) => state.selectedActions);
   const setZapTrigger = useStore((state) => state.setZapTrigger);
+  const [curNodeIdx, setCurNodeIdx] = useState(null);
   const params = useParams();
   const router = useRouter();
-  let trigger: SelectedAction | Action | null = null;
+  const pathName = usePathname();
 
-  if (selectedActions.length) {
-    trigger =
-      selectedActions.find((action: SelectedAction) => action.index === 0) ||
-      null;
-  }
-  if (params.id) {
-    trigger = actions.find((action: Action) => action.index === 0) || trigger;
-  }
+  /*   useEffect(() => {
+    if (pathName === "/zap/create") {
+      setFilterNodes(nodes);
+    } else if (nodes.length > actions.length) {
+      console.log("run");
 
+      //setFilterNodes(nodes);
+      setFilterNodes(nodes);
+    } else {
+      setFilterNodes(
+        generateInitialNodes(actions.length).filter((n) => n.id !== "dummy")
+      );
+    }
+  }, [actions.length, nodes.length, pathName, setFilterNodes]); */
+  const newNodes = useRef([]);
+
+  newNodes.current = filterNodes;
   useEffect(() => {
     if (actions.length) {
       setFilterNodes(
         generateInitialNodes(actions.length).filter((n) => n.id !== "dummy")
       );
-    } else {
-      setFilterNodes(nodes.filter((n) => n.id !== "dummy"));
     }
-  }, [actions.length]);
+  }, [actions.length, setFilterNodes]);
 
   useEffect(() => {
-    const updatedNodes = filterNodes.map((node, index) => {
+    newNodes.current = nodes;
+  }, [nodes.length]);
+
+  useEffect(() => {
+    if (selectedActions.length) {
+      const updatedActions = actions.map((action) => {
+        const match = selectedActions.find((val) => val.index === action.index);
+        if (match) {
+          return {
+            ...action,
+            actionId: match.availableActionId,
+          };
+        }
+        return action; // keep as-is
+      });
+
+      setActions(updatedActions);
+    }
+  }, [selectedActions]);
+
+  useEffect(() => {
+    const updatedNodes = newNodes.current.map((node, index) => {
+      //console.log(newNodes.current);
+
       let label: string | JSX.Element;
 
-      if (trigger && trigger.index === index) {
-        const inSelectedAction = selectedActions?.some(
-          (val) => val.index === trigger.index
-        );
-        const triggerFromSelectedAction = selectedActions?.find(
-          (val) => val.index === trigger.index
-        );
+      if (index === 0) {
         let match;
-        if (inSelectedAction) {
-          match = AvailableActions.find(
-            (available) =>
-              triggerFromSelectedAction?.availableActionId === available.id
+        if (actions.length) {
+          const triggerFromSelectedAction = actions.find(
+            (action) => action.index === 0
           );
+          if (
+            triggerFromSelectedAction &&
+            triggerFromSelectedAction.actionId !== "action"
+          ) {
+            match = AvailableActions.find(
+              (available) =>
+                triggerFromSelectedAction?.actionId === available.id
+            );
+          }
         }
+
+        console.log(selectedActions);
+
         label = (
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             <div
@@ -137,7 +172,7 @@ export default function ActionsList() {
                 fontWeight: "bold",
               }}
             >
-              {trigger.index + 1}. Select the event that starts your zap
+              {index + 1}. Select the event that starts your zap
             </div>
           </div>
         );
@@ -150,7 +185,7 @@ export default function ActionsList() {
 
       if (
         actions.length &&
-        params.id &&
+        //params.id &&
         actions.some((val) => val.sortingOrder === +node.id) &&
         !selectedActions.some((val) => val.index === index)
       ) {
@@ -167,7 +202,7 @@ export default function ActionsList() {
                 fontSize: "8px",
                 padding: "2px 6px",
                 backgroundColor: `${
-                  match?.id === "action" ? "#eee" : "#ffffff"
+                  match ? (match?.id === "action" ? "#eee" : "#ffffff") : "#eee"
                 }`,
                 borderRadius: "4px",
                 fontWeight: "bold",
@@ -178,8 +213,8 @@ export default function ActionsList() {
                 border: "1px solid #cccccc",
               }}
             >
-              {match &&
-                (match.id === "action" ? (
+              {match ? (
+                match.id === "action" ? (
                   <div className="flex bg-[#eee] gap-1">
                     {icon} {index === 0 ? "Trigger" : "Action"}
                   </div>
@@ -193,7 +228,10 @@ export default function ActionsList() {
                     />
                     <span className="font-bold">{match.name}</span>
                   </>
-                ))}
+                )
+              ) : (
+                <div className="flex bg-[#eee] gap-1">{icon} Action</div>
+              )}
             </div>
             <div
               style={{
@@ -203,7 +241,46 @@ export default function ActionsList() {
                 fontWeight: "bold",
               }}
             >
-              {node.id}. Select the event that runs your zap
+              {index + 1}. Select the event that runs your zap
+            </div>
+          </div>
+        );
+
+        return {
+          ...node,
+          data: { label },
+        };
+      } else if (
+        actions.length &&
+        !actions.some((val) => val.sortingOrder === +node.id)
+      ) {
+        label = (
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+            <div
+              style={{
+                fontSize: "8px",
+                padding: "2px 6px",
+                backgroundColor: "#eee",
+                borderRadius: "4px",
+                fontWeight: "bold",
+                display: "flex",
+                justifyItems: "start",
+                gap: "4px",
+                width: "fit-content",
+                border: "1px solid #cccccc",
+              }}
+            >
+              <div className="flex bg-[#eee] gap-1">{icon} Action</div>
+            </div>
+            <div
+              style={{
+                fontSize: "10px",
+                color: "#666666",
+                textAlign: "left",
+                fontWeight: "bold",
+              }}
+            >
+              {index + 1} Select the event that runs your zap
             </div>
           </div>
         );
@@ -247,7 +324,7 @@ export default function ActionsList() {
                     src={match.image}
                     alt={match.name}
                   />
-                  <span className="font-bold">{match.name}</span>
+                  <span className="font-bold">{match.name} </span>
                 </>
               )}
             </div>
@@ -264,8 +341,42 @@ export default function ActionsList() {
           </div>
         );
       } else {
-        label = node.data.label;
+        label = (
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+            <div
+              style={{
+                fontSize: "8px",
+                padding: "2px 6px",
+                backgroundColor: "#eee",
+                borderRadius: "4px",
+                fontWeight: "bold",
+                display: "flex",
+                justifyItems: "start",
+                gap: "4px",
+                width: "fit-content",
+                border: "1px solid #cccccc",
+              }}
+            >
+              <div className="flex bg-[#eee] gap-1">
+                {icon} {index === 0 ? "Trigger" : "Action"}
+              </div>
+            </div>
+            <div
+              style={{
+                fontSize: "10px",
+                color: "#666666",
+                textAlign: "left",
+                fontWeight: "bold",
+              }}
+            >
+              {index + 1}. Select the event that{" "}
+              {index === 0 ? "starts" : "runs"} your zap
+            </div>
+          </div>
+        );
       }
+      //label = node.data.label;
+
       return {
         ...node,
         data: { label },
@@ -288,25 +399,21 @@ export default function ActionsList() {
       setEdges(updatedEdges);
     }
 
-    if (selectedAction && selectedNode) {
+    if (selectedAction && selectedNode && curNodeIdx !== null) {
       setSelectedActions({
         name: selectedAction.name,
         sortingOrder: String(
-          filterNodes.findIndex((val) => val.id === selectedNode.id) + 1
+          newNodes.current.findIndex((val) => val.id === selectedNode.id) + 1
         ),
         metadata: {},
         availableActionId: selectedAction.id,
-        index: filterNodes.findIndex((val) => val.id === selectedNode.id),
+        index: curNodeIdx,
       });
-    }
-
-    if (trigger) {
-      setZapTrigger(trigger);
     }
 
     async function getVal() {
       if (selectedActions.length && !params.id) {
-        const newActions = filterNodes.map((node, index) => {
+        const newActions = newNodes.current.map((node, index) => {
           const matchedAction = selectedActions.find(
             (val) => Number(val.sortingOrder) === Number(index + 1)
           );
@@ -323,7 +430,7 @@ export default function ActionsList() {
           }
         });
 
-        const val = await handleZapCreate(trigger, newActions);
+        //const val = await handleZapCreate(trigger, newActions);
 
         if (val) {
           router.push(val);
@@ -337,8 +444,10 @@ export default function ActionsList() {
     selectedAction,
     setSelectedActions,
     setSelectedNode,
-    trigger,
+
     actions,
+
+    nodes.length,
     AvailableActions,
     selectedActions,
     filterNodes.length,
@@ -424,8 +533,6 @@ export default function ActionsList() {
     []
   );
 
-  const pathName = usePathname();
-
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   return (
     <ReactFlowProvider>
@@ -446,7 +553,10 @@ export default function ActionsList() {
             nodesDraggable={false}
             edgeTypes={edgeTypes}
             fitView
-            onNodeClick={(_, node) => setSelectedNode(node)}
+            onNodeClick={(_, node) => {
+              setSelectedNode(node);
+              setCurNodeIdx(nodes.findIndex((val) => val.id === node.id));
+            }}
             zoomOnScroll={false}
           >
             {(() => {
