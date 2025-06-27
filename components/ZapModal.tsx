@@ -168,7 +168,10 @@ export default function ZapModal({
                       key={action.id}
                       className="flex items-center gap-2 min-w-[200px] py-2 px-2 font-bold cursor-pointer hover:bg-[#f7f6fd]"
                       onClick={() => {
-                        setSelectedAction(action);
+                        setSelectedAction({
+                          ...action,
+                          selectionId: Date.now(),
+                        });
                       }}
                     >
                       <Image

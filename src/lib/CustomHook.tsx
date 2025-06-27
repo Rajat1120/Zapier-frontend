@@ -90,35 +90,25 @@ export const handleAddNode = (
     help();
   }
 
-  let trigger: SelectedAction | Action | null = null;
-
-  if (selectedActions.length) {
-    trigger =
-      selectedActions.find((action: SelectedAction) => action.index === 0) ||
-      null;
-  }
-
-  if (params) {
-    trigger = actions.find((action: Action) => action.index === 0) || trigger;
-  }
-
   const updatedNodes = newNodeList.map((node, index) => {
     let label: string | JSX.Element;
 
-    if (trigger && trigger.index === index) {
-      const inSelectedAction = selectedActions?.some(
-        (val) => val.index === trigger.index
-      );
-      const triggerFromSelectedAction = selectedActions?.find(
-        (val) => val.index === trigger.index
-      );
+    if (index === 0) {
       let match;
-      if (inSelectedAction) {
-        match = AvailableActions.find(
-          (available) =>
-            triggerFromSelectedAction?.availableActionId === available.id
+      if (actions.length) {
+        const triggerFromSelectedAction = actions.find(
+          (action) => action.index === 0
         );
+        if (
+          triggerFromSelectedAction &&
+          triggerFromSelectedAction.actionId !== "action"
+        ) {
+          match = AvailableActions.find(
+            (available) => triggerFromSelectedAction?.actionId === available.id
+          );
+        }
       }
+
       label = (
         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
           <div
@@ -146,7 +136,7 @@ export const handleAddNode = (
                 <span className="font-bold">{match.name}</span>
               </>
             ) : (
-              <>{icon} Trigger</>
+              <div className="flex bg-[#eee] gap-1">{icon}Trigger</div>
             )}
           </div>
           <div
@@ -157,7 +147,7 @@ export const handleAddNode = (
               fontWeight: "bold",
             }}
           >
-            {trigger.index + 1}. Select the event that starts your zap
+            {index + 1}. Select the event that starts your zap
           </div>
         </div>
       );
@@ -171,7 +161,6 @@ export const handleAddNode = (
 
     if (
       actions.length &&
-      params &&
       actions.some((val) => val.sortingOrder === +node.id) &&
       !selectedActions.some((val) => val.index === index)
     ) {
@@ -187,7 +176,9 @@ export const handleAddNode = (
             style={{
               fontSize: "8px",
               padding: "2px 6px",
-              backgroundColor: `${match?.id === "action" ? "#eee" : "#ffffff"}`,
+              backgroundColor: `${
+                match ? (match?.id === "action" ? "#eee" : "#ffffff") : "#eee"
+              }`,
               borderRadius: "4px",
               fontWeight: "bold",
               display: "flex",
@@ -197,10 +188,11 @@ export const handleAddNode = (
               border: "1px solid #cccccc",
             }}
           >
-            {match &&
-              (match.id === "action" ? (
+            {match ? (
+              match.id === "action" ? (
                 <div className="flex bg-[#eee] gap-1">
-                  {icon} {index === 0 ? "Trigger" : "Action"}
+                  {icon}
+                  {index === 0 ? "Trigger" : "Action"}
                 </div>
               ) : (
                 <>
@@ -212,7 +204,10 @@ export const handleAddNode = (
                   />
                   <span className="font-bold">{match.name}</span>
                 </>
-              ))}
+              )
+            ) : (
+              <div className="flex bg-[#eee] gap-1">{icon}Action</div>
+            )}
           </div>
           <div
             style={{
@@ -222,11 +217,50 @@ export const handleAddNode = (
               fontWeight: "bold",
             }}
           >
-            {node.id}. Select the event that runs your zap
+            {index + 1}. Select the event that runs your zap
           </div>
         </div>
       );
 
+      return {
+        ...node,
+        data: { label },
+        position: { x: 0, y: index * verticalGap },
+      };
+    } else if (
+      actions.length &&
+      !actions.some((val) => val.sortingOrder === +node.id)
+    ) {
+      label = (
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div
+            style={{
+              fontSize: "8px",
+              padding: "2px 6px",
+              backgroundColor: "#eee",
+              borderRadius: "4px",
+              fontWeight: "bold",
+              display: "flex",
+              justifyItems: "start",
+              gap: "4px",
+              width: "fit-content",
+              border: "1px solid #cccccc",
+            }}
+          >
+            <div className="flex bg-[#eee] gap-1">{icon}Action</div>
+          </div>
+          <div
+            style={{
+              fontSize: "10px",
+              color: "#666666",
+              textAlign: "left",
+              fontWeight: "bold",
+            }}
+          >
+            {index + 1} Select the event that runs your zap
+          </div>
+        </div>
+      );
       return {
         ...node,
         data: { label },
@@ -284,8 +318,41 @@ export const handleAddNode = (
         </div>
       );
     } else {
-      label = node.data.label;
+      label = (
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div
+            style={{
+              fontSize: "8px",
+              padding: "2px 6px",
+              backgroundColor: "#eee",
+              borderRadius: "4px",
+              fontWeight: "bold",
+              display: "flex",
+              justifyItems: "start",
+              gap: "4px",
+              width: "fit-content",
+              border: "1px solid #cccccc",
+            }}
+          >
+            <div className="flex bg-[#eee] gap-1">
+              {icon} {index === 0 ? "Trigger" : "Action"}
+            </div>
+          </div>
+          <div
+            style={{
+              fontSize: "10px",
+              color: "#666666",
+              textAlign: "left",
+              fontWeight: "bold",
+            }}
+          >
+            {index + 1}. Select the event that {index === 0 ? "starts" : "runs"}{" "}
+            your zap
+          </div>
+        </div>
+      );
     }
+
     return {
       ...node,
       data: { label },
@@ -362,6 +429,8 @@ export const useAddNode = ({
     selectedActions,
     AvailableActions,
     actions,
+    setActions,
+    setSelectedActions,
     params.id,
     selectedAction,
     filterNodes,

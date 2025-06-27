@@ -97,7 +97,7 @@ export default function ActionsList() {
 
   useEffect(() => {
     const updatedNodes = newNodes.current.map((node, index) => {
-      //console.log(newNodes.current);
+      console.log(newNodes.current);
 
       let label: string | JSX.Element;
 
@@ -117,8 +117,6 @@ export default function ActionsList() {
             );
           }
         }
-
-        console.log(selectedActions);
 
         label = (
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
@@ -171,7 +169,6 @@ export default function ActionsList() {
 
       if (
         actions.length &&
-        //params.id &&
         actions.some((val) => val.sortingOrder === +node.id) &&
         !selectedActions.some((val) => val.index === index)
       ) {
@@ -362,7 +359,6 @@ export default function ActionsList() {
           </div>
         );
       }
-      //label = node.data.label;
 
       return {
         ...node,
