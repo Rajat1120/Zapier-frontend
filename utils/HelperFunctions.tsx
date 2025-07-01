@@ -5,7 +5,7 @@ import axios from "axios";
 import { useEffect } from "react";
 
 import { ParamValue } from "next/dist/server/request/params";
-import { Action, SelectedAction } from "@/lib/type";
+import { SelectedAction } from "@/lib/type";
 
 export async function handleLogin(
   email: string,
@@ -65,7 +65,7 @@ export const useLogin = (
 };
 
 export default async function handleZapCreate(
-  selectedTrigger: SelectedAction | Action | null,
+  selectedTrigger: SelectedAction,
 
   selectedActions: unknown[]
 ) {
@@ -73,7 +73,7 @@ export default async function handleZapCreate(
 
   try {
     // Type guard to check for availableActionId
-    const getAvailableTriggerId = (trigger: SelectedAction | Action | null) => {
+    const getAvailableTriggerId = (trigger: SelectedAction) => {
       if (!trigger) return;
       if (
         "availableActionId" in trigger &&

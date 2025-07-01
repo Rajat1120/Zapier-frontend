@@ -1,13 +1,12 @@
 import { useEffect, useRef } from "react";
 import { Action, AvailableActions } from "./ActionList";
 import useStore from "../store";
-import type { Node as FlowNode } from "@xyflow/react";
+import type { Node as FlowNode, Node } from "@xyflow/react";
 import Image from "next/image";
 
 type Props = {
-  actions: Action[];
-  selectedNode: FlowNode | null;
-  setSelectedNode: (node: FlowNode | null) => void;
+  actions: Action[] | null;
+
   AvailableActions: AvailableActions[];
 };
 
@@ -49,15 +48,12 @@ const builtInTools = [
   },
 ];
 
-export default function ZapModal({
-  selectedNode,
-
-  AvailableActions,
-}: Props) {
+export default function ZapModal({ AvailableActions }: Props) {
   const modalRef = useRef<HTMLDivElement>(null);
   const setSelectedAction = useStore((state) => state.setSelectedAction);
 
   const setSelectedNode = useStore((state) => state.setSelectedNode);
+  const selectedNode = useStore((state) => state.selectedNode);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

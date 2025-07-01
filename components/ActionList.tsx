@@ -30,9 +30,9 @@ import { generateInitialNodes, icon } from "@/lib/reactFlow";
 import { useAddNode } from "@/lib/CustomHook";
 import Image from "next/image";
 import Sidebar from "./SideBar";
-import handleZapCreate from "../utils/HelperFunctions";
+
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { Action, CustomNode, SelectedAction, StrictEdge } from "@/lib/type";
+import { CustomNode, StrictEdge } from "@/lib/type";
 
 const initialEdges = [{ id: "e1-2", source: "1", target: "2", type: "custom" }];
 
@@ -57,10 +57,10 @@ export default function ActionsList() {
   const selectedNode = useStore((state) => state.selectedNode);
   const selectedAction = useStore((state) => state.selectedAction);
   const selectedActions = useStore((state) => state.selectedActions);
-  const setZapTrigger = useStore((state) => state.setZapTrigger);
+
   const [curNodeIdx, setCurNodeIdx] = useState<number | null>(null);
   const params = useParams();
-  const router = useRouter();
+
   const pathName = usePathname();
 
   const newNodes = useRef([]);
@@ -394,33 +394,6 @@ export default function ActionsList() {
       });
     }
 
-    async function getVal() {
-      if (selectedActions.length && !params.id) {
-        const newActions = newNodes.current.map((node, index) => {
-          const matchedAction = selectedActions.find(
-            (val) => Number(val.sortingOrder) === Number(index + 1)
-          );
-          if (matchedAction) {
-            return { ...matchedAction, sortingOrder: node.id, index };
-          } else {
-            return {
-              name: "Action",
-              availableActionId: "action",
-              metadata: {},
-              sortingOrder: node.id,
-              index,
-            };
-          }
-        });
-
-        //const val = await handleZapCreate(trigger, newActions);
-
-        if (val) {
-          router.push(val);
-        }
-      }
-    }
-    getVal();
     setSelectedNode(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -611,8 +584,6 @@ export default function ActionsList() {
         {pathName === "/zap/create" && selectedNode && (
           <ZapModal
             actions={actions}
-            selectedNode={selectedNode}
-            setSelectedNode={setSelectedNode}
             AvailableActions={AvailableActions}
           ></ZapModal>
         )}
@@ -621,8 +592,6 @@ export default function ActionsList() {
         ) : (
           <ZapModal
             actions={actions}
-            selectedNode={selectedNode}
-            setSelectedNode={setSelectedNode}
             AvailableActions={AvailableActions}
           ></ZapModal>
         )}

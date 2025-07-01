@@ -1,34 +1,32 @@
+export const icon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    height="14"
+    width="14"
+    color="GrayWarm8"
+    name="miscBolt"
+  >
+    <path
+      fill="#2D2E2E"
+      d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm4.87-11L11 18v-5H7.13L13 6v5h3.87Z"
+    ></path>
+  </svg>
+);
 
-
-  export const icon = (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      height="14"
-      width="14"
-      color="GrayWarm8"
-      name="miscBolt"
-    >
-      <path
-        fill="#2D2E2E"
-        d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm4.87-11L11 18v-5H7.13L13 6v5h3.87Z"
-      ></path>
-    </svg>
-  );
-
-export const generateInitialNodes = (count : number) => {
+export const generateInitialNodes = (count: number) => {
   const baseStyle = {
     fontSize: "8px",
     padding: "2px 6px",
-    backgroundColor: "#eee",
+    backgroundColor: "#ffffff",
     borderRadius: "4px",
     fontWeight: "bold",
     display: "flex",
     justifyItems: "start",
     gap: "4px",
     width: "fit-content",
-    border: "1px solid black",
+    border: "1px solid #cccccc",
   };
 
   const descriptionStyle = {
@@ -37,8 +35,6 @@ export const generateInitialNodes = (count : number) => {
     textAlign: "left" as const,
     fontWeight: "bold",
   };
-
-
 
   const nodes = [];
 
