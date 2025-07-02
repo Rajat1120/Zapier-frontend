@@ -33,6 +33,7 @@ import Sidebar from "./SideBar";
 
 import { useParams, usePathname } from "next/navigation";
 import { CustomNode, StrictEdge } from "@/lib/type";
+import { updateZap } from "../utils/HelperFunctions";
 
 const initialEdges = [{ id: "e1-2", source: "1", target: "2", type: "custom" }];
 
@@ -75,6 +76,10 @@ export default function ActionsList() {
   }, [actions.length, setFilterNodes]);
 
   useEffect(() => {
+    updateZap(params.id, actions);
+  }, [actions, params.id]);
+
+  useEffect(() => {
     newNodes.current = nodes;
   }, [nodes.length]);
 
@@ -97,8 +102,6 @@ export default function ActionsList() {
 
   useEffect(() => {
     const updatedNodes = newNodes.current.map((node, index) => {
-      console.log(newNodes.current);
-
       let label: string | JSX.Element;
 
       if (index === 0) {
@@ -436,8 +439,6 @@ export default function ActionsList() {
   }, []);
 
   function inActionTable(selectedNode: Node) {
-    console.log(selectedNode);
-
     const labelChildren =
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
@@ -459,7 +460,7 @@ export default function ActionsList() {
     (node: Node) => {
       return nodes.findIndex((val) => val.id === node.id);
     },
-    [nodes.length]
+    [nodes]
   );
 
   useEffect(() => {
