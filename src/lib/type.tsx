@@ -43,7 +43,7 @@ export type Action = {
   index: number;
 };
 
-export type AvailableActions = {
+export type AvailableAction = {
   id: string;
   name: string;
   image: string;

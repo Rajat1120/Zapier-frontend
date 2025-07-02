@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { addTrailingPlusNode } from "./utils";
 import {
   Action,
-  AvailableActions,
+  AvailableAction,
   CustomNode,
   SelectedAction,
   StrictEdge,
@@ -32,12 +32,14 @@ export const handleAddNode = (
   setEdges: React.Dispatch<React.SetStateAction<StrictEdge[]>>,
   selectedActions: SelectedAction[],
   actions: Action[],
-  AvailableActions: AvailableActions[],
+  AvailableActions: AvailableAction[],
   params: ParamValue,
-  selectedAction: SelectedAction,
+  selectedAction: AvailableAction | null,
   filterNodes: CustomNode[],
   setActions: React.Dispatch<React.SetStateAction<UpdatedAction[]>>,
-  setSelectedActions
+  setSelectedActions: React.Dispatch<
+    React.SetStateAction<SelectedAction[] | null>
+  >
 ) => {
   const { edgeId } = event?.detail;
   const edgeToSplit = edges?.find((e) => e.id === edgeId);
@@ -408,6 +410,8 @@ export const useAddNode = ({
         params.id,
         selectedAction,
         filterNodes,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-expect-error
         setActions,
         setSelectedActions
       );

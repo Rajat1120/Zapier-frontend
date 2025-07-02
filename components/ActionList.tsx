@@ -31,7 +31,7 @@ import { useAddNode } from "@/lib/CustomHook";
 import Image from "next/image";
 import Sidebar from "./SideBar";
 
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { CustomNode, StrictEdge } from "@/lib/type";
 
 const initialEdges = [{ id: "e1-2", source: "1", target: "2", type: "custom" }];
@@ -63,7 +63,7 @@ export default function ActionsList() {
 
   const pathName = usePathname();
 
-  const newNodes = useRef([]);
+  const newNodes = useRef<CustomNode[]>([]);
 
   newNodes.current = filterNodes;
   useEffect(() => {
@@ -437,10 +437,14 @@ export default function ActionsList() {
 
   function inActionTable(selectedNode: Node) {
     console.log(selectedNode);
-    //tsignore
+
     const labelChildren =
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
       selectedNode?.data?.label?.props?.children?.[0]?.props?.children?.props
         ?.children?.[2] ??
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
       selectedNode?.data?.label?.props?.children?.[0]?.props?.children?.props
         ?.children?.[1];
     if (labelChildren === "Action" || labelChildren === "Trigger") {

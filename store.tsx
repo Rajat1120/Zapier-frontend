@@ -4,7 +4,7 @@ import type { Node } from "@xyflow/react";
 import {
   CustomNode,
   Action,
-  AvailableActions,
+  AvailableAction,
   SelectedAction,
 } from "@/lib/type";
 
@@ -12,20 +12,20 @@ type StoreState = {
   email: string;
   password: string;
   selectedNode: Node | null;
-  selectedAction: AvailableActions | null;
+  selectedAction: AvailableAction | null;
   selectedActions: SelectedAction[];
   zapTrigger: SelectedAction | Action | null;
   actions: Action[];
-  AvailableActions: AvailableActions[];
+  AvailableActions: AvailableAction[];
   filterNodes: CustomNode[];
 
   setEmail: (email: string) => void;
   setPassword: (password: string) => void;
   setActions: (val: Action[]) => void;
-  setAvailableActions: (val: AvailableActions[]) => void;
+  setAvailableActions: (val: AvailableAction[]) => void;
   reset: () => void;
   setSelectedNode: (node: Node | null) => void;
-  setSelectedAction: (action: AvailableActions | null) => void;
+  setSelectedAction: (action: AvailableAction | null) => void;
   setZapTrigger: (action: SelectedAction | Action | null) => void;
   setSelectedActions: (newAction: SelectedAction | null) => void;
   setFilterNodes: (filterNodes: CustomNode[]) => void;

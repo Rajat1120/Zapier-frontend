@@ -4,7 +4,7 @@ import { addTrailingPlusNode } from "./utils";
 import useStore from "../../store";
 import Image from "next/image";
 import { icon } from "./reactFlow";
-import { Action, AvailableActions, CustomNode, StrictEdge } from "./type";
+import { Action, AvailableAction, CustomNode, StrictEdge } from "./type";
 
 type UseAddNodeParams = {
   nodes: CustomNode[];
@@ -22,7 +22,7 @@ export const handleAddNode = (
   setEdges: React.Dispatch<React.SetStateAction<StrictEdge[]>>,
   selectedActions: { sortingOrder: string | number; name: string }[],
   actions: Action[],
-  AvailableActions: AvailableActions[]
+  AvailableActions: AvailableAction[]
 ) => {
   const { edgeId } = event?.detail;
   const edgeToSplit = edges?.find((e) => e.id === edgeId);
