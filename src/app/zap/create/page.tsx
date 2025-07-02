@@ -80,6 +80,66 @@ export default function CreateNewZap() {
     const updatedNodes = nodes.map((node, index) => {
       let label: string | JSX.Element;
 
+      if (
+        selectedActions.length &&
+        selectedActions.some((val) => val.index === index)
+      ) {
+        const match = selectedActions.find((val) => index === val.index);
+        const icon = AvailableActions.find(
+          (action) => action.id === match?.availableActionId
+        )?.image;
+
+        if (match) {
+          label = (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "4px",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "8px",
+                  padding: "2px 6px",
+                  backgroundColor: "#ffffff",
+                  borderRadius: "4px",
+                  fontWeight: "bold",
+                  display: "flex",
+                  justifyItems: "start",
+                  gap: "4px",
+                  width: "fit-content",
+                  border: "1px solid #cccccc",
+                }}
+              >
+                <Image
+                  src={icon ?? ""}
+                  alt="action icon"
+                  height={12}
+                  width={12}
+                />
+                {match.name}
+              </div>
+              <div
+                style={{
+                  fontSize: "10px",
+                  color: "#666666",
+                  textAlign: "left",
+                  fontWeight: "bold",
+                }}
+              >
+                {index + 1}.Select the event that{" "}
+                {index === 0 ? "starts" : "runs"} your zap
+              </div>
+            </div>
+          );
+          return {
+            ...node,
+            data: { label },
+          };
+        }
+      }
+
       if (index === 0) {
         label = (
           <div
