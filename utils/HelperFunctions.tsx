@@ -6,6 +6,7 @@ import { useEffect } from "react";
 
 import { ParamValue } from "next/dist/server/request/params";
 import { SelectedAction } from "@/lib/type";
+import { Node } from "@xyflow/react";
 
 export async function handleLogin(
   email: string,
@@ -151,4 +152,17 @@ export async function updateZap(id: ParamValue, selectedActions: unknown[]) {
   } catch (err) {
     throw err;
   }
+}
+
+export function inActionTable(selectedNode: Node): boolean {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+
+  const type = selectedNode?.data?.label?.props?.match;
+
+  if (!type) {
+    return true;
+  }
+
+  return false;
 }
