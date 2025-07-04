@@ -21,6 +21,7 @@ type UseAddNodeParams = {
   edges: StrictEdge[];
   setNodes: React.Dispatch<React.SetStateAction<CustomNode[]>>;
   setEdges: React.Dispatch<React.SetStateAction<StrictEdge[]>>;
+  refetchActions: () => void;
 };
 
 export const handleAddNode = (
@@ -39,7 +40,8 @@ export const handleAddNode = (
   setActions: React.Dispatch<React.SetStateAction<UpdatedAction[]>>,
   setSelectedActions: React.Dispatch<
     React.SetStateAction<SelectedAction[] | null>
-  >
+  >,
+  refetchActions: () => void
 ) => {
   const { edgeId } = event?.detail;
   const edgeToSplit = edges?.find((e) => e.id === edgeId);
@@ -87,6 +89,7 @@ export const handleAddNode = (
       if (!params?.length) return;
 
       await updateZap(params, newNodes);
+      refetchActions();
     }
 
     help();
@@ -386,6 +389,7 @@ export const useAddNode = ({
   edges,
   setNodes,
   setEdges,
+  refetchActions,
 }: UseAddNodeParams) => {
   const selectedActions = useStore((state) => state.selectedActions);
   const setSelectedActions = useStore((state) => state.setSelectedActions);
@@ -413,7 +417,8 @@ export const useAddNode = ({
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         //@ts-expect-error
         setActions,
-        setSelectedActions
+        setSelectedActions,
+        refetchActions
       );
       if (val) {
         setFilterNodes(val);

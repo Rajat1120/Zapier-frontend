@@ -77,8 +77,9 @@ export default function CreateNewZap() {
   ]);
 
   useEffect(() => {
+    setSelectedAction(null);
     setSelectedActions(null);
-  }, [setSelectedActions]);
+  }, [setSelectedAction, setSelectedActions]);
 
   useEffect(() => {
     const updatedNodes = nodes.map((node, index) => {

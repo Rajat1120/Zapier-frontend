@@ -46,9 +46,11 @@ export default function ActionsList() {
 
   const [nodes, setNodes] = useState<CustomNode[]>(generateInitialNodes(2));
   const [edges, setEdges] = useState<StrictEdge[]>(initialEdges);
+  const [newNodes, setNewNodes] = useState<CustomNode[]>([]);
 
   const setSelectedNode = useStore((state) => state.setSelectedNode);
   const setSelectedActions = useStore((state) => state.setSelectedActions);
+  const setSelectedAction = useStore((state) => state.setSelectedAction);
   const setAvailableActions = useStore((state) => state.setAvailableActions);
   const setActions = useStore((state) => state.setActions);
   const actions = useStore((state) => state.actions);
@@ -65,8 +67,6 @@ export default function ActionsList() {
   const params = useParams();
 
   const pathName = usePathname();
-
-  const newNodes = useRef<CustomNode[]>([]);
 
   const {
     data: fetchedActions,
@@ -95,19 +95,18 @@ export default function ActionsList() {
 
   useEffect(() => {
     if (actions.length) {
-      setFilterNodes(
-        generateInitialNodes(actions.length).filter((n) => n.id !== "dummy")
-      );
+      setFilterNodes(generateInitialNodes(actions.length));
     }
   }, [actions, setFilterNodes]);
 
   useEffect(() => {
-    newNodes.current = filterNodes;
-  }, [filterNodes]);
+    setNewNodes(filterNodes);
+  }, [filterNodes, nodes]);
 
   useEffect(() => {
-    newNodes.current = nodes;
-  }, [nodes.length]);
+    setSelectedAction(null);
+    setSelectedActions(null);
+  }, [setSelectedAction, setSelectedActions]);
 
   useEffect(() => {
     if (selectedActions.length) {
@@ -128,7 +127,7 @@ export default function ActionsList() {
   }, [params.id, selectedActions, setActions, refetchActions]);
 
   useEffect(() => {
-    const updatedNodes = newNodes.current.map((node, index) => {
+    const updatedNodes = newNodes.map((node, index) => {
       let label: string | JSX.Element;
 
       if (index === 0) {
@@ -428,7 +427,7 @@ export default function ActionsList() {
       setSelectedActions({
         name: selectedAction.name,
         sortingOrder: String(
-          newNodes.current.findIndex((val) => val.id === selectedNode.id) + 1
+          newNodes.findIndex((val) => val.id === selectedNode.id) + 1
         ),
         metadata: {},
         availableActionId: selectedAction.id,
@@ -444,14 +443,14 @@ export default function ActionsList() {
     setSelectedNode,
 
     actions,
-
+    newNodes,
     nodes.length,
     AvailableActions,
     selectedActions,
     filterNodes.length,
   ]);
 
-  useAddNode({ nodes, edges, setNodes, setEdges });
+  useAddNode({ nodes, edges, setNodes, setEdges, refetchActions });
 
   useEffect(() => {
     const verticalGap = 100;
