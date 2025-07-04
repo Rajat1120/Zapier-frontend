@@ -78,7 +78,7 @@ export default function ActionsList() {
     queryFn: () => fetchActions(params.id),
     refetchOnMount: true,
     enabled: !!params.id,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60,
 
     refetchOnReconnect: true, // refetch on reconnect
   });
@@ -95,15 +95,11 @@ export default function ActionsList() {
 
   useEffect(() => {
     if (actions.length) {
-      console.log("run");
-
       setFilterNodes(
         generateInitialNodes(actions.length).filter((n) => n.id !== "dummy")
       );
     }
   }, [actions, setFilterNodes]);
-
-  console.log(actions);
 
   useEffect(() => {
     newNodes.current = filterNodes;
@@ -112,8 +108,6 @@ export default function ActionsList() {
   useEffect(() => {
     newNodes.current = nodes;
   }, [nodes.length]);
-
-  console.log(selectedActions);
 
   useEffect(() => {
     if (selectedActions.length) {
