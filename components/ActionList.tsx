@@ -68,23 +68,52 @@ export default function ActionsList() {
 
   const newNodes = useRef<CustomNode[]>([]);
 
-  newNodes.current = filterNodes;
+  const {
+    data: fetchedActions,
+    error: actionsError,
+    isLoading: actionsLoading,
+    refetch: refetchActions,
+  } = useQuery({
+    queryKey: ["actions", params.id],
+    queryFn: () => fetchActions(params.id),
+    refetchOnMount: true,
+    enabled: !!params.id,
+    staleTime: 1000 * 60 * 5,
+
+    refetchOnReconnect: true, // refetch on reconnect
+  });
+
+  const {
+    data: availableActionsData,
+    error: availableActionsError,
+    isLoading: availableActionsLoading,
+  } = useQuery({
+    queryKey: ["availableActions"],
+    queryFn: fetchAvailableActions,
+    staleTime: 1000 * 60 * 60,
+  });
+
   useEffect(() => {
     if (actions.length) {
+      console.log("run");
+
       setFilterNodes(
         generateInitialNodes(actions.length).filter((n) => n.id !== "dummy")
       );
     }
-  }, [actions.length, setFilterNodes]);
+  }, [actions, setFilterNodes]);
+
+  console.log(actions);
 
   useEffect(() => {
-    updateZap(params.id, actions);
-    refetchActions();
-  }, [actions, params.id]);
+    newNodes.current = filterNodes;
+  }, [filterNodes]);
 
   useEffect(() => {
     newNodes.current = nodes;
   }, [nodes.length]);
+
+  console.log(selectedActions);
 
   useEffect(() => {
     if (selectedActions.length) {
@@ -98,10 +127,11 @@ export default function ActionsList() {
         }
         return action; // keep as-is
       });
-
+      updateZap(params.id, updatedActions);
       setActions(updatedActions);
+      refetchActions();
     }
-  }, [selectedActions.length, selectedActions, actions.length, setActions]);
+  }, [params.id, selectedActions, setActions, refetchActions]);
 
   useEffect(() => {
     const updatedNodes = newNodes.current.map((node, index) => {
@@ -109,7 +139,19 @@ export default function ActionsList() {
 
       if (index === 0) {
         let match;
-        if (actions.length) {
+
+        if (
+          selectedActions.length &&
+          selectedActions.some((val) => val.index === 0)
+        ) {
+          const triggerFromSelectedAction = selectedActions.find(
+            (action) => action.index === 0
+          );
+          match = AvailableActions.find(
+            (available) =>
+              triggerFromSelectedAction?.availableActionId === available.id
+          );
+        } else if (actions.length) {
           const triggerFromSelectedAction = actions.find(
             (action) => action.index === 0
           );
@@ -465,29 +507,6 @@ export default function ActionsList() {
     },
     [nodes]
   );
-
-  const {
-    data: fetchedActions,
-    error: actionsError,
-    isLoading: actionsLoading,
-    refetch: refetchActions,
-  } = useQuery({
-    queryKey: ["actions", params.id],
-    queryFn: () => fetchActions(params.id),
-    refetchOnMount: true,
-    enabled: !!params.id,
-    staleTime: 1000 * 60 * 5,
-  });
-
-  const {
-    data: availableActionsData,
-    error: availableActionsError,
-    isLoading: availableActionsLoading,
-  } = useQuery({
-    queryKey: ["availableActions"],
-    queryFn: fetchAvailableActions,
-    staleTime: 1000 * 60 * 60,
-  });
 
   useEffect(() => {
     if (Array.isArray(fetchedActions)) setActions(fetchedActions);
