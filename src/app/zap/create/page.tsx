@@ -299,7 +299,7 @@ export default function CreateNewZap() {
     };
 
     fetchAvailableActions();
-  }, []);
+  }, [setAvailableActions]);
 
   useAddNode({ nodes, edges, setNodes, setEdges });
 
