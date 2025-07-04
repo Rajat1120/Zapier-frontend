@@ -213,7 +213,7 @@ export default function CreateNewZap() {
                 fontWeight: "bold",
               }}
             >
-              {index + 1}. Select the event that starts your zap
+              {index + 1}. Select the event that runs your zap
             </div>
           </div>
         );

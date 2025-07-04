@@ -78,7 +78,7 @@ export default function ActionsList() {
     queryFn: () => fetchActions(params.id),
     refetchOnMount: true,
     enabled: !!params.id,
-    staleTime: 1000 * 60,
+    staleTime: 100,
 
     refetchOnReconnect: true, // refetch on reconnect
   });
@@ -362,7 +362,7 @@ export default function ActionsList() {
                 fontWeight: "bold",
               }}
             >
-              {index + 1}. Select the event that starts your zap
+              {index + 1}. Select the event that runs your zap
             </div>
           </div>
         );
