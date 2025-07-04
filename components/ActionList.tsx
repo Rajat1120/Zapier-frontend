@@ -2,8 +2,6 @@
 
 import { JSX, useCallback, useEffect, useState, useRef } from "react";
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-
 import type { Connection, Node } from "@xyflow/react";
 
 import {
@@ -34,6 +32,8 @@ import Sidebar from "./SideBar";
 import { useParams, usePathname } from "next/navigation";
 import { CustomNode, StrictEdge } from "@/lib/type";
 import { updateZap } from "../utils/HelperFunctions";
+import { useQuery } from "@tanstack/react-query";
+import { fetchActions, fetchAvailableActions } from "@/lib/api";
 
 const initialEdges = [{ id: "e1-2", source: "1", target: "2", type: "custom" }];
 
@@ -59,6 +59,8 @@ export default function ActionsList() {
   const selectedAction = useStore((state) => state.selectedAction);
   const selectedActions = useStore((state) => state.selectedActions);
 
+  const [loading, setLoading] = useState<boolean>(true);
+
   const [curNodeIdx, setCurNodeIdx] = useState<number | null>(null);
   const params = useParams();
 
@@ -77,6 +79,7 @@ export default function ActionsList() {
 
   useEffect(() => {
     updateZap(params.id, actions);
+    refetchActions();
   }, [actions, params.id]);
 
   useEffect(() => {
@@ -463,32 +466,46 @@ export default function ActionsList() {
     [nodes]
   );
 
+  const {
+    data: fetchedActions,
+    error: actionsError,
+    isLoading: actionsLoading,
+    refetch: refetchActions,
+  } = useQuery({
+    queryKey: ["actions", params.id],
+    queryFn: () => fetchActions(params.id),
+    refetchOnMount: true,
+    enabled: !!params.id,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const {
+    data: availableActionsData,
+    error: availableActionsError,
+    isLoading: availableActionsLoading,
+  } = useQuery({
+    queryKey: ["availableActions"],
+    queryFn: fetchAvailableActions,
+    staleTime: 1000 * 60 * 60,
+  });
+
   useEffect(() => {
-    const fetchActions = async () => {
-      const supabase = createClientComponentClient();
-      const { data, error } = await supabase
-        .from("Action")
-        .select("*")
-        .eq("zapId", params.id); //
+    if (Array.isArray(fetchedActions)) setActions(fetchedActions);
+    if (actionsError) setError(actionsError.message);
+    setLoading(actionsLoading);
+  }, [fetchedActions, actionsError, actionsLoading, setActions]);
 
-      if (error) setError(error.message);
-      else setActions(data);
-    };
-
-    const fetchAvailableActions = async () => {
-      const supabase = createClientComponentClient();
-      const { data, error } = await supabase
-        .from("AvailableActions")
-        .select("*"); //
-
-      if (error) setError(error.message);
-      else setAvailableActions(data);
-    };
-
-    fetchAvailableActions();
-
-    if (params.id) fetchActions();
-  }, [params.id, setActions, setAvailableActions]);
+  useEffect(() => {
+    if (Array.isArray(availableActionsData))
+      setAvailableActions(availableActionsData);
+    if (availableActionsError) setError(availableActionsError.message);
+    setLoading(availableActionsLoading);
+  }, [
+    availableActionsData,
+    availableActionsError,
+    availableActionsLoading,
+    setAvailableActions,
+  ]);
 
   const onNodesChange = useCallback(
     (changes: NodeChange<CustomNode>[]) =>
@@ -526,6 +543,7 @@ export default function ActionsList() {
             {params.id ? "Edit zap" : "Publish"}
           </button>
         </div>
+        {loading ? <span>Loaidng...</span> : null}
         <Authentication></Authentication>
         <div ref={reactFlowWrapper} style={{ height: "100%", width: "100%" }}>
           <ReactFlow

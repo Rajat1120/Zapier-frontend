@@ -77,6 +77,10 @@ export default function CreateNewZap() {
   ]);
 
   useEffect(() => {
+    setSelectedActions(null);
+  }, [setSelectedActions]);
+
+  useEffect(() => {
     const updatedNodes = nodes.map((node, index) => {
       let label: string | JSX.Element;
 
