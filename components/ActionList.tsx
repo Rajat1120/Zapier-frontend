@@ -69,7 +69,7 @@ export default function ActionsList() {
   const setShowZapModal = useStore((state) => state.setShowZapModal);
   const showZapModal = useStore((state) => state.showZapModal);
   const [loading, setLoading] = useState<boolean>(true);
-
+  const reactFlowParentWrapper = useRef<HTMLDivElement>(null);
   const [curNodeIdx, setCurNodeIdx] = useState<number | null>(null);
   const params = useParams();
 
@@ -162,6 +162,7 @@ export default function ActionsList() {
           index={index}
           icon={icon}
           type={isTrigger ? "trigger" : "action"}
+          reactFlowParentWrapper={reactFlowParentWrapper}
         />
       );
 
@@ -299,7 +300,7 @@ export default function ActionsList() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   return (
     <ReactFlowProvider>
-      <div className="h-full w-full">
+      <div ref={reactFlowParentWrapper} className="h-full w-full">
         <div className="h-12 fixed top-0 z-10 w-full border-b-[0.5px] py-2 px-12 bg-[#fdf7f2] border-b-black flex items-center justify-end  ">
           <button className="bg-[#695be8] text-white font-bold px-2 py-1  rounded cursor-pointer">
             {params.id ? "Edit zap" : "Publish"}
