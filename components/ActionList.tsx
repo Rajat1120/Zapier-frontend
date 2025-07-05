@@ -163,6 +163,8 @@ export default function ActionsList() {
           icon={icon}
           type={isTrigger ? "trigger" : "action"}
           reactFlowParentWrapper={reactFlowParentWrapper}
+          setNodes={setNodes}
+          setEdges={setEdges}
         />
       );
 
@@ -291,11 +293,6 @@ export default function ActionsList() {
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
     []
   );
-
-  useEffect(() => {
-    console.log(showSideBar);
-    console.log(selectedNode);
-  }, [showSideBar, selectedNode]);
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   return (

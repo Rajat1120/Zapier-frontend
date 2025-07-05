@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React, { useState } from "react";
 import ActionSideBar from "./ActionSideBar";
+import { CustomNode, StrictEdge } from "@/lib/type";
 
 export function ZapNodeLabel({
   match,
@@ -8,12 +9,16 @@ export function ZapNodeLabel({
   icon,
   type,
   reactFlowParentWrapper,
+  setNodes,
+  setEdges,
 }: {
   match?: { name: string; image: string; id?: string };
   index: number;
   icon: React.ReactNode;
   type: "trigger" | "action";
   reactFlowParentWrapper: React.RefObject<HTMLDivElement | null>;
+  setNodes: React.Dispatch<React.SetStateAction<CustomNode[]>>;
+  setEdges: React.Dispatch<React.SetStateAction<StrictEdge[]>>;
 }) {
   const [showSideBar, setShowSideBar] = useState(false);
 
@@ -99,6 +104,9 @@ export function ZapNodeLabel({
         <ActionSideBar
           setShowSideBar={setShowSideBar}
           parentRef={reactFlowParentWrapper}
+          index={index}
+          setNodes={setNodes}
+          setEdges={setEdges}
         />
       )}
     </>
