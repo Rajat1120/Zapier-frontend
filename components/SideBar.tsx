@@ -8,6 +8,7 @@ import { useEffect } from "react";
 
 export default function Sidebar() {
   const selectedNode = useStore((state) => state.selectedNode);
+  const setSelectedNode = useStore((state) => state.setSelectedNode);
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
   const { name, image } = selectedNode?.data?.label?.props?.match;
@@ -32,9 +33,25 @@ export default function Sidebar() {
           </div>
           <span>Select the Event</span>
         </div>
-        <div>
-          <span>make it big</span>
-          <span>X</span>
+        <div className="flex space-x-3 items-center">
+          <Image
+            height={20}
+            width={20}
+            src={
+              "https://img.icons8.com/?size=100&id=78833&format=png&color=000000"
+            }
+            alt="Expand"
+          ></Image>
+          <Image
+            onClick={() => setSelectedNode(null)}
+            className="cursor-pointer"
+            height={24}
+            width={24}
+            alt="Close button"
+            src={
+              "https://img.icons8.com/?size=100&id=9433&format=png&color=000000"
+            }
+          ></Image>
         </div>
       </div>
       <div className="flex-grow border-b-[#d7d3c9] border overflow-y-auto">
@@ -55,7 +72,7 @@ export default function Sidebar() {
               </div>
               <button
                 onClick={() => setShowZapModal(true)}
-                className="border px-2 border-[#d7d3c9] text-sm cursor-pointer font-bold text-white bg-[#695be8] p-1 rounded-sm "
+                className=" px-2  text-sm cursor-pointer font-bold text-white bg-[#695be8] p-1 rounded-sm "
               >
                 Change
               </button>
@@ -76,8 +93,8 @@ export default function Sidebar() {
               <div>
                 <span className="text-sm">Select An account</span>
               </div>
-              <button className="border px-2 border-[#d7d3c9] text-sm cursor-pointer font-bold text-white bg-[#695be8] p-1 rounded-sm ">
-                Select
+              <button className=" px-2  text-sm cursor-pointer font-bold text-white bg-[#695be8] p-1 rounded-sm ">
+                Sing in
               </button>
             </div>
           </div>
