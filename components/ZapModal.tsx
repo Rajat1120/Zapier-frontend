@@ -1,14 +1,9 @@
 import { useEffect, useRef } from "react";
-import { Action, AvailableActions } from "./ActionList";
+
 import useStore from "../store";
-import type { Node as FlowNode, Node } from "@xyflow/react";
+
 import Image from "next/image";
-
-type Props = {
-  actions: Action[] | null;
-
-  AvailableActions: AvailableActions[];
-};
+import { inActionTable } from "../utils/HelperFunctions";
 
 const builtInTools = [
   {
@@ -48,13 +43,14 @@ const builtInTools = [
   },
 ];
 
-export default function ZapModal({ AvailableActions }: Props) {
+export default function ZapModal() {
   const modalRef = useRef<HTMLDivElement>(null);
   const setSelectedAction = useStore((state) => state.setSelectedAction);
-
+  const AvailableActions = useStore((state) => state.AvailableActions);
   const setSelectedNode = useStore((state) => state.setSelectedNode);
   const selectedNode = useStore((state) => state.selectedNode);
-
+  const setShowZapModal = useStore((state) => state.setShowZapModal);
+  const showZapModal = useStore((state) => state.showZapModal);
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -62,16 +58,25 @@ export default function ZapModal({ AvailableActions }: Props) {
         event.target instanceof Node &&
         !modalRef.current.contains(event.target)
       ) {
-        setSelectedNode(null);
+        setShowZapModal(false);
+        if (selectedNode && inActionTable(selectedNode, setShowZapModal)) {
+          setSelectedNode(null);
+        }
       }
     };
     window.addEventListener("mousedown", handleClickOutside);
     return () => {
       window.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [setSelectedNode]);
+  }, [selectedNode, setSelectedNode, setShowZapModal]);
 
-  if (!selectedNode) return null;
+  useEffect(() => {
+    if (!selectedNode) {
+      setShowZapModal(false);
+    }
+  }, [selectedNode, setShowZapModal]);
+
+  if (!showZapModal) return null;
   return (
     <div
       style={{
@@ -156,7 +161,7 @@ export default function ZapModal({ AvailableActions }: Props) {
                 Your top apps
               </h4>
               <div>
-                {AvailableActions.map((action) => {
+                {AvailableActions?.map((action) => {
                   if (action.name === "Action") return null;
 
                   return (
@@ -168,6 +173,7 @@ export default function ZapModal({ AvailableActions }: Props) {
                           ...action,
                           selectionId: Date.now(),
                         });
+                        setShowZapModal(false);
                       }}
                     >
                       <Image

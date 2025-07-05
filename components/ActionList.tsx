@@ -32,7 +32,11 @@ import Sidebar from "./SideBar";
 
 import { useParams, usePathname } from "next/navigation";
 import { CustomNode, StrictEdge } from "@/lib/type";
-import { inActionTable, updateZap } from "../utils/HelperFunctions";
+import {
+  inActionTable,
+  updateZap,
+  useShowSideBar,
+} from "../utils/HelperFunctions";
 import { useQuery } from "@tanstack/react-query";
 import { fetchActions, fetchAvailableActions } from "@/lib/api";
 import { ZapNodeLabel } from "./ZapNodeLable";
@@ -62,7 +66,8 @@ export default function ActionsList() {
   const selectedNode = useStore((state) => state.selectedNode);
   const selectedAction = useStore((state) => state.selectedAction);
   const selectedActions = useStore((state) => state.selectedActions);
-
+  const setShowZapModal = useStore((state) => state.setShowZapModal);
+  const showZapModal = useStore((state) => state.showZapModal);
   const [loading, setLoading] = useState<boolean>(true);
 
   const [curNodeIdx, setCurNodeIdx] = useState<number | null>(null);
@@ -181,7 +186,6 @@ export default function ActionsList() {
       setNodes(updatedNodes);
       setEdges(updatedEdges);
     }
-
     if (selectedAction && selectedNode && curNodeIdx !== null) {
       setSelectedActions({
         name: selectedAction.name,
@@ -192,9 +196,8 @@ export default function ActionsList() {
         availableActionId: selectedAction.id,
         index: curNodeIdx,
       });
+      setSelectedNode(null);
     }
-
-    setSelectedNode(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     selectedAction,
@@ -259,6 +262,8 @@ export default function ActionsList() {
     setAvailableActions,
   ]);
 
+  const showSideBar = useShowSideBar(selectedNode);
+
   const onNodesChange = useCallback(
     (changes: NodeChange<CustomNode>[]) =>
       setNodes((nds) =>
@@ -285,6 +290,11 @@ export default function ActionsList() {
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
     []
   );
+
+  useEffect(() => {
+    console.log(showSideBar);
+    console.log(selectedNode);
+  }, [showSideBar, selectedNode]);
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   return (
@@ -356,20 +366,11 @@ export default function ActionsList() {
 
         {error && <p>Error: {error}</p>}
 
-        {pathName === "/zap/create" && selectedNode && (
-          <ZapModal
-            actions={actions}
-            AvailableActions={AvailableActions}
-          ></ZapModal>
-        )}
-        {params.id && selectedNode && !inActionTable(selectedNode) ? (
-          <Sidebar></Sidebar>
-        ) : (
-          <ZapModal
-            actions={actions}
-            AvailableActions={AvailableActions}
-          ></ZapModal>
-        )}
+        {pathName === "/zap/create" && selectedNode && <ZapModal></ZapModal>}
+        {params.id && selectedNode && showSideBar && <Sidebar></Sidebar>}
+        {selectedNode &&
+          inActionTable(selectedNode, setShowZapModal) &&
+          showZapModal && <ZapModal></ZapModal>}
       </div>
     </ReactFlowProvider>
   );

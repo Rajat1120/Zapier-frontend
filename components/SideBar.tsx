@@ -3,12 +3,20 @@
 import Image from "next/image";
 import useStore from "../store";
 
+import ZapModal from "./ZapModal";
+import { useEffect } from "react";
+
 export default function Sidebar() {
   const selectedNode = useStore((state) => state.selectedNode);
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
   const { name, image } = selectedNode?.data?.label?.props?.match;
+  const setShowZapModal = useStore((state) => state.setShowZapModal);
+  const showZapModal = useStore((state) => state.showZapModal);
 
+  useEffect(() => {
+    setShowZapModal(false);
+  }, [setShowZapModal]);
   return (
     <div className="fixed top-16 right-4 w-[28%] h-[80%] flex  flex-col border-2 border-[#695be8] bg-[#fdf7f2] rounded-md">
       <div className="p-3 rounded-md justify-between  bg-[#f0eefb] flex">
@@ -37,7 +45,10 @@ export default function Sidebar() {
                 ></Image>{" "}
                 <span className="text-sm font-medium">{name}</span>
               </div>
-              <button className="border border-[#d7d3c9] p-1 rounded-sm ">
+              <button
+                onClick={() => setShowZapModal(true)}
+                className="border border-[#d7d3c9] p-1 rounded-sm "
+              >
                 Change
               </button>
             </div>
@@ -74,6 +85,7 @@ export default function Sidebar() {
           To continue, choose an event
         </button>
       </div>
+      {showZapModal && <ZapModal></ZapModal>}
     </div>
   );
 }

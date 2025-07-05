@@ -22,9 +22,11 @@ export default function DashBoard() {
   const setSelectedActions = useStore((state) => state.setSelectedActions);
   const setZapTrigger = useStore((state) => state.setZapTrigger);
   const setActions = useStore((state) => state.setActions);
+  const setSelectedNode = useStore((state) => state.setSelectedNode);
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    setSelectedNode(null);
+  }, [setSelectedNode]);
 
   useEffect(() => {
     refetchZaps();

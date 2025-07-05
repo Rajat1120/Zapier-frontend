@@ -443,12 +443,7 @@ export default function CreateNewZap() {
               </ReactFlow>
             </div>
 
-            {selectedNode && (
-              <ZapModal
-                actions={null}
-                AvailableActions={AvailableActions}
-              ></ZapModal>
-            )}
+            {selectedNode && <ZapModal></ZapModal>}
           </div>
         </ReactFlowProvider>
       </div>

@@ -47,6 +47,7 @@ export type AvailableAction = {
   id: string;
   name: string;
   image: string;
+  selectionId: number;
 };
 
 export interface Zap {

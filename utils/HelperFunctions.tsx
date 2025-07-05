@@ -154,13 +154,28 @@ export async function updateZap(id: ParamValue, selectedActions: unknown[]) {
   }
 }
 
-export function inActionTable(selectedNode: Node): boolean {
+export function inActionTable(
+  selectedNode: Node | null,
+  setShowZapModal: { (val: boolean): void; (arg0: boolean): void }
+): boolean {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
-
   const type = selectedNode?.data?.label?.props?.match;
 
   if (!type) {
+    setShowZapModal(true);
+    return true;
+  }
+
+  return false;
+}
+
+export function useShowSideBar(selectedNode: Node | null): boolean {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+  const type = selectedNode?.data?.label?.props?.match;
+
+  if (type) {
     return true;
   }
 
