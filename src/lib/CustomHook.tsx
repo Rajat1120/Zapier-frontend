@@ -444,6 +444,7 @@ export const useAddNode = ({
     selectedAction,
     filterNodes,
     setFilterNodes,
+    refetchActions,
   ]);
 };
 

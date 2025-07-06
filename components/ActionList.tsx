@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client";
 
 import { useCallback, useEffect, useState, useRef } from "react";
@@ -45,6 +44,19 @@ const initialEdges = [{ id: "e1-2", source: "1", target: "2", type: "custom" }];
 
 const edgeTypes = {
   custom: CustomEdge,
+};
+
+const generateEdges = (nodes: CustomNode[]) => {
+  const edges = [];
+  for (let i = 0; i < nodes.length - 1; i++) {
+    edges.push({
+      id: `edge-${i}-${i + 1}`,
+      source: nodes[i].id,
+      target: nodes[i + 1].id,
+      type: "custom",
+    });
+  }
+  return edges;
 };
 
 export default function ActionsList() {
@@ -131,7 +143,18 @@ export default function ActionsList() {
       setActions(updatedActions);
       refetchActions();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id, selectedActions, setActions, refetchActions]);
+
+  const updateNodesAndEdges = useCallback((nodeUpdates: CustomNode[]) => {
+    const newNodes = [...nodeUpdates];
+    const newEdges = generateEdges(newNodes);
+
+    addTrailingPlusNode(newNodes, newEdges);
+
+    setNodes(newNodes);
+    setEdges(newEdges);
+  }, []);
 
   useEffect(() => {
     const verticalGap = 120;
@@ -167,39 +190,29 @@ export default function ActionsList() {
           setEdges={setEdges}
         />
       );
-
       return {
         ...node,
         data: { label },
         position: { x: 0, y: index * verticalGap },
-        style: {
-          width: 280,
-          height: 70,
-        },
+        style: { width: 280, height: 70 },
       };
     });
-
-    const updatedEdges = [];
-
-    for (let i = 0; i < updatedNodes.length - 1; i++) {
-      updatedEdges.push({
-        id: `e${updatedNodes[i].id}-${updatedNodes[i + 1].id}`,
-        source: updatedNodes[i].id,
-        target: updatedNodes[i + 1].id,
-        type: "custom",
-      });
+    if (updatedNodes.length) {
+      updateNodesAndEdges(updatedNodes);
     }
-    if (updatedNodes.length && updatedEdges.length) {
-      addTrailingPlusNode(updatedNodes, updatedEdges);
-      setNodes(updatedNodes);
-      setEdges(updatedEdges);
-    }
+  }, [
+    newNodes,
+    actions,
+    AvailableActions,
+    selectedActions,
+    updateNodesAndEdges,
+  ]);
+
+  useEffect(() => {
     if (selectedAction && selectedNode && curNodeIdx !== null) {
       setSelectedActions({
         name: selectedAction.name,
-        sortingOrder: String(
-          newNodes.findIndex((val) => val.id === selectedNode.id) + 1
-        ),
+        sortingOrder: String(curNodeIdx + 1),
         metadata: {},
         availableActionId: selectedAction.id,
         index: curNodeIdx,
@@ -207,43 +220,9 @@ export default function ActionsList() {
       setSelectedNode(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    selectedAction,
-    setSelectedActions,
-    setSelectedNode,
-
-    actions,
-    newNodes,
-    nodes.length,
-    AvailableActions,
-    selectedActions,
-    filterNodes.length,
-  ]);
+  }, [selectedAction, setSelectedActions, setSelectedNode]);
 
   useAddNode({ nodes, edges, setNodes, setEdges, refetchActions });
-
-  useEffect(() => {
-    const verticalGap = 120;
-    const updatedNodes = nodes.map((node, index) => ({
-      ...node,
-      position: { x: 0, y: index * verticalGap },
-    }));
-
-    const updatedEdges = [];
-    for (let i = 0; i < updatedNodes.length - 1; i++) {
-      updatedEdges.push({
-        id: `e${updatedNodes[i].id}-${updatedNodes[i + 1].id}`,
-        source: updatedNodes[i].id,
-        target: updatedNodes[i + 1].id,
-        type: "custom",
-      });
-    }
-
-    addTrailingPlusNode(updatedNodes, updatedEdges);
-
-    setNodes(updatedNodes);
-    setEdges(updatedEdges);
-  }, []);
 
   const findCurNodeIdx = useCallback(
     (node: Node) => {
