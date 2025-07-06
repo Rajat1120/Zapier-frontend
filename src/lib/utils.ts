@@ -53,7 +53,7 @@ export const addTrailingPlusNode = (
   const filteredEdges = edgeList.filter(
     (e) => e.source !== "dummy" && e.target !== "dummy"
   );
-  const verticalGap = 100;
+  const verticalGap = 120;
   const lastNodeId = filteredNodes[filteredNodes.length - 1].id;
   const dummyNodeId = "dummy";
   // Make dummy node invisible and non-interactive, but keep edge visible

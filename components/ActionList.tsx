@@ -134,6 +134,7 @@ export default function ActionsList() {
   }, [params.id, selectedActions, setActions, refetchActions]);
 
   useEffect(() => {
+    const verticalGap = 120;
     const updatedNodes = newNodes.map((node, index) => {
       let match;
       const isTrigger = index === 0;
@@ -155,7 +156,6 @@ export default function ActionsList() {
           (available) => available.id === actionFromZap.actionId
         );
       }
-
       const label = (
         <ZapNodeLabel
           match={match}
@@ -171,6 +171,7 @@ export default function ActionsList() {
       return {
         ...node,
         data: { label },
+        position: { x: 0, y: index * verticalGap },
       };
     });
 
@@ -218,7 +219,7 @@ export default function ActionsList() {
   useAddNode({ nodes, edges, setNodes, setEdges, refetchActions });
 
   useEffect(() => {
-    const verticalGap = 100;
+    const verticalGap = 120;
     const updatedNodes = nodes.map((node, index) => ({
       ...node,
       position: { x: 0, y: index * verticalGap },

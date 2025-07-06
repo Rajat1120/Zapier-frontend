@@ -108,7 +108,7 @@ function updateActionsAfterDelete(
     );
 
     // Recalculate positions and update node IDs to be sequential
-    const verticalGap = 100;
+    const verticalGap = 120;
     const updatedNodes = filteredNodes.map((node, nodeIndex) => ({
       ...node,
       id: (nodeIndex + 1).toString(),

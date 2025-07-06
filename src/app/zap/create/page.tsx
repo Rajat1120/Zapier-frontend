@@ -304,7 +304,7 @@ export default function CreateNewZap() {
   useAddNode({ nodes, edges, setNodes, setEdges });
 
   useEffect(() => {
-    const verticalGap = 100;
+    const verticalGap = 120;
     const updatedNodes = nodes.map((node, index) => ({
       ...node,
       position: { x: 0, y: index * verticalGap },

@@ -76,7 +76,7 @@ export const handleAddNode = (
     : Math.max(sourceIndex, targetIndex);
   newNodeList.splice(insertIndex, 0, newNode);
 
-  const verticalGap = 100;
+  const verticalGap = 120;
 
   let newNodes: UpdatedAction[];
 
