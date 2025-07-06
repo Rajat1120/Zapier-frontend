@@ -38,20 +38,7 @@ const CustomEdge = ({
           }}
         >
           <div
-            style={{
-              position: "relative",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 16,
-              height: 16,
-              borderRadius: "50%",
-              backgroundColor: "#fdf7f2",
-              fontSize: 10,
-              fontWeight: "bold",
-              cursor: "pointer",
-              transition: "transform 0.2s ease",
-            }}
+            className="rounded-full bg-[#fdf7f2] hover:bg-[#695be8]  h-4 w-4 hover:scale-110 transition-all hover:text-white flex items-center justify-center text-xs font-bold cursor-pointer relative"
             onClick={() => {
               const event = new CustomEvent("add-node", {
                 detail: { edgeId: id },
@@ -59,14 +46,12 @@ const CustomEdge = ({
               window.dispatchEvent(event);
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "scale(1.2)";
               const tooltip = e.currentTarget.querySelector(
                 ".tooltip"
               ) as HTMLElement | null;
               if (tooltip) tooltip.style.opacity = "1";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "scale(1)";
               const tooltip = e.currentTarget.querySelector(
                 ".tooltip"
               ) as HTMLElement | null;
