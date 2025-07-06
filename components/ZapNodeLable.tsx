@@ -34,8 +34,8 @@ export function ZapNodeLabel({
         <div style={{ display: "flex", gap: "120px" }}>
           <div
             style={{
-              fontSize: "8px",
-              padding: "2px 6px",
+              fontSize: "10px",
+              padding: "4px 8px",
               backgroundColor,
               borderRadius: "4px",
               fontWeight: "bold",
@@ -50,8 +50,8 @@ export function ZapNodeLabel({
               <div className="max-h-6 flex items-center gap-1">
                 <Image
                   className="max-w-4 max-h-4"
-                  height={12}
-                  width={12}
+                  height={16}
+                  width={16}
                   src={match.image}
                   alt={match.name}
                 />
@@ -90,7 +90,7 @@ export function ZapNodeLabel({
         </div>
         <div
           style={{
-            fontSize: "10px",
+            fontSize: "12px",
             color: "#666666",
             textAlign: "left",
             fontWeight: "bold",

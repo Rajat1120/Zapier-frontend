@@ -172,6 +172,10 @@ export default function ActionsList() {
         ...node,
         data: { label },
         position: { x: 0, y: index * verticalGap },
+        style: {
+          width: 280,
+          height: 70,
+        },
       };
     });
 
@@ -273,7 +277,7 @@ export default function ActionsList() {
       setNodes((nds) =>
         applyNodeChanges(changes, nds).map((node, idx) => ({
           ...node,
-          style: node.style ?? nds[idx]?.style ?? { width: 240, height: 60 },
+          style: node.style ?? nds[idx]?.style ?? { width: 280, height: 70 },
         }))
       ),
     []

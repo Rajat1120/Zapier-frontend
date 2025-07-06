@@ -156,8 +156,8 @@ export default function CreateNewZap() {
           >
             <div
               style={{
-                fontSize: "8px",
-                padding: "2px 6px",
+                fontSize: "10px",
+                padding: "4px 8px",
                 backgroundColor: "#eee",
                 borderRadius: "4px",
                 fontWeight: "bold",
@@ -172,7 +172,7 @@ export default function CreateNewZap() {
             </div>
             <div
               style={{
-                fontSize: "10px",
+                fontSize: "12px",
                 color: "#666666",
                 textAlign: "left",
                 fontWeight: "bold",
@@ -186,14 +186,18 @@ export default function CreateNewZap() {
         return {
           ...node,
           data: { label },
+          style: {
+            width: 280,
+            height: 70,
+          },
         };
       } else {
         label = (
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             <div
               style={{
-                fontSize: "8px",
-                padding: "2px 6px",
+                fontSize: "10px",
+                padding: "4px 8px",
                 backgroundColor: "#eee",
                 borderRadius: "4px",
                 fontWeight: "bold",
@@ -208,7 +212,7 @@ export default function CreateNewZap() {
             </div>
             <div
               style={{
-                fontSize: "10px",
+                fontSize: "12px",
                 color: "#666666",
                 textAlign: "left",
                 fontWeight: "bold",
@@ -222,6 +226,10 @@ export default function CreateNewZap() {
         return {
           ...node,
           data: { label },
+          style: {
+            width: 280,
+            height: 70,
+          },
         };
       }
     });
@@ -308,6 +316,10 @@ export default function CreateNewZap() {
     const updatedNodes = nodes.map((node, index) => ({
       ...node,
       position: { x: 0, y: index * verticalGap },
+      style: {
+        width: 280,
+        height: 70,
+      },
     }));
 
     const updatedEdges = [];
@@ -332,7 +344,7 @@ export default function CreateNewZap() {
       setNodes((nds) =>
         applyNodeChanges(changes, nds).map((node, idx) => ({
           ...node,
-          style: node.style ?? nds[idx]?.style ?? { width: 240, height: 60 },
+          style: node.style ?? nds[idx]?.style ?? { width: 280, height: 70 },
         }))
       ),
     []

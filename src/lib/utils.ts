@@ -62,7 +62,7 @@ export const addTrailingPlusNode = (
     position: { x: 0, y: filteredNodes.length * verticalGap },
     data: { label: "" },
     connectable: false,
-    style: { width: 240, height: 60, opacity: 0, pointerEvents: "none" },
+    style: { width: 280, height: 70, opacity: 0, pointerEvents: "none" },
   };
   filteredNodes.push(dummyNode);
   filteredEdges.push({
