@@ -6,7 +6,7 @@ import useStore from "../store";
 import ZapModal from "./ZapModal";
 import { useEffect } from "react";
 
-export default function Sidebar() {
+export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const selectedNode = useStore((state) => state.selectedNode);
   const setSelectedNode = useStore((state) => state.setSelectedNode);
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -79,7 +79,9 @@ export default function Sidebar() {
             </div>
           </div>
           <div className="flex m-2 flex-col">
-            <span className="mb-1 font-medium text-sm">Action Event</span>
+            <span className="mb-1 font-medium text-sm">
+              {curNodeIdx === 0 ? "Trigger" : "Action"} Event
+            </span>
             <div className="w-full  flex justify-between p-2 border border-[#d7d3c9] rounded-md">
               <div>
                 <span className="text-sm">Choose an event</span>

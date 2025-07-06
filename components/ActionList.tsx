@@ -349,7 +349,9 @@ export default function ActionsList() {
         {error && <p>Error: {error}</p>}
 
         {pathName === "/zap/create" && selectedNode && <ZapModal></ZapModal>}
-        {params.id && selectedNode && showSideBar && <Sidebar></Sidebar>}
+        {params.id && selectedNode && showSideBar && (
+          <Sidebar curNodeIdx={curNodeIdx}></Sidebar>
+        )}
         {selectedNode &&
           inActionTable(selectedNode, setShowZapModal) &&
           showZapModal && <ZapModal></ZapModal>}
