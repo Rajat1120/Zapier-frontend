@@ -45,10 +45,12 @@ export default function ActionSideBar({
       parent.removeEventListener("click", handleClickOutside);
     };
   }, [parentRef, setShowSideBar]);
+
   return (
     <div
       onClick={(e) => {
         e.stopPropagation();
+        if (index === 0) return;
         updateActionsAfterDelete(
           index,
           setNodes,
@@ -60,7 +62,9 @@ export default function ActionSideBar({
         );
       }}
       ref={actionRef}
-      className="py-1 hover:text-[#ff0000]   text-xs shadow-2xl fixed left-[245px] hover:bg-[#f9dddd] border rounded-xs border-[#cccccc]    justify-center flex items-center  top-[5px] px-4 bg-white  z-50 "
+      className={`py-1 hover:text-[#ff0000] ${
+        index === 0 ? "cursor-not-allowed" : ""
+      }   text-xs shadow-2xl fixed left-[245px] hover:bg-[#f9dddd] border rounded-xs border-[#cccccc]    justify-center flex items-center  top-[5px] px-4 bg-white  z-50 `}
     >
       <span className="text-nowrap  font-medium flex justify-center items-center gap-x-1  text-[8px]">
         <Image

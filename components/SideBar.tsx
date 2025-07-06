@@ -100,7 +100,7 @@ export default function Sidebar() {
           </div>
           <div className="p-3">
             <p className="text-sm leading-5  ">
-              Google Drive is a secure partner with Zapier. Your credentials are
+              {name} is a secure partner with Zapier. Your credentials are
               encrypted and can be removed at any time. You can manage all of
               your connected accounts here.
             </p>
