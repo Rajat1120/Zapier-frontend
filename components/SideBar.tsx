@@ -6,6 +6,7 @@ import useStore from "../store";
 import ZapModal from "./ZapModal";
 import { useEffect } from "react";
 import { useParams } from "next/navigation";
+import { ParamValue } from "next/dist/server/request/params";
 
 export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const selectedNode = useStore((state) => state.selectedNode);
@@ -94,12 +95,12 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
             <span className="mb-1 font-medium text-sm">Account</span>
             <div className="w-full  flex justify-between p-2 border border-[#d7d3c9] rounded-md">
               <div>
-                <span className="text-sm">Select An account</span>
+                <span className="text-sm">Connect to {name}</span>
               </div>
               <button
                 onClick={() => {
                   const zapId = params.id;
-                  window.location.href = `/api/oauth/google/start?zapId=${zapId}`;
+                  handleGoogleConnect(zapId);
                 }}
                 className=" px-2  text-sm cursor-pointer font-bold text-white bg-[#695be8] p-1 rounded-sm "
               >
@@ -124,4 +125,23 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
       {showZapModal && <ZapModal></ZapModal>}
     </div>
   );
+}
+
+function handleGoogleConnect(zapId: ParamValue) {
+  window.open(
+    `/api/oauth/google/start?zapId=${zapId}`,
+    "google-oauth",
+    "width=900,height=700"
+  );
+
+  function handleOAuthMessage(event: MessageEvent) {
+    //security check
+    if (event.origin !== window.location.origin) return;
+    if (event.data === "oauth-success") {
+      console.log("✅ Google account connected!");
+      window.removeEventListener("message", handleOAuthMessage); // Clean up
+    }
+  }
+
+  window.addEventListener("message", handleOAuthMessage);
 }

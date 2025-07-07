@@ -37,7 +37,21 @@ export async function GET(req: NextRequest) {
     console.log("✅ Access Token:", access_token);
     console.log("✅ Refresh Token:", refresh_token);
 
-    return NextResponse.redirect(`http://localhost:3000/zap/${zapId}`);
+    return new NextResponse(
+      `<html>
+     <body>
+       <script>
+         window.opener.postMessage("oauth-success", window.origin);
+         window.close();
+       </script>
+     </body>
+   </html>`,
+      {
+        headers: {
+          "Content-Type": "text/html",
+        },
+      }
+    );
   } catch (error) {
     console.error("OAuth Callback Error:", error);
     return NextResponse.json(
