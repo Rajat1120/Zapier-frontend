@@ -5,6 +5,7 @@ import useStore from "../store";
 
 import ZapModal from "./ZapModal";
 import { useEffect } from "react";
+import { useParams } from "next/navigation";
 
 export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const selectedNode = useStore((state) => state.selectedNode);
@@ -14,7 +15,7 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const { name, image } = selectedNode?.data?.label?.props?.match;
   const setShowZapModal = useStore((state) => state.setShowZapModal);
   const showZapModal = useStore((state) => state.showZapModal);
-
+  const params = useParams();
   useEffect(() => {
     setShowZapModal(false);
   }, [setShowZapModal]);
@@ -95,8 +96,14 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
               <div>
                 <span className="text-sm">Select An account</span>
               </div>
-              <button className=" px-2  text-sm cursor-pointer font-bold text-white bg-[#695be8] p-1 rounded-sm ">
-                Sing in
+              <button
+                onClick={() => {
+                  const zapId = params.id;
+                  window.location.href = `/api/oauth/google/start?zapId=${zapId}`;
+                }}
+                className=" px-2  text-sm cursor-pointer font-bold text-white bg-[#695be8] p-1 rounded-sm "
+              >
+                Connect
               </button>
             </div>
           </div>
