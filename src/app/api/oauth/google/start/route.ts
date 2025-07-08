@@ -1,39 +1,54 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const scopes = [
-  // Basic identity
-  "https://www.googleapis.com/auth/userinfo.email",
-  "https://www.googleapis.com/auth/userinfo.profile",
-
-  // Gmail full access
-  "https://www.googleapis.com/auth/gmail.readonly",
-  "https://www.googleapis.com/auth/gmail.send",
-  "https://www.googleapis.com/auth/gmail.labels",
-  "https://www.googleapis.com/auth/gmail.modify",
-  "https://www.googleapis.com/auth/gmail.compose",
-
-  // Google Calendar full access
-  "https://www.googleapis.com/auth/calendar",
-  "https://www.googleapis.com/auth/calendar.events",
-
-  // Google Drive full access
-  "https://www.googleapis.com/auth/drive",
-  "https://www.googleapis.com/auth/drive.file",
-  "https://www.googleapis.com/auth/drive.metadata",
-  "https://www.googleapis.com/auth/drive.metadata.readonly",
-
-  // Google Sheets full access
-  "https://www.googleapis.com/auth/spreadsheets",
-  "https://www.googleapis.com/auth/spreadsheets.readonly",
-
-  // Google Docs full access
-  "https://www.googleapis.com/auth/documents",
-  "https://www.googleapis.com/auth/documents.readonly",
-];
+const appScopes: Record<string, string[]> = {
+  gmail: [
+    "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/gmail.send",
+    "https://www.googleapis.com/auth/gmail.labels",
+    "https://www.googleapis.com/auth/gmail.modify",
+    "https://www.googleapis.com/auth/gmail.compose",
+  ],
+  calendar: [
+    "https://www.googleapis.com/auth/calendar",
+    "https://www.googleapis.com/auth/calendar.events",
+  ],
+  drive: [
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/drive.file",
+    "https://www.googleapis.com/auth/drive.metadata",
+    "https://www.googleapis.com/auth/drive.metadata.readonly",
+  ],
+  sheet: [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/spreadsheets.readonly",
+  ],
+  slide: [
+    "https://www.googleapis.com/auth/presentations",
+    "https://www.googleapis.com/auth/presentations.readonly",
+  ],
+  docs: [
+    "https://www.googleapis.com/auth/documents",
+    "https://www.googleapis.com/auth/documents.readonly",
+  ],
+  youtube: [
+    "https://www.googleapis.com/auth/youtube.readonly",
+    "https://www.googleapis.com/auth/youtube.upload",
+  ],
+};
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const zapId = searchParams.get("zapId");
+  const app = searchParams.get("app");
+
+  const baseScopes = [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile",
+  ];
+
+  const selectedScopes = app && appScopes[app] ? appScopes[app] : [];
+
+  const scopes = [...baseScopes, ...selectedScopes];
 
   const redirectUrl = `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchParams(
     {

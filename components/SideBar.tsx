@@ -100,7 +100,7 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
               <button
                 onClick={() => {
                   const zapId = params.id;
-                  handleGoogleConnect(zapId);
+                  handleGoogleConnect(zapId, name);
                 }}
                 className=" px-2  text-sm cursor-pointer font-bold text-white bg-[#695be8] p-1 rounded-sm "
               >
@@ -127,19 +127,33 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   );
 }
 
-function handleGoogleConnect(zapId: ParamValue) {
-  window.open(
-    `/api/oauth/google/start?zapId=${zapId}`,
-    "google-oauth",
-    "width=900,height=700"
-  );
+function handleGoogleConnect(zapId: ParamValue, appName: string) {
+  const app = appName.toLowerCase().replace(/\s+/g, "");
+  const googleApps = [
+    "sheet",
+    "slide",
+    "calendar",
+    "docs",
+    "drive",
+    "youtube",
+    "gmail",
+  ];
+  const matchedApp = googleApps.find((keyword) => app.includes(keyword));
+
+  if (!matchedApp) {
+    console.warn("No OAuth flow configured for app:", appName);
+    return;
+  }
+
+  const url = `/api/oauth/google/start?zapId=${zapId}&app=${matchedApp}`;
+
+  window.open(url, "google-oauth", "width=900,height=700");
 
   function handleOAuthMessage(event: MessageEvent) {
-    //security check
     if (event.origin !== window.location.origin) return;
     if (event.data === "oauth-success") {
       console.log("✅ Google account connected!");
-      window.removeEventListener("message", handleOAuthMessage); // Clean up
+      window.removeEventListener("message", handleOAuthMessage);
     }
   }
 
