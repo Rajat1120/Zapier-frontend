@@ -11,6 +11,7 @@ import { ParamValue } from "next/dist/server/request/params";
 export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const selectedNode = useStore((state) => state.selectedNode);
   const setSelectedNode = useStore((state) => state.setSelectedNode);
+  const token = localStorage.getItem("token");
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
   const { name, image } = selectedNode?.data?.label?.props?.match;
@@ -100,7 +101,9 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
               <button
                 onClick={() => {
                   const zapId = params.id;
-                  handleGoogleConnect(zapId, name);
+                  if (token) {
+                    handleGoogleConnect(zapId, name, token);
+                  }
                 }}
                 className=" px-2  text-sm cursor-pointer font-bold text-white bg-[#695be8] p-1 rounded-sm "
               >
@@ -127,7 +130,11 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   );
 }
 
-function handleGoogleConnect(zapId: ParamValue, appName: string) {
+function handleGoogleConnect(
+  zapId: ParamValue,
+  appName: string,
+  token: string
+) {
   const app = appName.toLowerCase().replace(/\s+/g, "");
   const googleApps = [
     "sheet",
@@ -145,7 +152,7 @@ function handleGoogleConnect(zapId: ParamValue, appName: string) {
     return;
   }
 
-  const url = `/api/oauth/google/start?zapId=${zapId}&app=${matchedApp}`;
+  const url = `/api/oauth/google/start?zapId=${zapId}&app=${matchedApp}&token=${token}`;
 
   window.open(url, "google-oauth", "width=900,height=700");
 

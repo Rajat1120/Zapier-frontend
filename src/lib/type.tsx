@@ -76,3 +76,11 @@ export interface Zap {
     };
   };
 }
+
+export interface GoogleTokenPayload {
+  access_token: string;
+  refresh_token: string;
+  scopes: string[];
+  expires_in: number;
+  token: string;
+}

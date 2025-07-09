@@ -1,7 +1,7 @@
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Zap } from "./type";
+import { GoogleTokenPayload, Zap } from "./type";
 const supabase = createClientComponentClient();
 
 export const fetchActions = async (zapId: string | string[] | undefined) => {
@@ -65,4 +65,29 @@ export function useZaps() {
     error,
     refetchZaps,
   };
+}
+
+export async function updateGoogle_Tokens({
+  access_token,
+  refresh_token,
+  scopes,
+  expires_in,
+  token,
+}: GoogleTokenPayload & { token: string }): Promise<string> {
+  const response = await axios.post(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/google-token`,
+    {
+      access_token,
+      refresh_token,
+      scopes,
+      expires_in,
+    },
+    {
+      headers: {
+        Authorization: token,
+      },
+    }
+  );
+
+  return response.data;
 }

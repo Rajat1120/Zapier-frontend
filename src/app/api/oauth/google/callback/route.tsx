@@ -1,17 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
+import { updateGoogle_Tokens } from "@/lib/api";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get("code");
-  const zapId = searchParams.get("state");
+  const state = searchParams.get("state");
 
-  if (!code || !zapId) {
+  if (!code || !state) {
     return NextResponse.json(
       { error: "Missing code or state" },
       { status: 400 }
     );
   }
+
+  const { scopes, token } = JSON.parse(decodeURIComponent(state));
 
   try {
     const tokenResponse = await axios.post(
@@ -30,12 +33,15 @@ export async function GET(req: NextRequest) {
       }
     );
 
-    const { access_token, refresh_token } = tokenResponse.data;
-
-    // Optional: Store tokens in DB with zapId here
-
-    console.log("✅ Access Token:", access_token);
-    console.log("✅ Refresh Token:", refresh_token);
+    const { access_token, refresh_token, expires_in } = tokenResponse.data;
+    // store token in DB
+    await updateGoogle_Tokens({
+      access_token,
+      refresh_token,
+      scopes,
+      expires_in,
+      token,
+    });
 
     return new NextResponse(
       `<html>

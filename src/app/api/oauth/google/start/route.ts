@@ -38,9 +38,9 @@ const appScopes: Record<string, string[]> = {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const zapId = searchParams.get("zapId");
-  const app = searchParams.get("app");
 
+  const app = searchParams.get("app");
+  const token = searchParams.get("token");
   const baseScopes = [
     "https://www.googleapis.com/auth/userinfo.email",
     "https://www.googleapis.com/auth/userinfo.profile",
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
       scope: scopes.join(" "),
       access_type: "offline",
       prompt: "consent",
-      state: zapId ?? "",
+      state: encodeURIComponent(JSON.stringify({ token, scopes })),
     }
   ).toString()}`;
 
