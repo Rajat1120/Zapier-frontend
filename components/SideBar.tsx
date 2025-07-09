@@ -125,7 +125,7 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
                 >
                   {email && scopesMatch
                     ? `${name} ${email}`
-                    : `Connet to ${name}`}
+                    : `Connect to ${name}`}
                 </span>
               </div>
               <button
@@ -203,7 +203,15 @@ function handleGoogleConnect(
 
   const url = `/api/oauth/google/start?zapId=${zapId}&app=${matchedApp}&token=${token}`;
 
-  window.open(url, "google-oauth", "width=900,height=700");
+  const popup = window.open(url, "google-oauth", "width=900,height=700");
+
+  const interval = setInterval(() => {
+    if (popup?.closed) {
+      setConnecting(false);
+      clearInterval(interval);
+      window.removeEventListener("message", handleOAuthMessage);
+    }
+  }, 500);
 
   function handleOAuthMessage(event: MessageEvent) {
     setConnecting(false);
@@ -213,6 +221,7 @@ function handleGoogleConnect(
       setButtonLabel("Change");
       console.log("✅ Google account connected!");
       window.removeEventListener("message", handleOAuthMessage);
+      clearInterval(interval);
     }
   }
 
