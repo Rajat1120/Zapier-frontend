@@ -118,9 +118,14 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
             <span className="mb-1 font-medium text-sm">Account</span>
             <div className="w-full  flex justify-between p-2 border border-[#d7d3c9] rounded-md">
               <div>
-                <span className="text-sm ">
-                  {email ? `${name} ${email}` : null}
-                  {connecting ? "..." : !email ? `Connect to ${name}` : null}
+                <span
+                  className={`text-sm ${
+                    email && scopesMatch ? "font-medium" : ""
+                  }  truncate max-w-[250px] overflow-hidden whitespace-nowrap block`}
+                >
+                  {email && scopesMatch
+                    ? `${name} ${email}`
+                    : `Connet to ${name}`}
                 </span>
               </div>
               <button
