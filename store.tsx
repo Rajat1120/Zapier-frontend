@@ -19,9 +19,13 @@ type StoreState = {
   AvailableActions: AvailableAction[];
   filterNodes: CustomNode[];
   showZapModal: boolean;
+  connecting: boolean;
+  connected: false;
 
   setEmail: (email: string) => void;
+  setConnected: (val: boolean) => void;
   setPassword: (password: string) => void;
+  setConnecting: (val: boolean) => void;
   setActions: (val: Action[]) => void;
   setShowZapModal: (val: boolean) => void;
   setAvailableActions: (val: AvailableAction[]) => void;
@@ -37,14 +41,18 @@ const useStore = create<StoreState>((set) => ({
   email: "",
   password: "",
   selectedNode: null,
+  connected: false,
   showZapModal: false,
   selectedAction: null,
   selectedActions: [],
   zapTrigger: null,
+  connecting: false,
   actions: [],
   AvailableActions: [],
   filterNodes: [],
   setEmail: (email) => set(() => ({ email })),
+  setConnected: (val) => () => ({ connected: val }),
+  setConnecting: (val) => set(() => ({ connecting: val })),
   setShowZapModal: (val) => set(() => ({ showZapModal: val })),
   setPassword: (password) => set(() => ({ password })),
   setActions: (val) => set(() => ({ actions: val })),

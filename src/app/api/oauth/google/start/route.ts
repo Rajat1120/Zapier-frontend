@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const appScopes: Record<string, string[]> = {
+export const appScopes: Record<string, string[]> = {
   gmail: [
     "https://www.googleapis.com/auth/gmail.readonly",
     "https://www.googleapis.com/auth/gmail.send",

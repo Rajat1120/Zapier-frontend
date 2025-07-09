@@ -2,6 +2,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { GoogleTokenPayload, Zap } from "./type";
+import { appScopes } from "@/app/api/oauth/google/start/route";
 const supabase = createClientComponentClient();
 
 export const fetchActions = async (zapId: string | string[] | undefined) => {
@@ -90,4 +91,43 @@ export async function updateGoogle_Tokens({
   );
 
   return response.data;
+}
+
+function normalizeServiceKey(serviceName: string) {
+  // Convert "You Tube" → "youtube", "Google Slides" → "slide"
+  const lower = serviceName.toLowerCase().replace(/\s+/g, "");
+
+  const keywordMatch = Object.keys(appScopes).find((key) =>
+    lower.includes(key)
+  );
+
+  return keywordMatch || ""; // return "" if not matched
+}
+
+export function useHasServiceAccess(serviceName: string, token: string | null) {
+  const normalizedKey = normalizeServiceKey(serviceName);
+
+  return useQuery({
+    queryKey: ["google-token-scopes", normalizedKey, token],
+    refetchOnMount: true,
+    enabled: !!token && !!normalizedKey,
+    queryFn: async () => {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/google-token`,
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+
+      return res.data.scopes;
+    },
+    select: (scopes) => {
+      const requiredScopes = appScopes[normalizedKey];
+      if (!requiredScopes) return false;
+
+      return requiredScopes.some((scope) => scopes.includes(scope));
+    },
+  });
 }
