@@ -83,4 +83,5 @@ export interface GoogleTokenPayload {
   scopes: string[];
   expires_in: number;
   token: string;
+  email: string;
 }

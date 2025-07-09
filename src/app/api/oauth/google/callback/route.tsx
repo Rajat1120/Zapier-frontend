@@ -34,6 +34,15 @@ export async function GET(req: NextRequest) {
     );
 
     const { access_token, refresh_token, expires_in } = tokenResponse.data;
+
+    const userInfoRes = await axios.get(
+      "https://www.googleapis.com/oauth2/v3/userinfo",
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
     // store token in DB
     await updateGoogle_Tokens({
       access_token,
@@ -41,6 +50,7 @@ export async function GET(req: NextRequest) {
       scopes,
       expires_in,
       token,
+      email: userInfoRes.data.email,
     });
 
     return new NextResponse(

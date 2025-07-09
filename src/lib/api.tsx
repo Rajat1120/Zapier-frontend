@@ -74,6 +74,7 @@ export async function updateGoogle_Tokens({
   scopes,
   expires_in,
   token,
+  email,
 }: GoogleTokenPayload & { token: string }): Promise<string> {
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/google-token`,
@@ -82,6 +83,7 @@ export async function updateGoogle_Tokens({
       refresh_token,
       scopes,
       expires_in,
+      email,
     },
     {
       headers: {
@@ -112,22 +114,31 @@ export function useHasServiceAccess(serviceName: string, token: string | null) {
     refetchOnMount: true,
     enabled: !!token && !!normalizedKey,
     queryFn: async () => {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/google-token`,
-        {
-          headers: {
-            Authorization: token,
-          },
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/google-token`,
+          {
+            headers: { Authorization: token },
+          }
+        );
+
+        return res.data;
+      } catch (err: unknown) {
+        if (axios.isAxiosError(err) && err.response?.status === 404) {
+          return { scopes: [], email: null };
         }
-      );
-
-      return res.data.scopes;
+        throw err; // for other errors, rethrow
+      }
     },
-    select: (scopes) => {
+    select: (data) => {
+      const scopes = data?.scopes ?? [];
       const requiredScopes = appScopes[normalizedKey];
-      if (!requiredScopes) return false;
-
-      return requiredScopes.some((scope) => scopes.includes(scope));
+      const hasMatch =
+        requiredScopes?.some((scope) => scopes.includes(scope)) ?? false;
+      return {
+        scopesMatch: hasMatch,
+        email: data?.email ?? null,
+      };
     },
   });
 }

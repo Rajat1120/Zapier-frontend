@@ -4,7 +4,7 @@ import Image from "next/image";
 import useStore from "../store";
 
 import ZapModal from "./ZapModal";
-import { useEffect } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { ParamValue } from "next/dist/server/request/params";
 import { useHasServiceAccess } from "@/lib/api";
@@ -19,8 +19,7 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const setShowZapModal = useStore((state) => state.setShowZapModal);
   const setConnecting = useStore((state) => state.setConnecting);
   const connecting = useStore((state) => state.connecting);
-  const connected = useStore((state) => state.connected);
-  const setConnected = useStore((state) => state.setConnected);
+
   const showZapModal = useStore((state) => state.showZapModal);
 
   const params = useParams();
@@ -28,15 +27,22 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
     setShowZapModal(false);
   }, [setShowZapModal]);
 
-  const { data: hasAccess, isLoading } = useHasServiceAccess(name, token);
+  const { data, isLoading, refetch } = useHasServiceAccess(name, token);
+  const scopesMatch = data?.scopesMatch;
+  const email = data?.email;
+  const [buttonLabel, setButtonLabel] = useState("Connect");
 
-  let buttonLabel = "Connect";
-  if (isLoading || connecting) {
-    buttonLabel = "Loading...";
-  } else if (hasAccess || connected) {
-    buttonLabel = "Change";
-  }
+  console.log(data);
 
+  useEffect(() => {
+    if (isLoading || connecting) {
+      setButtonLabel("Loading...");
+    } else if (scopesMatch) {
+      setButtonLabel("Change");
+    } else {
+      setButtonLabel("Connect");
+    }
+  }, [connecting, isLoading, name, scopesMatch]);
   return (
     <div className="fixed top-16 right-4 w-[28%] h-[80%] flex  flex-col border-2 border-[#695be8] bg-white rounded-md">
       <div className="p-3 rounded-md justify-between  bg-[#f0eefb] flex">
@@ -112,21 +118,24 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
             <span className="mb-1 font-medium text-sm">Account</span>
             <div className="w-full  flex justify-between p-2 border border-[#d7d3c9] rounded-md">
               <div>
-                <span className="text-sm">
-                  {connecting ? "connecting..." : `Connect to ${name}`}
+                <span className="text-sm ">
+                  {email ? `${name} ${email}` : null}
+                  {connecting ? "..." : !email ? `Connect to ${name}` : null}
                 </span>
               </div>
               <button
                 onClick={() => {
                   const zapId = params.id;
-                  if (token && buttonLabel === "connect") {
+
+                  if (token && buttonLabel === "Connect") {
                     setConnecting(true);
                     handleGoogleConnect(
                       zapId,
                       name,
                       token,
                       setConnecting,
-                      setConnected
+                      setButtonLabel,
+                      refetch
                     );
                   }
                 }}
@@ -164,7 +173,11 @@ function handleGoogleConnect(
   appName: string,
   token: string,
   setConnecting: (val: boolean) => void,
-  setConnected: (val: boolean) => void
+  setButtonLabel: {
+    (value: SetStateAction<string>): void;
+    (arg0: string): void;
+  },
+  refetch: () => void
 ) {
   const app = appName.toLowerCase().replace(/\s+/g, "");
   const googleApps = [
@@ -191,7 +204,8 @@ function handleGoogleConnect(
     setConnecting(false);
     if (event.origin !== window.location.origin) return;
     if (event.data === "oauth-success") {
-      setConnected(true);
+      refetch();
+      setButtonLabel("Change");
       console.log("✅ Google account connected!");
       window.removeEventListener("message", handleOAuthMessage);
     }
