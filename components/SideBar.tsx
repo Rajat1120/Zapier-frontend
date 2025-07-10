@@ -8,11 +8,14 @@ import { SetStateAction, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { ParamValue } from "next/dist/server/request/params";
 import { useHasServiceAccess } from "@/lib/api";
+import ActionEventSideBar from "./ActionEventSideBar";
 
 export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const selectedNode = useStore((state) => state.selectedNode);
   const setSelectedNode = useStore((state) => state.setSelectedNode);
   const token = localStorage.getItem("token");
+  const [showActionSideBar, setShowActionSideBar] = useState<boolean>(false);
+
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
   const { name, image } = selectedNode?.data?.label?.props?.match;
@@ -105,11 +108,23 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
             <span className="mb-1 font-medium text-sm">
               {curNodeIdx === 0 ? "Trigger" : "Action"} Event
             </span>
-            <div className="w-full cursor-pointer flex justify-between p-2 border border-[#d7d3c9] rounded-md">
+            {showActionSideBar && (
+              <ActionEventSideBar
+                name={name}
+                setShowActionSideBar={setShowActionSideBar}
+              ></ActionEventSideBar>
+            )}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowActionSideBar((prev) => !prev);
+              }}
+              className="w-full cursor-pointer flex justify-between p-2 border border-[#d7d3c9] rounded-md"
+            >
               <div>
                 <span className="text-sm">Choose an event</span>
               </div>
-              <button className="">
+              <div className="">
                 <svg
                   width="20"
                   height="20"
@@ -125,8 +140,8 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
                     d="M9 20l7 7 7-7M23 12l-7-7-7 7"
                   ></path>
                 </svg>
-              </button>
-            </div>
+              </div>
+            </button>
           </div>
           <div className="flex m-2 flex-col">
             <span className="mb-1 font-medium text-sm">Account</span>

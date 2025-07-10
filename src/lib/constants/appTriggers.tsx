@@ -2,7 +2,7 @@ export const appTriggers: Record<
   string,
   { heading: string; subheading: string }[]
 > = {
-  sheets: [
+  "Google sheets": [
     {
       heading: "New or Updated Spreadsheet Row",
       subheading:
@@ -17,7 +17,7 @@ export const appTriggers: Record<
       subheading: "Triggers when new worksheet is created in a spreadsheet.",
     },
   ],
-  docs: [
+  "Google docs": [
     {
       heading: "New Document",
       subheading: "Triggers when a new document is added (inside any folder)",
