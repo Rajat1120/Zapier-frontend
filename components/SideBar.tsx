@@ -107,11 +107,27 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
             <span className="mb-1 font-medium text-sm">
               {curNodeIdx === 0 ? "Trigger" : "Action"} Event
             </span>
-            <div className="w-full  flex justify-between p-2 border border-[#d7d3c9] rounded-md">
+            <div className="w-full cursor-pointer flex justify-between p-2 border border-[#d7d3c9] rounded-md">
               <div>
                 <span className="text-sm">Choose an event</span>
               </div>
-              <button>Change</button>
+              <button className="">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 32 32"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                >
+                  <path
+                    stroke="#535358"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 20l7 7 7-7M23 12l-7-7-7 7"
+                  ></path>
+                </svg>
+              </button>
             </div>
           </div>
           <div className="flex m-2 flex-col">
