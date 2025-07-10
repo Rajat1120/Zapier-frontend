@@ -1,5 +1,7 @@
 import { appTriggers } from "@/lib/constants/appTriggers";
 import React, { useEffect, useRef } from "react";
+import useStore from "../store";
+import { useParams } from "next/navigation";
 
 interface ActionEventSideBarProps {
   name: string;
@@ -17,7 +19,10 @@ const ActionEventSideBar: React.FC<ActionEventSideBarProps> = ({
 
   setShowActionSideBar,
 }) => {
+  const params = useParams();
   const eventSideBarRef = useRef<HTMLDivElement | null>(null);
+  const setZapTriggerMeta = useStore((state) => state.setZapTriggerMeta);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -52,6 +57,14 @@ const ActionEventSideBar: React.FC<ActionEventSideBarProps> = ({
           {(appTriggers[name] as AppTrigger[]).map((val, i) => {
             return (
               <div
+                onClick={() => {
+                  setZapTriggerMeta({
+                    zapId: params.id,
+                    triggerApp: name,
+                    triggerEvent: val.heading,
+                  });
+                  setShowActionSideBar(false);
+                }}
                 key={i}
                 className="flex cursor-pointer hover:bg-[#ecebf8] flex-col gap-y-1 p-2"
               >

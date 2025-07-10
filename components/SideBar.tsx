@@ -7,7 +7,7 @@ import ZapModal from "./ZapModal";
 import { SetStateAction, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { ParamValue } from "next/dist/server/request/params";
-import { useHasServiceAccess } from "@/lib/api";
+import { useHasServiceAccess, useTriggerUpdate } from "@/lib/api";
 import ActionEventSideBar from "./ActionEventSideBar";
 
 export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
@@ -25,7 +25,31 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
 
   const showZapModal = useStore((state) => state.showZapModal);
 
+  const zapTriggerMeta = useStore((state) => state.zapTriggerMeta);
+  const setZapTriggerMeta = useStore((state) => state.setZapTriggerMeta);
+
   const params = useParams();
+
+  const { triggerEvent, isLoading: triggerEventLoading } = useTriggerUpdate({
+    event: zapTriggerMeta?.triggerEvent,
+    zapId: params.id,
+  });
+  useEffect(() => {
+    console.log("Updated zapTriggerMeta:", zapTriggerMeta);
+  }, [zapTriggerMeta]);
+
+  useEffect(() => {
+    if (!triggerEvent) return;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    setZapTriggerMeta((val) => ({
+      zapId: val.zapId,
+      triggerApp: val.triggerApp,
+      triggerEvent, // updated event
+    }));
+    console.log(triggerEvent);
+  }, [setZapTriggerMeta, triggerEvent]);
+
   useEffect(() => {
     setShowZapModal(false);
   }, [setShowZapModal]);
@@ -122,7 +146,13 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
               className="w-full cursor-pointer flex justify-between p-2 border border-[#d7d3c9] rounded-md"
             >
               <div>
-                <span className="text-sm">Choose an event</span>
+                <span
+                  className={`text-sm ${zapTriggerMeta ? "font-medium" : ""} `}
+                >
+                  {zapTriggerMeta
+                    ? zapTriggerMeta.triggerEvent
+                    : "Choose an event"}
+                </span>
               </div>
               <div className="">
                 <svg

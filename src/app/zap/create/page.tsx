@@ -50,6 +50,14 @@ export default function CreateNewZap() {
   const setSelectedActions = useStore((state) => state.setSelectedActions);
   const selectedActions = useStore((state) => state.selectedActions);
   const [curNodeIdx, setCurNodeIdx] = useState<number | null>(null);
+  const setShowZapModal = useStore((state) => state.setShowZapModal);
+
+  useEffect(() => {
+    if (selectedNode) {
+      setShowZapModal(true);
+    }
+  }, [selectedNode, setShowZapModal]);
+
   useEffect(() => {
     if (selectedNode) {
       setSelectedAction(null);
@@ -105,8 +113,8 @@ export default function CreateNewZap() {
             >
               <div
                 style={{
-                  fontSize: "8px",
-                  padding: "2px 6px",
+                  fontSize: "10px",
+                  padding: "4px 8px",
                   backgroundColor: "#ffffff",
                   borderRadius: "4px",
                   fontWeight: "bold",
@@ -120,8 +128,8 @@ export default function CreateNewZap() {
                 <Image
                   src={icon ?? ""}
                   alt="action icon"
-                  height={12}
-                  width={12}
+                  height={16}
+                  width={16}
                 />
                 {match.name}
               </div>

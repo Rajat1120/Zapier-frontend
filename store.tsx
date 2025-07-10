@@ -7,6 +7,7 @@ import {
   AvailableAction,
   SelectedAction,
 } from "@/lib/type";
+import { ParamValue } from "next/dist/server/request/params";
 
 type StoreState = {
   email: string;
@@ -21,6 +22,11 @@ type StoreState = {
   showZapModal: boolean;
   connecting: boolean;
   connected: false;
+  zapTriggerMeta: {
+    zapId: string;
+    triggerApp: string;
+    triggerEvent: string;
+  } | null;
 
   setEmail: (email: string) => void;
   setConnected: (val: boolean) => void;
@@ -35,6 +41,11 @@ type StoreState = {
   setZapTrigger: (action: SelectedAction | Action | null) => void;
   setSelectedActions: (newAction: SelectedAction | null) => void;
   setFilterNodes: (filterNodes: CustomNode[]) => void;
+  setZapTriggerMeta: (meta: {
+    zapId: ParamValue;
+    triggerApp: string;
+    triggerEvent: string;
+  }) => void;
 };
 
 const useStore = create<StoreState>((set) => ({
@@ -50,6 +61,7 @@ const useStore = create<StoreState>((set) => ({
   actions: [],
   AvailableActions: [],
   filterNodes: [],
+  zapTriggerMeta: null,
   setEmail: (email) => set(() => ({ email })),
   setConnected: (val) => () => ({ connected: val }),
   setConnecting: (val) => set(() => ({ connecting: val })),
@@ -80,6 +92,7 @@ const useStore = create<StoreState>((set) => ({
           : [...state.selectedActions, newAction],
       };
     }),
+  setZapTriggerMeta: (meta) => set(() => ({ zapTriggerMeta: meta })),
 }));
 
 export default useStore;

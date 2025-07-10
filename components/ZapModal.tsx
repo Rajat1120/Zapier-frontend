@@ -51,6 +51,7 @@ export default function ZapModal() {
   const selectedNode = useStore((state) => state.selectedNode);
   const setShowZapModal = useStore((state) => state.setShowZapModal);
   const showZapModal = useStore((state) => state.showZapModal);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
