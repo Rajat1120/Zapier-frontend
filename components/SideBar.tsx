@@ -32,8 +32,6 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const email = data?.email;
   const [buttonLabel, setButtonLabel] = useState("Connect");
 
-  console.log(data);
-
   useEffect(() => {
     if (isLoading || connecting) {
       setButtonLabel("Loading...");
