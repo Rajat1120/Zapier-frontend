@@ -45,7 +45,7 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
     }
   }, [connecting, isLoading, name, scopesMatch]);
   return (
-    <div className="fixed top-16 right-4 w-[28%] h-[80%] flex  flex-col border-2 border-[#695be8] bg-white rounded-md">
+    <div className="fixed top-16 right-4 min-w-[400px] max-w-[400px] h-[80%] flex  flex-col border-2 border-[#695be8] bg-white rounded-md">
       <div className="p-3 rounded-md justify-between  bg-[#f0eefb] flex">
         <div className="flex items-center space-x-2">
           <div className="bg-white h-8 w-8 border border-[#d7d3c9] rounded-xs flex items-center justify-center ">

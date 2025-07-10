@@ -37,9 +37,9 @@ const ActionEventSideBar: React.FC<ActionEventSideBarProps> = ({
   return (
     <div
       ref={eventSideBarRef}
-      className="fixed border top-76 bg-white rounded-sm shadow-2xl right-100"
+      className="fixed border  top-76 bg-white rounded-sm shadow-2xl right-100"
     >
-      <div className="max-w-90 h-auto">
+      <div className="max-w-90 min-w-90 h-auto">
         <div className="py-2 w-full px-2">
           <input
             type="text"
@@ -48,7 +48,7 @@ const ActionEventSideBar: React.FC<ActionEventSideBarProps> = ({
           />
         </div>
 
-        <div className="px-2 py-4">
+        <div className="px-2 py-4 max-h-70 overflow-scroll">
           {(appTriggers[name] as AppTrigger[]).map((val, i) => {
             return (
               <div

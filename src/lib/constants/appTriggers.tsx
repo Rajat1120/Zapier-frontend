@@ -16,6 +16,11 @@ export const appTriggers: Record<
       heading: "New Worksheet",
       subheading: "Triggers when new worksheet is created in a spreadsheet.",
     },
+    {
+      heading: "New Spreadsheet row",
+      subheading:
+        "Triggers when a new row is added to the bottom  of a spreadsheet.",
+    },
   ],
   "Google docs": [
     {
