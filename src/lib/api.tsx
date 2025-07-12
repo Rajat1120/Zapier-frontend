@@ -4,7 +4,7 @@ import axios from "axios";
 import { GoogleTokenPayload, Zap } from "./type";
 import { appScopes } from "@/app/api/oauth/google/start/route";
 import { ParamValue } from "next/dist/server/request/params";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 const supabase = createClientComponentClient();
 
 export const fetchActions = async (zapId: string | string[] | undefined) => {
@@ -171,7 +171,11 @@ export function useTriggerUpdate({
     updateTrigger();
   }, [zapId, event]);
 
-  const [triggerEvent, setTriggerEvent] = useState<string | null>(null);
+  const [triggerData, setTriggerData] = useState<{
+    triggerEvent: string;
+    zapId: string;
+    triggerApp: string;
+  } | null>(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["trigger-event", zapId],
@@ -179,16 +183,16 @@ export function useTriggerUpdate({
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/trigger/${zapId}`
       );
-      return res.data.triggerEvent; // assume backend returns { triggerEvent: "..." }
+      return res.data;
     },
-    enabled: !!zapId, // run only when zapId is not null/undefined
+    enabled: !!zapId,
   });
 
   useEffect(() => {
     if (data) {
-      setTriggerEvent(data);
+      setTriggerData(data);
     }
   }, [data]);
 
-  return { triggerEvent, isLoading, isError };
+  return { triggerData, isLoading, isError };
 }

@@ -9,6 +9,7 @@ import { useParams } from "next/navigation";
 import { ParamValue } from "next/dist/server/request/params";
 import { useHasServiceAccess, useTriggerUpdate } from "@/lib/api";
 import ActionEventSideBar from "./ActionEventSideBar";
+import { isWordIncluded } from "@/lib/utils";
 
 export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const selectedNode = useStore((state) => state.selectedNode);
@@ -30,25 +31,22 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
 
   const params = useParams();
 
-  const { triggerEvent, isLoading: triggerEventLoading } = useTriggerUpdate({
+  const { triggerData, isLoading: triggerEventLoading } = useTriggerUpdate({
     event: zapTriggerMeta?.triggerEvent,
     zapId: params.id,
   });
-  useEffect(() => {
-    console.log("Updated zapTriggerMeta:", zapTriggerMeta);
-  }, [zapTriggerMeta]);
 
   useEffect(() => {
-    if (!triggerEvent) return;
+    if (!triggerData) return;
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
-    setZapTriggerMeta((val) => ({
-      zapId: val.zapId,
-      triggerApp: val.triggerApp,
-      triggerEvent, // updated event
-    }));
-    console.log(triggerEvent);
-  }, [setZapTriggerMeta, triggerEvent]);
+
+    setZapTriggerMeta({
+      zapId: triggerData?.triggerEvent,
+      triggerApp: triggerData?.triggerApp,
+      triggerEvent: triggerData?.triggerEvent, // updated event
+    });
+  }, [setZapTriggerMeta, triggerData, triggerEventLoading]);
 
   useEffect(() => {
     setShowZapModal(false);
@@ -58,6 +56,13 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const scopesMatch = data?.scopesMatch;
   const email = data?.email;
   const [buttonLabel, setButtonLabel] = useState("Connect");
+  const [isTrigger, setIsTrigger] = useState(false);
+
+  useEffect(() => {
+    if (zapTriggerMeta && name) {
+      setIsTrigger(isWordIncluded(zapTriggerMeta?.triggerApp, name));
+    }
+  }, [name, zapTriggerMeta]);
 
   useEffect(() => {
     if (isLoading || connecting) {
@@ -146,10 +151,10 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
               className="w-full cursor-pointer flex justify-between p-2 border border-[#d7d3c9] rounded-md"
             >
               <div>
-                <span
-                  className={`text-sm ${zapTriggerMeta ? "font-medium" : ""} `}
-                >
-                  {zapTriggerMeta
+                <span className={`text-sm ${isTrigger ? "font-medium" : ""} `}>
+                  {triggerEventLoading
+                    ? "Loading..."
+                    : isTrigger && zapTriggerMeta
                     ? zapTriggerMeta.triggerEvent
                     : "Choose an event"}
                 </span>

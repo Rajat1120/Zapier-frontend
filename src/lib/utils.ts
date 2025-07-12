@@ -77,3 +77,11 @@ export const addTrailingPlusNode = (
   nodeList.push(...filteredNodes);
   edgeList.push(...filteredEdges);
 };
+
+export function isWordIncluded(str1: string, str2: string) {
+  const s1 = str1.toLowerCase().replace(/\s+/g, "");
+  const s2 = str2.toLowerCase().replace(/\s+/g, "");
+  console.log(s1, s2);
+
+  return s2.includes(s1);
+}
