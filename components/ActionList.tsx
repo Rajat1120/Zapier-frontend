@@ -69,6 +69,7 @@ export default function ActionsList() {
   const setSelectedNode = useStore((state) => state.setSelectedNode);
   const setSelectedActions = useStore((state) => state.setSelectedActions);
   const setSelectedAction = useStore((state) => state.setSelectedAction);
+  const setUpdateTrigger = useStore((state) => state.setUpdateTrigger);
   const setAvailableActions = useStore((state) => state.setAvailableActions);
   const setActions = useStore((state) => state.setActions);
   const actions = useStore((state) => state.actions);
@@ -78,6 +79,7 @@ export default function ActionsList() {
   const selectedNode = useStore((state) => state.selectedNode);
   const selectedAction = useStore((state) => state.selectedAction);
   const selectedActions = useStore((state) => state.selectedActions);
+  const setZapTriggerMeta = useStore((state) => state.setZapTriggerMeta);
   const setShowZapModal = useStore((state) => state.setShowZapModal);
   const showZapModal = useStore((state) => state.showZapModal);
   const [loading, setLoading] = useState<boolean>(true);
@@ -117,6 +119,18 @@ export default function ActionsList() {
       setFilterNodes(generateInitialNodes(actions.length));
     }
   }, [actions, setFilterNodes]);
+
+  useEffect(() => {
+    const triggerNode = selectedActions.find((node) => node.index === 0);
+
+    if (triggerNode) {
+      const triggerNodeInActions = actions.find((node) => node.index === 0);
+      if (triggerNode.availableActionId !== triggerNodeInActions?.actionId) {
+        setZapTriggerMeta(null);
+        setUpdateTrigger(false);
+      }
+    }
+  }, [actions, selectedActions, setUpdateTrigger, setZapTriggerMeta]);
 
   useEffect(() => {
     setNewNodes(filterNodes);

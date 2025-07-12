@@ -27,6 +27,7 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const showZapModal = useStore((state) => state.showZapModal);
 
   const zapTriggerMeta = useStore((state) => state.zapTriggerMeta);
+  const updateTrigger = useStore((state) => state.updateTrigger);
   const setZapTriggerMeta = useStore((state) => state.setZapTriggerMeta);
 
   const params = useParams();
@@ -40,13 +41,14 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
     if (!triggerData) return;
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
-
-    setZapTriggerMeta({
-      zapId: triggerData?.triggerEvent,
-      triggerApp: triggerData?.triggerApp,
-      triggerEvent: triggerData?.triggerEvent, // updated event
-    });
-  }, [setZapTriggerMeta, triggerData, triggerEventLoading]);
+    if (updateTrigger) {
+      setZapTriggerMeta({
+        zapId: triggerData?.triggerEvent,
+        triggerApp: triggerData?.triggerApp,
+        triggerEvent: triggerData?.triggerEvent, // updated event
+      });
+    }
+  }, [setZapTriggerMeta, triggerData, triggerEventLoading, updateTrigger]);
 
   useEffect(() => {
     setShowZapModal(false);
@@ -59,7 +61,7 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const [isTrigger, setIsTrigger] = useState(false);
 
   useEffect(() => {
-    if (zapTriggerMeta && name) {
+    if (zapTriggerMeta && name && zapTriggerMeta.triggerEvent) {
       setIsTrigger(isWordIncluded(zapTriggerMeta?.triggerApp, name));
     }
   }, [name, zapTriggerMeta]);
@@ -169,9 +171,9 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
                 >
                   <path
                     stroke="#535358"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
                     d="M9 20l7 7 7-7M23 12l-7-7-7 7"
                   ></path>
                 </svg>

@@ -13,6 +13,7 @@ type StoreState = {
   email: string;
   password: string;
   selectedNode: Node | null;
+  updateTrigger: boolean;
   selectedAction: AvailableAction | null;
   selectedActions: SelectedAction[];
   zapTrigger: SelectedAction | Action | null;
@@ -29,6 +30,7 @@ type StoreState = {
   } | null;
 
   setEmail: (email: string) => void;
+  setUpdateTrigger: (val: boolean) => void;
   setConnected: (val: boolean) => void;
   setPassword: (password: string) => void;
   setConnecting: (val: boolean) => void;
@@ -41,17 +43,20 @@ type StoreState = {
   setZapTrigger: (action: SelectedAction | Action | null) => void;
   setSelectedActions: (newAction: SelectedAction | null) => void;
   setFilterNodes: (filterNodes: CustomNode[]) => void;
-  setZapTriggerMeta: (meta: {
-    zapId: ParamValue;
-    triggerApp: string;
-    triggerEvent: string;
-  }) => void;
+  setZapTriggerMeta: (
+    meta: {
+      zapId: ParamValue;
+      triggerApp: string;
+      triggerEvent: string;
+    } | null
+  ) => void;
 };
 
 const useStore = create<StoreState>((set) => ({
   email: "",
   password: "",
   selectedNode: null,
+  updateTrigger: true,
   connected: false,
   showZapModal: false,
   selectedAction: null,
@@ -63,6 +68,7 @@ const useStore = create<StoreState>((set) => ({
   filterNodes: [],
   zapTriggerMeta: null,
   setEmail: (email) => set(() => ({ email })),
+  setUpdateTrigger: (val) => set(() => ({ updateTrigger: val })),
   setConnected: (val) => () => ({ connected: val }),
   setConnecting: (val) => set(() => ({ connecting: val })),
   setShowZapModal: (val) => set(() => ({ showZapModal: val })),
@@ -92,7 +98,20 @@ const useStore = create<StoreState>((set) => ({
           : [...state.selectedActions, newAction],
       };
     }),
-  setZapTriggerMeta: (meta) => set(() => ({ zapTriggerMeta: meta })),
+  setZapTriggerMeta: (meta) =>
+    set(() => ({
+      zapTriggerMeta: meta
+        ? {
+            ...meta,
+            zapId:
+              typeof meta.zapId === "string"
+                ? meta.zapId
+                : Array.isArray(meta.zapId)
+                ? meta.zapId[0] ?? ""
+                : "",
+          }
+        : null,
+    })),
 }));
 
 export default useStore;
