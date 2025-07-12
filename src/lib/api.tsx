@@ -3,8 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { GoogleTokenPayload, Zap } from "./type";
 import { appScopes } from "@/app/api/oauth/google/start/route";
-import { ParamValue } from "next/dist/server/request/params";
-import { useEffect, useState } from "react";
+
 const supabase = createClientComponentClient();
 
 export const fetchActions = async (zapId: string | string[] | undefined) => {
@@ -143,56 +142,4 @@ export function useHasServiceAccess(serviceName: string, token: string | null) {
       };
     },
   });
-}
-
-export function useTriggerUpdate({
-  event,
-  zapId,
-}: {
-  event: string | undefined;
-  zapId: ParamValue | undefined;
-}) {
-  useEffect(() => {
-    if (!zapId || !event) return;
-
-    const updateTrigger = async () => {
-      try {
-        await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/trigger/${zapId}`,
-          {
-            triggerEvent: event,
-          }
-        );
-      } catch (error) {
-        console.error("Failed to update trigger:", error);
-      }
-    };
-
-    updateTrigger();
-  }, [zapId, event]);
-
-  const [triggerData, setTriggerData] = useState<{
-    triggerEvent: string;
-    zapId: string;
-    triggerApp: string;
-  } | null>(null);
-
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["trigger-event", zapId],
-    queryFn: async () => {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/trigger/${zapId}`
-      );
-      return res.data;
-    },
-    enabled: !!zapId,
-  });
-
-  useEffect(() => {
-    if (data) {
-      setTriggerData(data);
-    }
-  }, [data]);
-
-  return { triggerData, isLoading, isError };
 }

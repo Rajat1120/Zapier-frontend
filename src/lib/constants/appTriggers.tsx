@@ -33,4 +33,66 @@ export const appTriggers: Record<
         "Triggers when a new document is added to a specific folder (but not it's subfolders)",
     },
   ],
+  Notion: [
+    {
+      heading: "New Comment",
+      subheading:
+        "Triggers when a new comment is created in your Notion workspace.",
+    },
+    {
+      heading: "New Database Item",
+      subheading: "Triggers when a new item is created in a database.",
+    },
+    {
+      heading: "Updated Database Item",
+      subheading: "Triggers when a new item in a selected database is updated.",
+    },
+    {
+      heading: "Updated page",
+      subheading: "Triggers when a Page is updated.",
+    },
+  ],
+  Slack: [
+    {
+      heading: "New Channel",
+      subheading: "Triggers when a new #channel is created.",
+    },
+    {
+      heading: "New File",
+      subheading: "Triggers when a new file is uploaded to your workspace.",
+    },
+    {
+      heading: "New Mention",
+      subheading:
+        "Triggers when a username or highlight word is mentioned in a public #channel.",
+    },
+  ],
+  Gmail: [
+    {
+      heading: "New Attachment",
+      subheading: "Triggers when your receive a new attachment",
+    },
+    {
+      heading: "New Conversation",
+      subheading:
+        "Triggers when a new email conversations begains in your inbox.",
+    },
+    {
+      heading: "New Email",
+      subheading: "Triggers when a new emai appears in the specified mailbox.",
+    },
+  ],
+  "Google Calendar": [
+    {
+      heading: "New Event",
+      subheading: "Triggers when a new event is created.",
+    },
+  ],
+  "You Tube": [
+    {
+      heading: "New Comment on Video",
+      subheading:
+        "Triggers when a new comment is posted on a specific YouTube video.",
+    },
+  ],
 };

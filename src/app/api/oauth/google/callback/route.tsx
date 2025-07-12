@@ -34,6 +34,7 @@ export async function GET(req: NextRequest) {
     );
 
     const { access_token, refresh_token, expires_in } = tokenResponse.data;
+    console.log("Granted scopes:", tokenResponse.data.scope);
 
     const userInfoRes = await axios.get(
       "https://www.googleapis.com/oauth2/v3/userinfo",
@@ -68,11 +69,18 @@ export async function GET(req: NextRequest) {
         },
       }
     );
-  } catch (error) {
-    console.error("OAuth Callback Error:", error);
-    return NextResponse.json(
-      { error: "Token exchange failed" },
-      { status: 500 }
-    );
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    const errorMessage =
+      error?.response?.data?.error_description ||
+      error?.response?.data?.error ||
+      error?.message ||
+      "Unknown error during token exchange";
+
+    console.error("OAuth Callback Error:", errorMessage);
+
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

@@ -7,9 +7,10 @@ import ZapModal from "./ZapModal";
 import { SetStateAction, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { ParamValue } from "next/dist/server/request/params";
-import { useHasServiceAccess, useTriggerUpdate } from "@/lib/api";
+import { useHasServiceAccess } from "@/lib/api";
 import ActionEventSideBar from "./ActionEventSideBar";
 import { isWordIncluded } from "@/lib/utils";
+import { useTriggerUpdate } from "@/lib/CustomHook";
 
 export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const selectedNode = useStore((state) => state.selectedNode);

@@ -1,4 +1,6 @@
-import { useEffect } from "react";
+"use client";
+
+import { useEffect, useState } from "react";
 import { addTrailingPlusNode } from "./utils";
 import {
   Action,
@@ -15,6 +17,8 @@ import { useParams } from "next/navigation";
 import { ParamValue } from "next/dist/server/request/params";
 import { updateZap } from "../../utils/HelperFunctions";
 import { JSX } from "react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 type UseAddNodeParams = {
   nodes: CustomNode[];
@@ -493,4 +497,56 @@ function updateActionsAfterInsert(
   updatedActions.splice(insertedIndex, 0, newAction);
 
   return updatedActions;
+}
+
+export function useTriggerUpdate({
+  event,
+  zapId,
+}: {
+  event: string | undefined;
+  zapId: ParamValue | undefined;
+}) {
+  useEffect(() => {
+    if (!zapId || !event) return;
+
+    const updateTrigger = async () => {
+      try {
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/trigger/${zapId}`,
+          {
+            triggerEvent: event,
+          }
+        );
+      } catch (error) {
+        console.error("Failed to update trigger:", error);
+      }
+    };
+
+    updateTrigger();
+  }, [zapId, event]);
+
+  const [triggerData, setTriggerData] = useState<{
+    triggerEvent: string;
+    zapId: string;
+    triggerApp: string;
+  } | null>(null);
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["trigger-event", zapId],
+    queryFn: async () => {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/trigger/${zapId}`
+      );
+      return res.data;
+    },
+    enabled: !!zapId,
+  });
+
+  useEffect(() => {
+    if (data) {
+      setTriggerData(data);
+    }
+  }, [data]);
+
+  return { triggerData, isLoading, isError };
 }
