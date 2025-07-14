@@ -17,8 +17,10 @@ export const appScopes: Record<string, string[]> = {
     "https://www.googleapis.com/auth/drive.metadata",
     "https://www.googleapis.com/auth/drive.appdata",
     "https://www.googleapis.com/auth/drive.file",
-    "https://www.googleapis.com/auth/drive.metadata.readonly",
     "https://www.googleapis.com/auth/drive.readonly",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile",
+    "openid",
   ],
   sheet: [
     "https://www.googleapis.com/auth/spreadsheets",
