@@ -17,6 +17,7 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const setSelectedNode = useStore((state) => state.setSelectedNode);
   const token = localStorage.getItem("token");
   const [showActionSideBar, setShowActionSideBar] = useState<boolean>(false);
+  const [selectedField, setselectedField] = useState<string>("setup");
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
@@ -89,7 +90,9 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
               alt={name}
             ></Image>
           </div>
-          <span>Select the Event</span>
+          <span className={`${zapTriggerMeta ? "font-medium" : ""}`}>
+            {zapTriggerMeta ? zapTriggerMeta.triggerEvent : "Select the event"}
+          </span>
         </div>
         <div className="flex space-x-3 items-center">
           <Image
@@ -113,7 +116,55 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
         </div>
       </div>
       <div className="flex-grow border-b-[#d7d3c9] border overflow-y-auto">
-        <div className="p-3">Setup</div>
+        <div className="flex items-center">
+          <div
+            onClick={() => setselectedField("setup")}
+            className={`p-3 cursor-pointer font-semibold text-sm border-b-2 ${
+              selectedField === "setup" ? " border-[#695be8]" : "border-white"
+            } `}
+          >
+            Setup
+          </div>
+
+          <Image
+            width={40}
+            height={40}
+            className="w-4 h-4 object-contain"
+            alt="next img"
+            src={
+              "https://img.icons8.com/?size=100&id=3199&format=png&color=000000"
+            }
+          ></Image>
+
+          <div
+            onClick={() => setselectedField("configure")}
+            className={`p-3 cursor-pointer font-semibold text-sm border-b-2 ${
+              selectedField === "configure"
+                ? " border-[#695be8]"
+                : "border-white"
+            } `}
+          >
+            Configure
+          </div>
+          <Image
+            width={40}
+            height={40}
+            className="w-4 h-4 object-contain"
+            alt="next img"
+            src={
+              "https://img.icons8.com/?size=100&id=3199&format=png&color=000000"
+            }
+          ></Image>
+
+          <div
+            onClick={() => setselectedField("test")}
+            className={`p-3 cursor-pointer font-semibold text-sm border-b-2 ${
+              selectedField === "test" ? " border-[#695be8]" : "border-white"
+            } `}
+          >
+            Test
+          </div>
+        </div>
         <div className=" border-t border-b p-3 h-full border-[#d7d3c9]">
           <div className="flex m-2 flex-col">
             <span className="mb-1 font-medium text-sm">App</span>
