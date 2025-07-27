@@ -86,6 +86,7 @@ export async function GET(req: NextRequest) {
       scope: scopes.join(" "),
       access_type: "offline",
       prompt: "consent",
+      include_granted_scopes: "false",
       state: encodeURIComponent(JSON.stringify({ token, scopes })),
     }
   ).toString()}`;

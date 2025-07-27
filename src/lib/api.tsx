@@ -200,3 +200,43 @@ export function handleGoogleConnect(
 
   window.addEventListener("message", handleOAuthMessage);
 }
+
+export function useGetDriveFolders({
+  token,
+  enabled,
+}: {
+  token: string | null;
+  enabled: boolean;
+}) {
+  const { isLoading: gettingFolders, data: driveFolders } = useQuery({
+    queryKey: ["google-drive-folders"],
+    queryFn: () => getDriveFolders(token),
+    enabled: typeof window !== "undefined" && enabled,
+    staleTime: 1000 * 60 * 2,
+    retry: 1,
+  });
+
+  if (!token) {
+    return { gettingFolders: false, driveFolders: [] };
+  }
+
+  return { gettingFolders, driveFolders: driveFolders ?? [] };
+}
+
+async function getDriveFolders(token: string | null) {
+  if (!token) return [];
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/google-drive/google/folders`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: token,
+      },
+    }
+  );
+
+  const data = await res.json();
+
+  return data.folders || [];
+}
