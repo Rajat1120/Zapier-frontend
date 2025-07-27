@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { GoogleTokenPayload, Zap } from "./type";
 import { appScopes } from "@/app/api/oauth/google/start/route";
+import { ParamValue } from "next/dist/server/request/params";
+import { SetStateAction } from "react";
 
 const supabase = createClientComponentClient();
 
@@ -142,4 +144,59 @@ export function useHasServiceAccess(serviceName: string, token: string | null) {
       };
     },
   });
+}
+
+export function handleGoogleConnect(
+  zapId: ParamValue,
+  appName: string,
+  token: string,
+  setConnecting: (val: boolean) => void,
+  setButtonLabel: {
+    (value: SetStateAction<string>): void;
+    (arg0: string): void;
+  },
+  refetch: () => void
+) {
+  const app = appName.toLowerCase().replace(/\s+/g, "");
+  const googleApps = [
+    "sheet",
+    "slide",
+    "calendar",
+    "docs",
+    "drive",
+    "youtube",
+    "gmail",
+  ];
+  const matchedApp = googleApps.find((keyword) => app.includes(keyword));
+
+  if (!matchedApp) {
+    console.warn("No OAuth flow configured for app:", appName);
+    return;
+  }
+
+  const url = `/api/oauth/google/start?zapId=${zapId}&app=${matchedApp}&token=${token}`;
+
+  const popup = window.open(url, "google-oauth", "width=900,height=700");
+
+  const interval = setInterval(() => {
+    if (popup?.closed) {
+      setConnecting(false);
+      clearInterval(interval);
+      window.removeEventListener("message", handleOAuthMessage);
+    }
+  }, 500);
+
+  function handleOAuthMessage(event: MessageEvent) {
+    setConnecting(false);
+    if (event.origin !== window.location.origin) return;
+    if (event.data === "oauth-success") {
+      refetch();
+      setButtonLabel("Change");
+      console.log("✅ Google account connected!");
+      window.removeEventListener("message", handleOAuthMessage);
+      clearInterval(interval);
+    }
+  }
+
+  window.addEventListener("message", handleOAuthMessage);
 }

@@ -4,79 +4,26 @@ import Image from "next/image";
 import useStore from "../store";
 
 import ZapModal from "./ZapModal";
-import { SetStateAction, useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { ParamValue } from "next/dist/server/request/params";
-import { useHasServiceAccess } from "@/lib/api";
-import ActionEventSideBar from "./ActionEventSideBar";
-import { isWordIncluded } from "@/lib/utils";
-import { useTriggerUpdate } from "@/lib/CustomHook";
+import { useState } from "react";
+
+import Setup from "./Setup";
+import Configure from "./Configure";
+import Test from "./Test";
 
 export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const selectedNode = useStore((state) => state.selectedNode);
   const setSelectedNode = useStore((state) => state.setSelectedNode);
-  const token = localStorage.getItem("token");
-  const [showActionSideBar, setShowActionSideBar] = useState<boolean>(false);
+
   const [selectedField, setselectedField] = useState<string>("setup");
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
   const { name, image } = selectedNode?.data?.label?.props?.match;
-  const setShowZapModal = useStore((state) => state.setShowZapModal);
-  const setConnecting = useStore((state) => state.setConnecting);
-  const connecting = useStore((state) => state.connecting);
 
   const showZapModal = useStore((state) => state.showZapModal);
 
   const zapTriggerMeta = useStore((state) => state.zapTriggerMeta);
-  const updateTrigger = useStore((state) => state.updateTrigger);
-  const setZapTriggerMeta = useStore((state) => state.setZapTriggerMeta);
 
-  const params = useParams();
-
-  const { triggerData, isLoading: triggerEventLoading } = useTriggerUpdate({
-    event: zapTriggerMeta?.triggerEvent,
-    zapId: params.id,
-  });
-
-  useEffect(() => {
-    if (!triggerData) return;
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-    if (updateTrigger) {
-      setZapTriggerMeta({
-        zapId: triggerData?.triggerEvent,
-        triggerApp: triggerData?.triggerApp,
-        triggerEvent: triggerData?.triggerEvent, // updated event
-      });
-    }
-  }, [setZapTriggerMeta, triggerData, triggerEventLoading, updateTrigger]);
-
-  useEffect(() => {
-    setShowZapModal(false);
-  }, [setShowZapModal]);
-
-  const { data, isLoading, refetch } = useHasServiceAccess(name, token);
-  const scopesMatch = data?.scopesMatch;
-  const email = data?.email;
-  const [buttonLabel, setButtonLabel] = useState("Connect");
-  const [isTrigger, setIsTrigger] = useState(false);
-
-  useEffect(() => {
-    if (zapTriggerMeta && name && zapTriggerMeta.triggerEvent) {
-      setIsTrigger(isWordIncluded(zapTriggerMeta?.triggerApp, name));
-    }
-  }, [name, zapTriggerMeta]);
-
-  useEffect(() => {
-    if (isLoading || connecting) {
-      setButtonLabel("Loading...");
-    } else if (scopesMatch) {
-      setButtonLabel("Change");
-    } else {
-      setButtonLabel("Connect");
-    }
-  }, [connecting, isLoading, name, scopesMatch]);
   return (
     <div className="fixed top-16 right-4 min-w-[400px] max-w-[400px] h-[80%] flex  flex-col border-2 border-[#695be8] bg-white rounded-md">
       <div className="p-3 rounded-md justify-between  bg-[#f0eefb] flex">
@@ -115,7 +62,7 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
           ></Image>
         </div>
       </div>
-      <div className="flex-grow border-b-[#d7d3c9] border overflow-y-auto">
+      <div className="flex border-b-[#d7d3c9] border h-12">
         <div className="flex items-center">
           <div
             onClick={() => setselectedField("setup")}
@@ -126,26 +73,30 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
             Setup
           </div>
 
-          <Image
-            width={40}
-            height={40}
-            className="w-4 h-4 object-contain"
-            alt="next img"
-            src={
-              "https://img.icons8.com/?size=100&id=3199&format=png&color=000000"
-            }
-          ></Image>
-
-          <div
-            onClick={() => setselectedField("configure")}
-            className={`p-3 cursor-pointer font-semibold text-sm border-b-2 ${
-              selectedField === "configure"
-                ? " border-[#695be8]"
-                : "border-white"
-            } `}
-          >
-            Configure
-          </div>
+          {zapTriggerMeta?.triggerEvent === "New Document in folder" && (
+            <>
+              {" "}
+              <Image
+                width={40}
+                height={40}
+                className="w-4 h-4 object-contain"
+                alt="next img"
+                src={
+                  "https://img.icons8.com/?size=100&id=3199&format=png&color=000000"
+                }
+              ></Image>
+              <div
+                onClick={() => setselectedField("configure")}
+                className={`p-3 cursor-pointer font-semibold text-sm border-b-2 ${
+                  selectedField === "configure"
+                    ? " border-[#695be8]"
+                    : "border-white"
+                } `}
+              >
+                Configure
+              </div>
+            </>
+          )}
           <Image
             width={40}
             height={40}
@@ -165,122 +116,10 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
             Test
           </div>
         </div>
-        <div className=" border-t border-b p-3 h-full border-[#d7d3c9]">
-          <div className="flex m-2 flex-col">
-            <span className="mb-1 font-medium text-sm">App</span>
-            <div className="w-full rounded-md items-center  flex justify-between p-2 border border-[#d7d3c9]">
-              <div className="border flex items-center space-x-2 border-[#d7d3c9] rounded-sm py-1 px-2">
-                <Image
-                  className="max-w-4 max-h-4"
-                  width={16}
-                  height={16}
-                  src={image}
-                  alt={name}
-                ></Image>{" "}
-                <span className="text-sm font-medium">{name}</span>
-              </div>
-              <button
-                onClick={() => setShowZapModal(true)}
-                className=" px-2  text-sm cursor-pointer font-bold text-white bg-[#695be8] p-1 rounded-sm "
-              >
-                Change
-              </button>
-            </div>
-          </div>
-          <div className="flex m-2 flex-col">
-            <span className="mb-1 font-medium text-sm">
-              {curNodeIdx === 0 ? "Trigger" : "Action"} Event
-            </span>
-            {showActionSideBar && (
-              <ActionEventSideBar
-                name={name}
-                setShowActionSideBar={setShowActionSideBar}
-              ></ActionEventSideBar>
-            )}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowActionSideBar((prev) => !prev);
-              }}
-              className="w-full cursor-pointer flex justify-between p-2 border border-[#d7d3c9] rounded-md"
-            >
-              <div>
-                <span className={`text-sm ${isTrigger ? "font-medium" : ""} `}>
-                  {triggerEventLoading
-                    ? "Loading..."
-                    : isTrigger && zapTriggerMeta
-                    ? zapTriggerMeta.triggerEvent
-                    : "Choose an event"}
-                </span>
-              </div>
-              <div className="">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 32 32"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                >
-                  <path
-                    stroke="#535358"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M9 20l7 7 7-7M23 12l-7-7-7 7"
-                  ></path>
-                </svg>
-              </div>
-            </button>
-          </div>
-          <div className="flex m-2 flex-col">
-            <span className="mb-1 font-medium text-sm">Account</span>
-            <div className="w-full  flex justify-between p-2 border border-[#d7d3c9] rounded-md">
-              <div>
-                <span
-                  className={`text-sm ${
-                    email && scopesMatch ? "font-medium" : ""
-                  }  truncate max-w-[250px] overflow-hidden whitespace-nowrap block`}
-                >
-                  {email && scopesMatch
-                    ? `${name} ${email}`
-                    : `Connect to ${name}`}
-                </span>
-              </div>
-              <button
-                onClick={() => {
-                  const zapId = params.id;
-
-                  if (token && buttonLabel === "Connect") {
-                    setConnecting(true);
-                    handleGoogleConnect(
-                      zapId,
-                      name,
-                      token,
-                      setConnecting,
-                      setButtonLabel,
-                      refetch
-                    );
-                  }
-                }}
-                className={` px-2  text-sm cursor-pointer font-bold  ${
-                  buttonLabel === "Connect"
-                    ? "bg-[#695be8] text-white border-0"
-                    : "bg-white text-[#737271] border hover:bg-[#fdfbf2] border-[#d7d3c9]"
-                } p-1 rounded-sm `}
-              >
-                {buttonLabel}
-              </button>
-            </div>
-          </div>
-          <div className="p-3">
-            <p className="text-sm leading-5  ">
-              {name} is a secure partner with Zapier. Your credentials are
-              encrypted and can be removed at any time. You can manage all of
-              your connected accounts here.
-            </p>
-          </div>
-        </div>
       </div>
+      {selectedField === "setup" && <Setup curNodeIdx={curNodeIdx}></Setup>}
+      {selectedField === "configure" && <Configure></Configure>}
+      {selectedField === "test" && <Test></Test>}
       <div className="p-3 flex justify-center items-center ">
         <button className="w-full bg-[#ece9df] font-bold text-[#737272] p-2">
           To continue, choose an event
@@ -289,59 +128,4 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
       {showZapModal && <ZapModal></ZapModal>}
     </div>
   );
-}
-
-function handleGoogleConnect(
-  zapId: ParamValue,
-  appName: string,
-  token: string,
-  setConnecting: (val: boolean) => void,
-  setButtonLabel: {
-    (value: SetStateAction<string>): void;
-    (arg0: string): void;
-  },
-  refetch: () => void
-) {
-  const app = appName.toLowerCase().replace(/\s+/g, "");
-  const googleApps = [
-    "sheet",
-    "slide",
-    "calendar",
-    "docs",
-    "drive",
-    "youtube",
-    "gmail",
-  ];
-  const matchedApp = googleApps.find((keyword) => app.includes(keyword));
-
-  if (!matchedApp) {
-    console.warn("No OAuth flow configured for app:", appName);
-    return;
-  }
-
-  const url = `/api/oauth/google/start?zapId=${zapId}&app=${matchedApp}&token=${token}`;
-
-  const popup = window.open(url, "google-oauth", "width=900,height=700");
-
-  const interval = setInterval(() => {
-    if (popup?.closed) {
-      setConnecting(false);
-      clearInterval(interval);
-      window.removeEventListener("message", handleOAuthMessage);
-    }
-  }, 500);
-
-  function handleOAuthMessage(event: MessageEvent) {
-    setConnecting(false);
-    if (event.origin !== window.location.origin) return;
-    if (event.data === "oauth-success") {
-      refetch();
-      setButtonLabel("Change");
-      console.log("✅ Google account connected!");
-      window.removeEventListener("message", handleOAuthMessage);
-      clearInterval(interval);
-    }
-  }
-
-  window.addEventListener("message", handleOAuthMessage);
 }
