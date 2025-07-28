@@ -95,4 +95,26 @@ export const appTriggers: Record<
         "Triggers when a new comment is posted on a specific YouTube video.",
     },
   ],
+
+  "Google drive": [
+    {
+      heading: "New File",
+      subheading: "Triggers when any new file is added (inside of any folder).",
+    },
+    {
+      heading: "New File in Folder",
+      subheading:
+        "Triggers when a new file is created within, moved to, or uploaded directly to a specific folder (but not it's subfolders).",
+    },
+    {
+      heading: "New Folder",
+      subheading:
+        "Triggers when a new folder is added directly to a specific folder (but not it's subfolder).",
+    },
+    {
+      heading: "Updated File",
+      subheading:
+        "Triggers when a file is updated in a specific folder (but not it's subfolders).",
+    },
+  ],
 };

@@ -121,8 +121,18 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
       {selectedField === "configure" && <Configure></Configure>}
       {selectedField === "test" && <Test></Test>}
       <div className="p-3 flex justify-center items-center ">
-        <button className="w-full bg-[#ece9df] font-bold text-[#737272] p-2">
-          To continue, choose an event
+        <button
+          onClick={() => setselectedField("configure")}
+          disabled={!zapTriggerMeta?.triggerEvent}
+          className={`rounded-sm ${
+            !zapTriggerMeta?.triggerEvent
+              ? "cursor-not-allowed text-[#737272] bg-[#ece9df]"
+              : "cursor-pointer bg-[#695be8] text-white"
+          } w-full   font-bold  p-2`}
+        >
+          {zapTriggerMeta?.triggerEvent
+            ? "Continue"
+            : "To continue, choose an event"}
         </button>
       </div>
       {showZapModal && <ZapModal></ZapModal>}

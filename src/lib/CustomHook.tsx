@@ -550,3 +550,22 @@ export function useTriggerUpdate({
 
   return { triggerData, isLoading, isError };
 }
+
+export async function updateActionsMetadata({
+  zapId,
+  metaData,
+}: {
+  zapId: ParamValue;
+  metaData: { [key: string]: string };
+}) {
+  try {
+    await axios.post(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/trigger/metadata/${zapId}`,
+      {
+        metadata: metaData,
+      }
+    );
+  } catch (error) {
+    console.error("Failed to update  metadata:", error);
+  }
+}

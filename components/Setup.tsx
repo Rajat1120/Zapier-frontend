@@ -17,6 +17,7 @@ const Setup = ({ curNodeIdx }: { curNodeIdx: number | null }) => {
   const [showActionSideBar, setShowActionSideBar] = useState<boolean>(false);
   const token = localStorage.getItem("token");
   const zapTriggerMeta = useStore((state) => state.zapTriggerMeta);
+
   const [isTrigger, setIsTrigger] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Connect");
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
