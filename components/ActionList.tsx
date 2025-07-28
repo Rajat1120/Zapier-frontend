@@ -149,6 +149,7 @@ export default function ActionsList() {
           return {
             ...action,
             actionId: match.availableActionId,
+            actionEvent: null,
           };
         }
         return action; // keep as-is

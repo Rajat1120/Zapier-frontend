@@ -13,6 +13,7 @@ const Setup = ({ curNodeIdx }: { curNodeIdx: number | null }) => {
   const connecting = useStore((state) => state.connecting);
   const updateTrigger = useStore((state) => state.updateTrigger);
   const setShowZapModal = useStore((state) => state.setShowZapModal);
+  const actions = useStore((state) => state.actions);
   const setZapTriggerMeta = useStore((state) => state.setZapTriggerMeta);
   const [showActionSideBar, setShowActionSideBar] = useState<boolean>(false);
   const token = localStorage.getItem("token");
@@ -49,6 +50,8 @@ const Setup = ({ curNodeIdx }: { curNodeIdx: number | null }) => {
   useEffect(() => {
     setShowZapModal(false);
   }, [setShowZapModal]);
+
+  const actionEvent = actions.find((val) => val.index === curNodeIdx);
 
   useEffect(() => {
     if (!triggerData) return;
@@ -92,6 +95,7 @@ const Setup = ({ curNodeIdx }: { curNodeIdx: number | null }) => {
           </span>
           {showActionSideBar && (
             <ActionEventSideBar
+              curNodeIdx={curNodeIdx}
               name={name}
               setShowActionSideBar={setShowActionSideBar}
             ></ActionEventSideBar>
@@ -104,11 +108,17 @@ const Setup = ({ curNodeIdx }: { curNodeIdx: number | null }) => {
             className="w-full cursor-pointer flex justify-between p-2 border border-[#d7d3c9] rounded-md"
           >
             <div>
-              <span className={`text-sm ${isTrigger ? "font-medium" : ""} `}>
+              <span
+                className={`text-sm ${
+                  isTrigger || actionEvent ? "font-medium" : ""
+                } `}
+              >
                 {triggerEventLoading
                   ? "Loading..."
                   : isTrigger && zapTriggerMeta
                   ? zapTriggerMeta.triggerEvent
+                  : actionEvent?.actionEvent
+                  ? actionEvent.actionEvent
                   : "Choose an event"}
               </span>
             </div>

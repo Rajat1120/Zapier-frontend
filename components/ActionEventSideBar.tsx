@@ -1,11 +1,13 @@
-import { appTriggers } from "@/lib/constants/appTriggers";
+import { appActions, appTriggers } from "@/lib/constants/appTriggers";
 import React, { useEffect, useRef } from "react";
 import useStore from "../store";
 import { useParams } from "next/navigation";
+import { updateZap } from "../utils/HelperFunctions";
+import { Action } from "@/lib/type";
 
 interface ActionEventSideBarProps {
   name: string;
-
+  curNodeIdx: number | null;
   setShowActionSideBar: (show: boolean) => void;
 }
 
@@ -16,12 +18,14 @@ interface AppTrigger {
 
 const ActionEventSideBar: React.FC<ActionEventSideBarProps> = ({
   name,
-
+  curNodeIdx,
   setShowActionSideBar,
 }) => {
   const params = useParams();
   const eventSideBarRef = useRef<HTMLDivElement | null>(null);
   const setZapTriggerMeta = useStore((state) => state.setZapTriggerMeta);
+  const setActions = useStore((state) => state.setActions);
+  const actions = useStore((state) => state.actions);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -54,15 +58,49 @@ const ActionEventSideBar: React.FC<ActionEventSideBarProps> = ({
         </div>
 
         <div className="px-2 py-4 max-h-70 overflow-scroll">
-          {(appTriggers[name] as AppTrigger[]).map((val, i) => {
+          {(curNodeIdx === 0
+            ? appTriggers[name]
+            : (appActions[name] as AppTrigger[])
+          ).map((val, i) => {
             return (
               <div
                 onClick={() => {
-                  setZapTriggerMeta({
-                    zapId: params.id,
-                    triggerApp: name,
-                    triggerEvent: val.heading,
-                  });
+                  if (curNodeIdx === 0) {
+                    setZapTriggerMeta({
+                      zapId: params.id,
+                      triggerApp: name,
+                      triggerEvent: val.heading,
+                    });
+                  } else {
+                    const newAction = actions.find(
+                      (action) => Number(action.index) === Number(curNodeIdx)
+                    );
+                    if (newAction) {
+                      newAction.actionEvent = val.heading;
+                    }
+
+                    const newActions = actions.map((action) => {
+                      if (Number(action.index) === Number(curNodeIdx)) {
+                        return { ...newAction, actionEvent: val.heading };
+                      }
+                      return action;
+                    }) as Action[];
+
+                    if (newActions.length) {
+                      setActions(newActions);
+                    }
+                    const updatedActions = newActions.map((action) => {
+                      return {
+                        actionId: action.actionId,
+                        index: action.index,
+                        sortingOrder: action.sortingOrder,
+                        actionEvent: action.actionEvent,
+                        metadata: action.metadata,
+                      };
+                    });
+
+                    updateZap(params.id, updatedActions);
+                  }
                   setShowActionSideBar(false);
                 }}
                 key={i}

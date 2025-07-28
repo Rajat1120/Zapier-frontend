@@ -41,6 +41,7 @@ export type Action = {
   metadata: JSON;
   sortingOrder: number;
   index: number;
+  actionEvent: string | null;
 };
 
 export type AvailableAction = {

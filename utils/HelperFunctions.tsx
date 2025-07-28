@@ -136,7 +136,9 @@ export async function updateZap(id: ParamValue, selectedActions: unknown[]) {
             actionId: string;
             index: number;
             sortingOrder: number;
+            actionEvent: string;
           };
+
           return action;
         }),
       }),

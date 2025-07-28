@@ -118,3 +118,91 @@ export const appTriggers: Record<
     },
   ],
 };
+
+export const appActions: Record<
+  string,
+  { heading: string; subheading: string }[]
+> = {
+  "Google sheets": [
+    {
+      heading: "Clear Spreadsheet Row(s)",
+      subheading:
+        "Clears the content of the selected row(s) while keeping the row(s) intact in the spreadsheet.",
+    },
+    {
+      heading: "Create Spreadsheet",
+      subheading:
+        "Creates a new spreadsheet. Choose from a blank spreadsheet, a copy of an existing one, or one with headers.",
+    },
+  ],
+  "Google docs": [
+    {
+      heading: "Create Document from text",
+      subheading:
+        "Create a new document from text. Also supports Limited HTML.",
+    },
+  ],
+  Notion: [
+    {
+      heading: "Create Page",
+      subheading: "Creates a Page inside a parent page.",
+    },
+  ],
+  Slack: [
+    {
+      heading: "Create Channel",
+      subheading: "Creates a new channel.",
+    },
+  ],
+  Gmail: [
+    {
+      heading: "Create Draft",
+      subheading: "Create a draft email message.",
+    },
+  ],
+  "Google Calendar": [
+    {
+      heading: "Delete Event",
+      subheading: "Deletes an event",
+    },
+    {
+      heading: "Quick Add Event",
+      subheading:
+        "Create an event from a piece of text. Google parses the text for data,time and description info.",
+    },
+  ],
+  "You Tube": [
+    {
+      heading: "Add Video to Playlist",
+      subheading: "Add a video to one of your playlists",
+    },
+    {
+      heading: "Update Video",
+      subheading: "Post a video to your channel",
+    },
+  ],
+
+  "Google drive": [
+    {
+      heading: "Copy File",
+      subheading: "Create a copy of specified file.",
+    },
+    {
+      heading: "Create File From Text",
+      subheading: "Create a new file from plain text",
+    },
+    {
+      heading: "Create Folder",
+      subheading: "Create a new, empty folder.",
+    },
+    {
+      heading: "Create Shortcut",
+      subheading: "Create a shortcut to a file.",
+    },
+    {
+      heading: "Delete File",
+      subheading:
+        "This action will delete a file in Google drive. you will need to provide the file ID",
+    },
+  ],
+};
