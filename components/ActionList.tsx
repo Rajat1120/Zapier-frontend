@@ -150,6 +150,7 @@ export default function ActionsList() {
             ...action,
             actionId: match.availableActionId,
             actionEvent: null,
+            metadata: {} as JSON,
           };
         }
         return action; // keep as-is

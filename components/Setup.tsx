@@ -28,20 +28,28 @@ const Setup = ({ curNodeIdx }: { curNodeIdx: number | null }) => {
   const { data, isLoading, refetch } = useHasServiceAccess(name, token);
   const email = data?.email;
   const scopesMatch = data?.scopesMatch;
+  const expiresAt = data?.expiresAt;
   const { triggerData, isLoading: triggerEventLoading } = useTriggerUpdate({
     event: zapTriggerMeta?.triggerEvent,
     zapId: params.id,
   });
 
+  const istTime = new Date(
+    new Date(expiresAt).getTime() + 5.5 * 60 * 60 * 1000
+  );
+
+  const now = new Date();
+  const isExpired = now > istTime;
+
   useEffect(() => {
     if (isLoading || connecting) {
       setButtonLabel("Loading...");
-    } else if (scopesMatch) {
+    } else if (scopesMatch && !isExpired) {
       setButtonLabel("Change");
     } else {
       setButtonLabel("Connect");
     }
-  }, [connecting, isLoading, name, scopesMatch]);
+  }, [connecting, isExpired, isLoading, name, scopesMatch]);
   useEffect(() => {
     if (zapTriggerMeta && name && zapTriggerMeta.triggerEvent) {
       setIsTrigger(isWordIncluded(zapTriggerMeta?.triggerApp, name));
@@ -159,7 +167,11 @@ const Setup = ({ curNodeIdx }: { curNodeIdx: number | null }) => {
               onClick={() => {
                 const zapId = params.id;
 
-                if (token && buttonLabel === "Connect") {
+                if (
+                  (token && buttonLabel === "Connect") ||
+                  buttonLabel === "Change"
+                ) {
+                  if (!token) return;
                   setConnecting(true);
                   handleGoogleConnect(
                     zapId,

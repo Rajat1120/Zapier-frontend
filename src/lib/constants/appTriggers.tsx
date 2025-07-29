@@ -96,6 +96,13 @@ export const appTriggers: Record<
     },
   ],
 
+  "Google slides": [
+    {
+      heading: "New Presentations",
+      subheading: "Triggers when a new presentation is created",
+    },
+  ],
+
   "Google drive": [
     {
       heading: "New File",
@@ -181,6 +188,13 @@ export const appActions: Record<
       subheading: "Post a video to your channel",
     },
   ],
+  "Google slides": [
+    {
+      heading: "Create Presentation From Template",
+      subheading:
+        "Creates a new presentation based on an existing one and can replace any placeholder variable found in your template presentation, like {{name}}, {{email}}, etc.",
+    },
+  ],
 
   "Google drive": [
     {
@@ -206,3 +220,34 @@ export const appActions: Record<
     },
   ],
 };
+
+export const showConfigureArray = [
+  "New Document in folder",
+  "New or Updated Spreadsheet Row",
+  "New Spreadsheet row",
+  "New Worksheet",
+  "New File in Folder",
+  "New Folder",
+  "Updated File",
+  "New Comment",
+  "New Database Item",
+  "Updated Database Item",
+  "Updated page",
+  "New File",
+  "New Mention",
+  "New Comment on Video",
+  "New Attachment",
+  "New Conversation",
+  "New Email",
+  "Clear Spreadsheet Row(s)",
+  "Create Spreadsheet",
+  "Delete Event",
+  "Quick Add Event",
+  "Copy File",
+  "Create Document from text",
+  "Create File From Text",
+  "Create Folder",
+  "Create Shortcut",
+  "Delete File",
+  "Create Page",
+];

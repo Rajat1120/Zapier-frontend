@@ -141,6 +141,7 @@ export function useHasServiceAccess(serviceName: string, token: string | null) {
       return {
         scopesMatch: hasMatch,
         email: data?.email ?? null,
+        expiresAt: data?.expiresAt ?? null,
       };
     },
   });

@@ -7,22 +7,35 @@ import ZapModal from "./ZapModal";
 import { useState } from "react";
 
 import Setup from "./Setup";
-import Configure from "./Configure";
+import ConfigureDocs from "./ConfigureDocs";
 import Test from "./Test";
+import { showConfigureArray } from "@/lib/constants/appTriggers";
 
 export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const selectedNode = useStore((state) => state.selectedNode);
   const setSelectedNode = useStore((state) => state.setSelectedNode);
 
+  const zapTriggerMeta = useStore((state) => state.zapTriggerMeta);
+  const actions = useStore((state) => state.actions);
+
   const [selectedField, setselectedField] = useState<string>("setup");
+  const showZapModal = useStore((state) => state.showZapModal);
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
   const { name, image } = selectedNode?.data?.label?.props?.match;
 
-  const showZapModal = useStore((state) => state.showZapModal);
-
-  const zapTriggerMeta = useStore((state) => state.zapTriggerMeta);
+  function showConfigure(index: number | null) {
+    if (index === null) return false;
+    if (index === 0 && zapTriggerMeta?.triggerEvent) {
+      return showConfigureArray.includes(zapTriggerMeta?.triggerEvent);
+    } else {
+      const action = actions.find((action) => action.index === curNodeIdx);
+      return (
+        action?.actionEvent && showConfigureArray.includes(action?.actionEvent)
+      );
+    }
+  }
 
   return (
     <div className="fixed top-16 right-4 min-w-[400px] max-w-[400px] h-[80%] flex  flex-col border-2 border-[#695be8] bg-white rounded-md">
@@ -73,7 +86,7 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
             Setup
           </div>
 
-          {zapTriggerMeta?.triggerEvent === "New Document in folder" && (
+          {showConfigure(curNodeIdx) && (
             <>
               {" "}
               <Image
@@ -118,11 +131,15 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
         </div>
       </div>
       {selectedField === "setup" && <Setup curNodeIdx={curNodeIdx}></Setup>}
-      {selectedField === "configure" && <Configure></Configure>}
+      {selectedField === "configure" && <ConfigureDocs></ConfigureDocs>}
       {selectedField === "test" && <Test></Test>}
       <div className="p-3 flex justify-center items-center ">
         <button
-          onClick={() => setselectedField("configure")}
+          onClick={() => {
+            if (showConfigure(curNodeIdx)) {
+              setselectedField("configure");
+            }
+          }}
           disabled={!zapTriggerMeta?.triggerEvent}
           className={`rounded-sm ${
             !zapTriggerMeta?.triggerEvent

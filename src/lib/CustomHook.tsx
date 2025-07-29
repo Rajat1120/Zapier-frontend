@@ -515,6 +515,7 @@ export function useTriggerUpdate({
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/trigger/${zapId}`,
           {
             triggerEvent: event,
+            metadata: {} as JSON,
           }
         );
       } catch (error) {
