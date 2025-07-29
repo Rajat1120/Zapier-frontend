@@ -7,9 +7,10 @@ import ZapModal from "./ZapModal";
 import { useState } from "react";
 
 import Setup from "./Setup";
-import ConfigureDocs from "./ConfigureDocs";
+
 import Test from "./Test";
 import { showConfigureArray } from "@/lib/constants/appTriggers";
+import { configureComponentMap } from "@/lib/utils";
 
 export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const selectedNode = useStore((state) => state.selectedNode);
@@ -21,6 +22,10 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const [selectedField, setselectedField] = useState<string>("setup");
   const showZapModal = useStore((state) => state.showZapModal);
 
+  const SelectedConfigureComponent =
+    configureComponentMap[
+      zapTriggerMeta?.triggerEvent as keyof typeof configureComponentMap
+    ];
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
   const { name, image } = selectedNode?.data?.label?.props?.match;
@@ -131,7 +136,9 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
         </div>
       </div>
       {selectedField === "setup" && <Setup curNodeIdx={curNodeIdx}></Setup>}
-      {selectedField === "configure" && <ConfigureDocs></ConfigureDocs>}
+      {selectedField === "configure" && SelectedConfigureComponent && (
+        <SelectedConfigureComponent />
+      )}
       {selectedField === "test" && <Test></Test>}
       <div className="p-3 flex justify-center items-center ">
         <button

@@ -1,7 +1,8 @@
 import axios from "axios";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-
+import ConfigureDocs from "../../components/ConfigureDocs";
+import ConfigureSheets from "../../components/ConfigureSheets";
 import { Edge } from "@xyflow/react";
 import { CustomNode } from "./type";
 
@@ -84,3 +85,11 @@ export function isWordIncluded(str1: string, str2: string) {
 
   return s2.includes(s1);
 }
+
+export const configureComponentMap = {
+  "New Document in folder": ConfigureDocs,
+  "New Spreadsheet row": ConfigureSheets,
+  "New or Updated Spreadsheet Row": ConfigureSheets,
+  "New Worksheet": ConfigureSheets,
+  // Add more mappings as needed
+};
