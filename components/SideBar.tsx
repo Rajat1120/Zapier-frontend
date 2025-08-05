@@ -26,6 +26,9 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
     configureComponentMap[
       zapTriggerMeta?.triggerEvent as keyof typeof configureComponentMap
     ];
+
+  console.log(zapTriggerMeta?.triggerEvent);
+
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
   const { name, image } = selectedNode?.data?.label?.props?.match;

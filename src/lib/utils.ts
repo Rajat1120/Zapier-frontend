@@ -5,6 +5,8 @@ import ConfigureDocs from "../../components/ConfigureDocs";
 import ConfigureSheets from "../../components/ConfigureSheets";
 import { Edge } from "@xyflow/react";
 import { CustomNode } from "./type";
+import ConfigureGmail from "../../components/ConfigureGmail";
+import ConfigureNotion from "../../components/ConfigureNotion";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -91,5 +93,13 @@ export const configureComponentMap = {
   "New Spreadsheet row": ConfigureSheets,
   "New or Updated Spreadsheet Row": ConfigureSheets,
   "New Worksheet": ConfigureSheets,
+  "New Attachment": ConfigureGmail,
+  "New Conversation": ConfigureGmail,
+  "New Email": ConfigureGmail,
+  "New Comment": ConfigureNotion,
+  "New Database Item": ConfigureNotion,
+  "Updated Database Item": ConfigureNotion,
+  "Updated Page": ConfigureNotion,
+  
   // Add more mappings as needed
 };
