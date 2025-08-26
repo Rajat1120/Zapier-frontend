@@ -82,9 +82,10 @@ export const addTrailingPlusNode = (
 };
 
 export function isWordIncluded(str1: string, str2: string) {
+
   const s1 = str1.toLowerCase().replace(/\s+/g, "");
   const s2 = str2.toLowerCase().replace(/\s+/g, "");
-
+  if(s1 === "email" && s2 === "gmail") return true;
   return s2.includes(s1);
 }
 
