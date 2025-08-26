@@ -1,7 +1,15 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react';
 import { useGetGmailLabels } from './ConfigureGmail';
 
-const ConfigureModal = ({ setIsModalOpen , googleAccessToken, triggerRef}: { setIsModalOpen: (isOpen: boolean) => void , googleAccessToken: string | null, triggerRef: React.RefObject<HTMLDivElement | null> }) => {
+const ConfigureModal = ({ 
+  setIsModalOpen, 
+  googleAccessToken, 
+  triggerRef 
+}: { 
+  setIsModalOpen: (isOpen: boolean) => void, 
+  googleAccessToken: string | null, 
+  triggerRef: React.RefObject<HTMLDivElement | null> 
+}) => {
   const { data: gmailLabels, isLoading: isLoadingGmailLabels, isError: isErrorGmailLabels, error: errorGmailLabels } = useGetGmailLabels(googleAccessToken);
   const modalContentRef = useRef<HTMLDivElement | null>(null);
 
@@ -17,7 +25,6 @@ const ConfigureModal = ({ setIsModalOpen , googleAccessToken, triggerRef}: { set
       }
     };
 
-    // Listen to multiple events for better coverage
     window.addEventListener("mousedown", handleClickOutside, true);
     window.addEventListener("click", handleClickOutside, true);
     window.addEventListener("touchstart", handleClickOutside, true);
@@ -32,40 +39,56 @@ const ConfigureModal = ({ setIsModalOpen , googleAccessToken, triggerRef}: { set
   return (
     <div
       ref={modalContentRef}
-      className="absolute shadow-2xl right-full mr-2 top-40 border w-80 max-h-80 overflow-y-auto py-4 px-4 bg-white z-10 rounded-md"
+      className="absolute shadow-2xl right-full mr-2 top-40 border w-80 bg-white z-10 rounded-md flex flex-col"
     >
-      <div className="flex items-center justify-between mb-4">
-        <span className="text-sm font-bold">Gmail Labels</span>
+      <div className="flex items-center justify-between mb-4 border-b border-gray-100 px-4 py-4">
+        <span className="text-sm font-bold">Select value for label or mailbox</span>
         <button 
           onClick={() => setIsModalOpen(false)} 
-          className="text-gray-500 hover:text-gray-700 text-lg font-bold"
+          className="text-gray-500 hover:text-gray-700 h-10 w-10 cursor-pointer text-lg font-bold"
         >
           ×
         </button>
       </div>
-      
-      <div className="space-y-2">
-        {isLoadingGmailLabels && (
-          <p className="text-sm text-gray-600">Loading labels...</p>
-        )}
-        {isErrorGmailLabels && (
-          <p className="text-sm text-red-600">Error fetching labels</p>
-        )}
-        {gmailLabels && (
-          <ul className="space-y-1">
-            {gmailLabels.map((label: any) => (
-              <li 
-                key={label.id} 
-                className="p-2 text-sm hover:bg-gray-100 rounded cursor-pointer border-b border-gray-100 last:border-b-0"
-              >
-                {label.name}
-              </li>
-            ))}
-          </ul>
-        )}
+      <div className="max-h-80 overflow-y-auto px-4 pb-4">
+        <div className="space-y-2">
+          {isLoadingGmailLabels && (
+            <ul className="space-y-1">
+              {[...Array(3)].map((_, index) => (
+                <li 
+                  key={`skeleton-${index}`} 
+                  className="p-2 text-sm rounded border-b border-gray-100 last:border-b-0 bg-gray-200 animate-pulse h-12"
+                />
+              ))}
+            </ul>
+          )}
+          {isErrorGmailLabels && (
+            <p className="text-sm text-red-600">Error fetching labels</p>
+          )}
+          {gmailLabels && (
+            <ul className="space-y-1">
+              {gmailLabels.map((label: any) => (
+                <li 
+                  key={label.id} 
+                  className="p-2 text-sm hover:bg-gray-100 rounded cursor-pointer border-b border-gray-100 last:border-b-0"
+                >
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="min-w-4 min-h-4 border-2 border-gray-400 rounded-full cursor-pointer hover:border-gray-600"
+                    />
+                    <div className="flex flex-col">
+                      <span className="font-medium">{label.name}</span>
+                      <span className="text-xs text-gray-500">{`ID: ${label.id}`}</span>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default ConfigureModal
+export default ConfigureModal;
