@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import React, { useState, useRef } from "react";
+import ConfigureModal from "./ConfigureModal";
 
 function useGetGoogleAccessToken(token: string | null) {
   return useQuery({
@@ -48,6 +50,8 @@ export function useGetGmailLabels(googleAccessToken: string | null) {
 
 const ConfigureGmail = () => {
   const token = localStorage.getItem("token");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const triggerRef = useRef<HTMLDivElement | null>(null);
 
   
   const {
@@ -56,22 +60,25 @@ const ConfigureGmail = () => {
     isError,
     error,
   } = useGetGoogleAccessToken(token);
-const { data: gmailLabels, isLoading: isLoadingGmailLabels, isError: isErrorGmailLabels, error: errorGmailLabels } = useGetGmailLabels(googleAccessToken);
 
 
 
-  const handleClick = () => {
-    console.log("Google Access Token:", googleAccessToken);
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsModalOpen((val) => !val);
   };
 
+ 
+
   return (
-    <div className="flex p-5 flex-col gap-y-2">
+    <div className="flex p-5  flex-col gap-y-2">
       <span className="text-sm font-semibold text-[#333333]">
         Label or mailbox <span className="text-[#ff6666]">*</span>
       </span>
-      <div className="flex justify-between border cursor-pointer hover:border-black text-sm font-semibold transition-all duration-500 p-2">
+      <div ref={triggerRef} onClick={handleClick} className="flex  justify-between border cursor-pointer hover:border-black text-sm font-semibold transition-all duration-500 p-2">
         <button
-          onClick={handleClick}
+         
           className="border-none cursor-pointer outline-0"
           disabled={isLoading}
         >
@@ -101,7 +108,12 @@ const { data: gmailLabels, isLoading: isLoadingGmailLabels, isError: isErrorGmai
           </svg>
         </div>
       </div>
+       {isModalOpen && (
+        <ConfigureModal  setIsModalOpen={setIsModalOpen} googleAccessToken={googleAccessToken} triggerRef={triggerRef} />
+      )}
+     
     </div>
+    
   );
 };
 
