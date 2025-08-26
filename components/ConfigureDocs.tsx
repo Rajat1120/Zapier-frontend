@@ -2,7 +2,8 @@ import { useHasServiceAccess } from "@/lib/api";
 import React, { useEffect, useState } from "react";
 import useStore from "../store";
 
-import ConfigureSidebar from "./ConfigureSidebar";
+import ConfigureDocsModal from "./ConfigureDocsModal";
+import { isWordIncluded } from "@/lib/utils";
 
 const ConfigureDocs = () => {
   const selectedNode = useStore((state) => state.selectedNode);
@@ -16,7 +17,13 @@ const ConfigureDocs = () => {
   const { data, isLoading } = useHasServiceAccess(name, token);
   const email = data?.email;
 
+  
+  
   const actions = useStore((state) => state.actions);
+  const index = actions.find((action) => isWordIncluded(action.actionId, name))?.index;
+  
+  
+
 
   useEffect(() => {
     const trigger = actions.find((action) => action.index === 0);
@@ -39,10 +46,11 @@ const ConfigureDocs = () => {
         <div className="relative">
           <span className="text-sm font-semibold">Folder</span>
           {!showFolders ? null : (
-            <ConfigureSidebar
+            <ConfigureDocsModal
+              index={index }
               setShowFolders={setShowFolders}
               setInputVal={setInputVal}
-            ></ConfigureSidebar>
+            ></ConfigureDocsModal>
           )}
           <button
             onClick={() => setShowFolders(!showFolders)}

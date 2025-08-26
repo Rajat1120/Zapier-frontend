@@ -1,7 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useState, useRef } from "react";
-import ConfigureModal from "./ConfigureModal";
+
+import ConfigureGmailModal from "./ConfigureGmailModal";
+import useStore from "../store";
+import { isWordIncluded } from "@/lib/utils";
 
 function useGetGoogleAccessToken(token: string | null) {
   return useQuery({
@@ -52,8 +55,13 @@ const ConfigureGmail = () => {
   const token = localStorage.getItem("token");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const triggerRef = useRef<HTMLDivElement | null>(null);
+  const selectedNode = useStore((state) => state.selectedNode);
+   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //@ts-ignore
+  const { name } = selectedNode?.data?.label?.props?.match;
 
-  
+    const actions = useStore((state) => state.actions);
+  const index = actions.find((action) => isWordIncluded(action.actionId, name))?.index;
   const {
     data: googleAccessToken,
     isLoading,
@@ -109,7 +117,7 @@ const ConfigureGmail = () => {
         </div>
       </div>
        {isModalOpen && (
-        <ConfigureModal  setIsModalOpen={setIsModalOpen} googleAccessToken={googleAccessToken} triggerRef={triggerRef} />
+        <ConfigureGmailModal  setIsModalOpen={setIsModalOpen} googleAccessToken={googleAccessToken} triggerRef={triggerRef} index={index} />
       )}
      
     </div>

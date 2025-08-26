@@ -224,7 +224,7 @@ export function useGetDriveFolders({
   return { gettingFolders, driveFolders: driveFolders ?? [] };
 }
 
-async function getDriveFolders(token: string | null) {
+export async function getDriveFolders(token: string | null) {
   if (!token) return [];
 
   const res = await fetch(

@@ -1,17 +1,23 @@
 import React, { useEffect, useRef } from 'react';
 import { useGetGmailLabels } from './ConfigureGmail';
+import { updateActionsMetadata } from '@/lib/CustomHook';
+import { useParams } from 'next/navigation';
 
-const ConfigureModal = ({ 
+const ConfigureGmailModal = ({ 
   setIsModalOpen, 
   googleAccessToken, 
-  triggerRef 
+  triggerRef,
+  index
 }: { 
   setIsModalOpen: (isOpen: boolean) => void, 
   googleAccessToken: string | null, 
-  triggerRef: React.RefObject<HTMLDivElement | null> 
+  triggerRef: React.RefObject<HTMLDivElement | null>,
+  index: number | undefined
 }) => {
   const { data: gmailLabels, isLoading: isLoadingGmailLabels, isError: isErrorGmailLabels, error: errorGmailLabels } = useGetGmailLabels(googleAccessToken);
   const modalContentRef = useRef<HTMLDivElement | null>(null);
+  const params = useParams();
+  const zapId = params.id;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
@@ -69,6 +75,17 @@ const ConfigureModal = ({
             <ul className="space-y-1">
               {gmailLabels.map((label: any) => (
                 <li 
+                onClick={() => {
+                  setIsModalOpen(false);
+                  updateActionsMetadata({
+                    zapId,
+                    metaData: {
+                      labelId: label.id,
+                      labelName: label.name,
+                    },
+                    index
+                  });
+                }}
                   key={label.id} 
                   className="p-2 text-sm hover:bg-gray-100 rounded cursor-pointer border-b border-gray-100 last:border-b-0"
                 >
@@ -91,4 +108,4 @@ const ConfigureModal = ({
   );
 }
 
-export default ConfigureModal;
+export default ConfigureGmailModal;

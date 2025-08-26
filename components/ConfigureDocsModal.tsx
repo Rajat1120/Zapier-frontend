@@ -1,4 +1,4 @@
-import { useGetDriveFolders } from "@/lib/api";
+import { getDriveFolders, useGetDriveFolders } from "@/lib/api";
 import { updateActionsMetadata } from "@/lib/CustomHook";
 import Image from "next/image";
 import { useParams } from "next/navigation";
@@ -7,11 +7,13 @@ import { useEffect, useRef, useState } from "react";
 interface ConfigureSidebarProps {
   setShowFolders: (show: boolean) => void;
   setInputVal: (value: string) => void;
+  index: number | undefined;
 }
 
-const ConfigureSidebar = ({
+const ConfigureDocsModal = ({
   setShowFolders,
   setInputVal,
+  index
 }: ConfigureSidebarProps) => {
   const [tokenVal, setTokenVal] = useState("");
   const token = localStorage.getItem("token");
@@ -85,6 +87,7 @@ const ConfigureSidebar = ({
                         folderId: val.id,
                         folderName: val.name,
                       },
+                      index
                     });
                   }}
                   className="flex cursor-pointer hover:bg-[#efedfe] px-4 py-2 flex-col"
@@ -102,4 +105,4 @@ const ConfigureSidebar = ({
   );
 };
 
-export default ConfigureSidebar;
+export default ConfigureDocsModal;

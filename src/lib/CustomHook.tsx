@@ -555,15 +555,21 @@ export function useTriggerUpdate({
 export async function updateActionsMetadata({
   zapId,
   metaData,
+  index
 }: {
   zapId: ParamValue;
   metaData: { [key: string]: string };
+  index: number | undefined;
 }) {
+  
+
+  if (typeof index !== "number") return;
   try {
     await axios.post(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/trigger/metadata/${zapId}`,
       {
         metadata: metaData,
+        index: index,
       }
     );
   } catch (error) {
