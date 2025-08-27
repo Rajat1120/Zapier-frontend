@@ -2,22 +2,27 @@ import React, { useEffect, useRef } from 'react';
 import { useGetGmailLabels } from './ConfigureGmail';
 import { updateActionsMetadata } from '@/lib/CustomHook';
 import { useParams } from 'next/navigation';
+import useStore from '../store';
 
 const ConfigureGmailModal = ({ 
   setIsModalOpen, 
   googleAccessToken, 
   triggerRef,
-  index
+  index,
+  setIsUpdating
 }: { 
   setIsModalOpen: (isOpen: boolean) => void, 
   googleAccessToken: string | null, 
   triggerRef: React.RefObject<HTMLDivElement | null>,
-  index: number | undefined
+  index: number | undefined,
+  setIsUpdating: (updating: boolean) => void
 }) => {
   const { data: gmailLabels, isLoading: isLoadingGmailLabels, isError: isErrorGmailLabels, error: errorGmailLabels } = useGetGmailLabels(googleAccessToken);
   const modalContentRef = useRef<HTMLDivElement | null>(null);
   const params = useParams();
   const zapId = params.id;
+  const actions = useStore((state) => state.actions);
+  const setActions = useStore((state) => state.setActions);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
@@ -75,16 +80,29 @@ const ConfigureGmailModal = ({
             <ul className="space-y-1">
               {gmailLabels.map((label: any) => (
                 <li 
-                onClick={() => {
+                onClick={async () => {
                   setIsModalOpen(false);
-                  updateActionsMetadata({
-                    zapId,
-                    metaData: {
-                      labelId: label.id,
-                      labelName: label.name,
-                    },
-                    index
-                  });
+                  try {
+                    setIsUpdating(true);
+                    await updateActionsMetadata({
+                      zapId,
+                      metaData: {
+                        labelId: label.id,
+                        labelName: label.name,
+                      },
+                      index
+                    });
+                    if (typeof index === 'number') {
+                      const newMeta = { labelId: label.id, labelName: label.name } as unknown as JSON;
+                      setActions(
+                        actions.map((a) =>
+                          a.index === index ? { ...a, metadata: newMeta } : a
+                        )
+                      );
+                    }
+                  } finally {
+                    setIsUpdating(false);
+                  }
                 }}
                   key={label.id} 
                   className="p-2 text-sm hover:bg-gray-100 rounded cursor-pointer border-b border-gray-100 last:border-b-0"

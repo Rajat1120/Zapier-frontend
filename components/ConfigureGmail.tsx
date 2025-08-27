@@ -6,7 +6,7 @@ import ConfigureGmailModal from "./ConfigureGmailModal";
 import useStore from "../store";
 import { isWordIncluded } from "@/lib/utils";
 
-function useGetGoogleAccessToken(token: string | null) {
+ function useGetGoogleAccessToken(token: string | null) {
   return useQuery({
     queryKey: ["google-access-token"],
     queryFn: async () => {
@@ -54,6 +54,7 @@ export function useGetGmailLabels(googleAccessToken: string | null) {
 const ConfigureGmail = () => {
   const token = localStorage.getItem("token");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const triggerRef = useRef<HTMLDivElement | null>(null);
   const selectedNode = useStore((state) => state.selectedNode);
    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -90,10 +91,12 @@ const ConfigureGmail = () => {
         <button
          
           className="border-none cursor-pointer outline-0"
-          disabled={isLoading}
+          disabled={isLoading || isUpdating}
         >
           <span className={`${labelName ? "text-black" : "text-[#808080]"}`}>
-            {isLoading
+            {isUpdating
+              ? "Saving..."
+              : isLoading
               ? "Loading..."
               : isError
               ? "Error fetching token"
@@ -119,7 +122,7 @@ const ConfigureGmail = () => {
         </div>
       </div>
        {isModalOpen && (
-        <ConfigureGmailModal  setIsModalOpen={setIsModalOpen} googleAccessToken={googleAccessToken} triggerRef={triggerRef} index={index} />
+        <ConfigureGmailModal  setIsModalOpen={setIsModalOpen} googleAccessToken={googleAccessToken} triggerRef={triggerRef} index={index} setIsUpdating={setIsUpdating} />
       )}
      
     </div>
