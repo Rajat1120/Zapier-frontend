@@ -502,20 +502,23 @@ function updateActionsAfterInsert(
 export function useTriggerUpdate({
   event,
   zapId,
+  metadata
 }: {
   event: string | undefined;
   zapId: ParamValue | undefined;
+  metadata: { [key: string]: string } | undefined;
 }) {
   useEffect(() => {
     if (!zapId || !event) return;
-
+    
+    
     const updateTrigger = async () => {
       try {
         await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/trigger/${zapId}`,
           {
             triggerEvent: event,
-            metadata: {} as JSON,
+            metadata: metadata,
           }
         );
       } catch (error) {

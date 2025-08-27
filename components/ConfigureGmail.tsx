@@ -62,6 +62,8 @@ const ConfigureGmail = () => {
 
     const actions = useStore((state) => state.actions);
   const index = actions.find((action) => isWordIncluded(action.actionId, name))?.index;
+  const metadata = actions.find((action) => isWordIncluded(action.actionId, name))?.metadata;
+  const labelName = (metadata as { labelName?: string } | undefined)?.labelName;
   const {
     data: googleAccessToken,
     isLoading,
@@ -90,12 +92,12 @@ const ConfigureGmail = () => {
           className="border-none cursor-pointer outline-0"
           disabled={isLoading}
         >
-          <span className="text-[#808080]">
+          <span className={`${labelName ? "text-black" : "text-[#808080]"}`}>
             {isLoading
               ? "Loading..."
               : isError
               ? "Error fetching token"
-              : "Choose value"}
+              : labelName || "Choose value"}
           </span>
         </button>
         <div>

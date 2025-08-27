@@ -32,6 +32,7 @@ const Setup = ({ curNodeIdx }: { curNodeIdx: number | null }) => {
   const { triggerData, isLoading: triggerEventLoading } = useTriggerUpdate({
     event: zapTriggerMeta?.triggerEvent,
     zapId: params.id,
+    metadata: actions.find((val) => val.index === 0)?.metadata as { [key: string]: string } | undefined
   });
 
   const istTime = new Date(
