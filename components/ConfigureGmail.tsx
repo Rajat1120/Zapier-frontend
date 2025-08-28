@@ -80,7 +80,6 @@ const ConfigureGmail = () => {
     setIsModalOpen((val) => !val);
   };
 
- 
 
   return (
     <div className="flex p-5  flex-col gap-y-2">

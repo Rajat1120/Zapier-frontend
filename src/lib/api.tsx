@@ -17,7 +17,11 @@ export const fetchActions = async (zapId: string | string[] | undefined) => {
     .eq("zapId", zapId);
 
   if (error) throw new Error(error.message);
-  return data;
+  // Normalize legacy ids to reflect backend renames
+  return (data || []).map((action) => ({
+    ...action,
+    actionId: action.actionId === "email" ? "gmail" : action.actionId,
+  }));
 };
 
 export const fetchAvailableActions = async () => {

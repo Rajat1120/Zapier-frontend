@@ -82,7 +82,7 @@ export const addTrailingPlusNode = (
 };
 
 export function isWordIncluded(str1: string, str2: string) {
-
+console.log(str1,str2);
   const s1 = str1.toLowerCase().replace(/\s+/g, "");
   const s2 = str2.toLowerCase().replace(/\s+/g, "");
   return s2.includes(s1);

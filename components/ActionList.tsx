@@ -198,6 +198,7 @@ export default function ActionsList() {
           (available) => available.id === actionFromZap.actionId
         );
       }
+      console.log(actions);
       const label = (
         <ZapNodeLabel
           match={match}
