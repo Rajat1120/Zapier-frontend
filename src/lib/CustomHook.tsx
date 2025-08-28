@@ -17,7 +17,7 @@ import { useParams } from "next/navigation";
 import { ParamValue } from "next/dist/server/request/params";
 import { updateZap } from "../../utils/HelperFunctions";
 import { JSX } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
 type UseAddNodeParams = {
@@ -508,12 +508,16 @@ export function useTriggerUpdate({
   zapId: ParamValue | undefined;
   metadata: { [key: string]: string } | undefined;
 }) {
+  const queryClient = useQueryClient();
   const { data, isLoading, isError } = useQuery({
     queryKey: ["trigger-event", zapId],
     queryFn: async () => {
+      // Block UI interactions during backend fetch
+      document.body.style.pointerEvents = "none";
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/trigger/${zapId}`
       );
+      document.body.style.pointerEvents = "auto";
       return res.data;
     },
     enabled: !!zapId,
@@ -526,6 +530,8 @@ export function useTriggerUpdate({
 
     const updateTrigger = async () => {
       try {
+        useStore.getState().setTriggerUpdating(true);
+        document.body.style.pointerEvents = "none";
         await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/trigger/${zapId}`,
           {
@@ -533,8 +539,26 @@ export function useTriggerUpdate({
             metadata: {},
           }
         );
+        // Optimistically update local store so UI reflects immediately
+        const currentMeta = useStore.getState().zapTriggerMeta;
+        useStore.getState().setZapTriggerMeta(
+          currentMeta
+            ? { ...currentMeta, triggerEvent: event }
+            : {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                //@ts-ignore
+                zapId,
+                triggerApp: "",
+                triggerEvent: event,
+              }
+        );
+        // Refresh server value in background
+        await queryClient.invalidateQueries({ queryKey: ["trigger-event", zapId] });
       } catch (error) {
         console.error("Failed to update trigger:", error);
+      } finally {
+        document.body.style.pointerEvents = "auto";
+        useStore.getState().setTriggerUpdating(false);
       }
     };
 

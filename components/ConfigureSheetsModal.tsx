@@ -112,6 +112,7 @@ const ConfigureSheetsModal = ({
     let cancelled = false;
     (async () => {
       try {
+        document.body.style.pointerEvents = "none";
         setLoading(true);
         if (mode === "spreadsheet") {
           const files = await fetchSpreadsheets(googleAccessToken);
@@ -129,6 +130,7 @@ const ConfigureSheetsModal = ({
         }
       } finally {
         if (!cancelled) setLoading(false);
+        document.body.style.pointerEvents = "auto";
       }
     })();
     return () => {
@@ -140,6 +142,7 @@ const ConfigureSheetsModal = ({
     setIsModalOpen(false);
     try {
       setIsUpdating(true);
+      document.body.style.pointerEvents = "none";
       await updateActionsMetadata({
         zapId,
         metaData: {
@@ -167,6 +170,7 @@ const ConfigureSheetsModal = ({
       }
     } finally {
       setIsUpdating(false);
+      document.body.style.pointerEvents = "auto";
     }
   };
 
@@ -175,6 +179,7 @@ const ConfigureSheetsModal = ({
     setIsModalOpen(false);
     try {
       setIsUpdating(true);
+      document.body.style.pointerEvents = "none";
       await updateActionsMetadata({
         zapId,
         metaData: {
@@ -202,6 +207,7 @@ const ConfigureSheetsModal = ({
       }
     } finally {
       setIsUpdating(false);
+      document.body.style.pointerEvents = "auto";
     }
   };
 
@@ -210,6 +216,7 @@ const ConfigureSheetsModal = ({
     setIsModalOpen(false);
     try {
       setIsUpdating(true);
+      document.body.style.pointerEvents = "none";
       await updateActionsMetadata({
         zapId,
         metaData: {
@@ -235,6 +242,7 @@ const ConfigureSheetsModal = ({
       }
     } finally {
       setIsUpdating(false);
+      document.body.style.pointerEvents = "auto";
     }
   };
 

@@ -21,6 +21,7 @@ const Setup = ({ curNodeIdx }: { curNodeIdx: number | null }) => {
 
   const [isTrigger, setIsTrigger] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Connect");
+  const triggerUpdating = useStore((state) => state.triggerUpdating);
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
   const { name, image } = selectedNode?.data?.label?.props?.match;
@@ -62,18 +63,7 @@ const Setup = ({ curNodeIdx }: { curNodeIdx: number | null }) => {
 
   const actionEvent = actions.find((val) => val.index === curNodeIdx);
 
-  useEffect(() => {
-    if (!triggerData) return;
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-    if (updateTrigger) {
-      setZapTriggerMeta({
-        zapId: triggerData?.triggerEvent,
-        triggerApp: triggerData?.triggerApp,
-        triggerEvent: triggerData?.triggerEvent, // updated event
-      });
-    }
-  }, [setZapTriggerMeta, triggerData, triggerEventLoading, updateTrigger]);
+  // Do not overwrite store on each tab switch; rely on backend data directly for display
   return (
     <div className="h-full">
       <div className="  border-b p-3 h-full border-[#d7d3c9]">
@@ -119,16 +109,14 @@ const Setup = ({ curNodeIdx }: { curNodeIdx: number | null }) => {
             <div>
               <span
                 className={`text-sm ${
-                  isTrigger || actionEvent ? "font-medium" : ""
+                  (curNodeIdx === 0 ? !!zapTriggerMeta : !!actionEvent) ? "font-medium" : ""
                 } `}
               >
-                {triggerEventLoading
+                {triggerEventLoading || triggerUpdating
                   ? "Loading..."
-                  : isTrigger && zapTriggerMeta
-                  ? zapTriggerMeta.triggerEvent
-                  : actionEvent?.actionEvent
-                  ? actionEvent.actionEvent
-                  : "Choose an event"}
+                  : curNodeIdx === 0
+                  ? (triggerData?.triggerEvent || zapTriggerMeta?.triggerEvent || "Choose an event")
+                  : (actionEvent?.actionEvent || "Choose an event")}
               </span>
             </div>
             <div className="">

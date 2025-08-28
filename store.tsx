@@ -23,6 +23,7 @@ type StoreState = {
   showZapModal: boolean;
   connecting: boolean;
   connected: false;
+  triggerUpdating: boolean;
   zapTriggerMeta: {
     zapId: string;
     triggerApp: string;
@@ -34,6 +35,7 @@ type StoreState = {
   setConnected: (val: boolean) => void;
   setPassword: (password: string) => void;
   setConnecting: (val: boolean) => void;
+  setTriggerUpdating: (val: boolean) => void;
   setActions: (val: Action[]) => void;
   setShowZapModal: (val: boolean) => void;
   setAvailableActions: (val: AvailableAction[]) => void;
@@ -63,6 +65,7 @@ const useStore = create<StoreState>((set) => ({
   selectedActions: [],
   zapTrigger: null,
   connecting: false,
+  triggerUpdating: false,
   actions: [],
   AvailableActions: [],
   filterNodes: [],
@@ -71,6 +74,7 @@ const useStore = create<StoreState>((set) => ({
   setUpdateTrigger: (val) => set(() => ({ updateTrigger: val })),
   setConnected: (val) => () => ({ connected: val }),
   setConnecting: (val) => set(() => ({ connecting: val })),
+  setTriggerUpdating: (val) => set(() => ({ triggerUpdating: val })),
   setShowZapModal: (val) => set(() => ({ showZapModal: val })),
   setPassword: (password) => set(() => ({ password })),
   setActions: (val) => set(() => ({ actions: val })),
