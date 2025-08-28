@@ -1,4 +1,5 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useParams } from "next/navigation";
 import useStore from "../store";
 import { isWordIncluded } from "@/lib/utils";
 import ConfigureSheetsModal from "./ConfigureSheetsModal";
@@ -34,13 +35,21 @@ const ConfigureSheets = () => {
   const columnTriggerRef = useRef<HTMLDivElement | null>(null);
   const [activeMode, setActiveMode] = useState<"spreadsheet" | "worksheet" | "column">("spreadsheet");
   const selectedNode = useStore((state) => state.selectedNode);
+  const zapTriggerMeta = useStore((state) => state.zapTriggerMeta);
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
   const { name } = selectedNode?.data?.label?.props?.match;
 
   const actions = useStore((state) => state.actions);
   const index = actions.find((action) => isWordIncluded(action.actionId, name))?.index;
-  const metadata = actions.find((action) => isWordIncluded(action.actionId, name))?.metadata;
+  const matchedAction = typeof index === "number"
+    ? actions.find((action) => action.index === index)
+    : actions.find((action) => isWordIncluded(action.actionId, name));
+  const metadata = matchedAction?.metadata;
+  const actionEventFromAction = matchedAction?.actionEvent || null;
+  const actionEventFromTrigger = zapTriggerMeta?.triggerEvent || null;
+  const effectiveEvent = (actionEventFromTrigger || actionEventFromAction || "").toString();
+  const normalizedActionEvent = effectiveEvent.toLowerCase().trim();
   const spreadsheetId = (metadata as { spreadsheetId?: string } | undefined)?.spreadsheetId;
   const spreadsheetName = (metadata as { spreadsheetName?: string } | undefined)?.spreadsheetName;
   const worksheetId = (metadata as { worksheetId?: string } | undefined)?.worksheetId;
@@ -48,6 +57,8 @@ const ConfigureSheets = () => {
   const triggerColumnName = (metadata as { triggerColumnName?: string } | undefined)?.triggerColumnName;
 
   const { data: googleAccessToken, isLoading, isError } = useGetGoogleAccessToken(token);
+  const previousEventRef = useRef<string | null>(null);
+  const params = useParams();
 
   const openSpreadsheetModal = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -66,6 +77,41 @@ const ConfigureSheets = () => {
     setActiveMode("column");
     setIsModalOpen(true);
   };
+
+  // Reset metadata when trigger event changes
+  useEffect(() => {
+    if (!normalizedActionEvent) return;
+    // Only reset if the event actually changed after initial mount
+    if (previousEventRef.current === null) {
+      previousEventRef.current = normalizedActionEvent;
+      return;
+    }
+    if (previousEventRef.current === normalizedActionEvent) return;
+    previousEventRef.current = normalizedActionEvent;
+    if (typeof index !== "number") return;
+    // Clear metadata locally
+    const setActions = useStore.getState().setActions;
+    const currentActions = useStore.getState().actions;
+    const clearedMeta = {} as unknown as JSON;
+    setActions(
+      currentActions.map((a) => (a.index === index ? { ...a, metadata: clearedMeta } : a))
+    );
+    // Clear in DB
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    import("@/lib/CustomHook").then(({ updateActionsMetadata }) => {
+      const paramsZapId = params.id;
+      if (!paramsZapId) return;
+      // send empty object so backend overwrites prior values
+      void updateActionsMetadata({
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
+        zapId: paramsZapId,
+        metaData: {},
+        index,
+      });
+    });
+  }, [normalizedActionEvent, index, params.id]);
 
   return (
     <div className="flex p-5 flex-col gap-y-2">
@@ -100,68 +146,85 @@ const ConfigureSheets = () => {
           </svg>
         </div>
       </div>
-      <span className="text-sm font-semibold text-[#333333]">
-        Worksheet <span className="text-[#ff6666]">*</span>
-      </span>
-      <div
-        ref={worksheetTriggerRef}
-        onClick={openWorksheetModal}
-        className="flex justify-between border cursor-pointer hover:border-black text-sm font-semibold transition-all duration-500 p-2"
-      >
-        <button className="border-none cursor-pointer outline-0" disabled={isLoading || isUpdatingWorksheet}>
-          <span className={`${worksheetName ? "text-black" : "text-[#808080]"}`}>
-            {isUpdatingWorksheet ? "Saving..." : isLoading ? "Loading..." : isError ? "Error" : worksheetName || "Choose value"}
+      {/* Show Worksheet only when trigger is NOT "New worksheet" and NOT empty */}
+      {normalizedActionEvent !== "new worksheet" && (
+        <>
+          <span className="text-sm font-semibold text-[#333333]">
+            Worksheet <span className="text-[#ff6666]">*</span>
           </span>
-        </button>
-        <div>
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 32 32"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
+          <div
+            ref={worksheetTriggerRef}
+            onClick={(e) => {
+              if (!spreadsheetId) return; // require spreadsheet first
+              openWorksheetModal(e);
+            }}
+            className="flex justify-between border cursor-pointer hover:border-black text-sm font-semibold transition-all duration-500 p-2"
           >
-            <path
-              stroke="#535358"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M9 20l7 7 7-7M23 12l-7-7-7 7"
-            ></path>
-          </svg>
-        </div>
-      </div>
-      <span className="text-sm font-semibold text-[#333333] mt-2">
-        Trigger Column <span className="text-[#ff6666]">*</span>
-      </span>
-      <div
-        ref={columnTriggerRef}
-        onClick={openColumnModal}
-        className="flex justify-between border cursor-pointer hover:border-black text-sm font-semibold transition-all duration-500 p-2"
-      >
-        <button className="border-none cursor-pointer outline-0" disabled={isLoading || isUpdatingColumn}>
-          <span className={`${triggerColumnName ? "text-black" : "text-[#808080]"}`}>
-            {isUpdatingColumn ? "Saving..." : isLoading ? "Loading..." : isError ? "Error" : triggerColumnName || "Choose value"}
+            <button className="border-none cursor-pointer outline-0" disabled={isLoading || isUpdatingWorksheet || !spreadsheetId}>
+              <span className={`${worksheetName ? "text-black" : "text-[#808080]"}`}>
+                {isUpdatingWorksheet ? "Saving..." : isLoading ? "Loading..." : isError ? "Error" : worksheetName || "Choose value"}
+              </span>
+            </button>
+            <div>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 32 32"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+              >
+                <path
+                  stroke="#535358"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 20l7 7 7-7M23 12l-7-7-7 7"
+                ></path>
+              </svg>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Show Trigger Column only when NOT "New worksheet" and NOT "New spreadsheet row" */}
+      {normalizedActionEvent !== "new worksheet" && normalizedActionEvent !== "new spreadsheet row" && (
+        <>
+          <span className="text-sm font-semibold text-[#333333] mt-2">
+            Trigger Column <span className="text-[#ff6666]">*</span>
           </span>
-        </button>
-        <div>
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 32 32"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
+          <div
+            ref={columnTriggerRef}
+            onClick={(e) => {
+              if (!spreadsheetId || !worksheetName) return; // require both first
+              openColumnModal(e);
+            }}
+            className="flex justify-between border cursor-pointer hover:border-black text-sm font-semibold transition-all duration-500 p-2"
           >
-            <path
-              stroke="#535358"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M9 20l7 7 7-7M23 12l-7-7-7 7"
-            ></path>
-          </svg>
-        </div>
-      </div>
+            <button className="border-none cursor-pointer outline-0" disabled={isLoading || isUpdatingColumn || !spreadsheetId || !worksheetName}>
+              <span className={`${triggerColumnName ? "text-black" : "text-[#808080]"}`}>
+                {isUpdatingColumn ? "Saving..." : isLoading ? "Loading..." : isError ? "Error" : triggerColumnName || "Choose value"}
+              </span>
+            </button>
+            <div>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 32 32"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+              >
+                <path
+                  stroke="#535358"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 20l7 7 7-7M23 12l-7-7-7 7"
+                ></path>
+              </svg>
+            </div>
+          </div>
+        </>
+      )}
 
       {isModalOpen && (
         <ConfigureSheetsModal
@@ -173,6 +236,7 @@ const ConfigureSheets = () => {
           mode={activeMode}
           selectedSpreadsheet={spreadsheetId && spreadsheetName ? { id: spreadsheetId, name: spreadsheetName } : null}
           selectedWorksheetName={worksheetName || null}
+          currentEvent={effectiveEvent}
         />
       )}
     </div>

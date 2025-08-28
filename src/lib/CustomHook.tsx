@@ -508,33 +508,6 @@ export function useTriggerUpdate({
   zapId: ParamValue | undefined;
   metadata: { [key: string]: string } | undefined;
 }) {
-  useEffect(() => {
-    if (!zapId || !event) return;
-    
-    
-    const updateTrigger = async () => {
-      try {
-        await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/trigger/${zapId}`,
-          {
-            triggerEvent: event,
-            metadata: metadata,
-          }
-        );
-      } catch (error) {
-        console.error("Failed to update trigger:", error);
-      }
-    };
-
-    updateTrigger();
-  }, [zapId, event]);
-
-  const [triggerData, setTriggerData] = useState<{
-    triggerEvent: string;
-    zapId: string;
-    triggerApp: string;
-  } | null>(null);
-
   const { data, isLoading, isError } = useQuery({
     queryKey: ["trigger-event", zapId],
     queryFn: async () => {
@@ -545,6 +518,36 @@ export function useTriggerUpdate({
     },
     enabled: !!zapId,
   });
+
+  useEffect(() => {
+    if (!zapId || !event) return;
+    if (!data || isLoading || isError) return;
+    if (data.triggerEvent === event) return; // only update when changed
+
+    const updateTrigger = async () => {
+      try {
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/trigger/${zapId}`,
+          {
+            triggerEvent: event,
+            metadata: {},
+          }
+        );
+      } catch (error) {
+        console.error("Failed to update trigger:", error);
+      }
+    };
+
+    updateTrigger();
+  }, [zapId, event, data, isLoading, isError]);
+
+  const [triggerData, setTriggerData] = useState<{
+    triggerEvent: string;
+    zapId: string;
+    triggerApp: string;
+  } | null>(null);
+
+  // data query defined above
 
   useEffect(() => {
     if (data) {
@@ -561,7 +564,7 @@ export async function updateActionsMetadata({
   index
 }: {
   zapId: ParamValue;
-  metaData: { [key: string]: string };
+  metaData: { [key: string]: unknown };
   index: number | undefined;
 }) {
   

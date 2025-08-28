@@ -62,6 +62,7 @@ const ConfigureSheetsModal = ({
   mode,
   selectedSpreadsheet,
   selectedWorksheetName,
+  currentEvent,
 }: {
   setIsModalOpen: (isOpen: boolean) => void;
   googleAccessToken: string | null;
@@ -71,6 +72,7 @@ const ConfigureSheetsModal = ({
   mode: "spreadsheet" | "worksheet" | "column";
   selectedSpreadsheet: { id: string; name: string } | null;
   selectedWorksheetName: string | null;
+  currentEvent: string;
 }) => {
   const modalContentRef = useRef<HTMLDivElement | null>(null);
   const params = useParams();
@@ -146,6 +148,7 @@ const ConfigureSheetsModal = ({
           worksheetId: null as unknown as string,
           worksheetName: null as unknown as string,
           triggerColumnName: null as unknown as string,
+          triggerEventSnapshot: currentEvent,
         },
         index,
       });
@@ -156,6 +159,7 @@ const ConfigureSheetsModal = ({
           worksheetId: null,
           worksheetName: null,
           triggerColumnName: null,
+          triggerEventSnapshot: currentEvent,
         } as unknown as JSON;
         setActions(
           actions.map((a) => (a.index === index ? { ...a, metadata: newMeta } : a))
@@ -179,6 +183,7 @@ const ConfigureSheetsModal = ({
           worksheetId: worksheet.id,
           worksheetName: worksheet.name,
           triggerColumnName: null as unknown as string,
+          triggerEventSnapshot: currentEvent,
         },
         index,
       });
@@ -189,6 +194,7 @@ const ConfigureSheetsModal = ({
           worksheetId: worksheet.id,
           worksheetName: worksheet.name,
           triggerColumnName: null,
+          triggerEventSnapshot: currentEvent,
         } as unknown as JSON;
         setActions(
           actions.map((a) => (a.index === index ? { ...a, metadata: newMeta } : a))
@@ -211,6 +217,7 @@ const ConfigureSheetsModal = ({
           spreadsheetName: selectedSpreadsheet.name,
           worksheetName: selectedWorksheetName,
           triggerColumnName: columnName,
+          triggerEventSnapshot: currentEvent,
         },
         index,
       });
@@ -220,6 +227,7 @@ const ConfigureSheetsModal = ({
           spreadsheetName: selectedSpreadsheet.name,
           worksheetName: selectedWorksheetName,
           triggerColumnName: columnName,
+          triggerEventSnapshot: currentEvent,
         } as unknown as JSON;
         setActions(
           actions.map((a) => (a.index === index ? { ...a, metadata: newMeta } : a))
