@@ -237,10 +237,19 @@ export default function ActionsList() {
         availableActionId: selectedAction.id,
         index: curNodeIdx,
       });
-      setSelectedNode(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAction, setSelectedActions, setSelectedNode]);
+
+  // Ensure sidebar stays open and reflects updated node data after app change
+  useEffect(() => {
+    if (selectedNode) {
+      const refreshed = nodes.find((n) => n.id === selectedNode.id);
+      if (refreshed) {
+        setSelectedNode(refreshed as unknown as Node);
+      }
+    }
+  }, [actions, selectedActions, nodes, selectedNode, setSelectedNode]);
 
   useAddNode({ nodes, edges, setNodes, setEdges, refetchActions });
 
