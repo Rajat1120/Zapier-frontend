@@ -115,7 +115,11 @@ const Setup = ({ curNodeIdx }: { curNodeIdx: number | null }) => {
                 {triggerEventLoading || triggerUpdating
                   ? "Loading..."
                   : curNodeIdx === 0
-                  ? (triggerData?.triggerEvent || zapTriggerMeta?.triggerEvent || "Choose an event")
+                  ? // When app changes, we set updateTrigger=false to avoid restoring
+                    // the previous server trigger. Respect that by ignoring server value.
+                    (!updateTrigger
+                      ? (zapTriggerMeta?.triggerEvent || "Choose an event")
+                      : (zapTriggerMeta?.triggerEvent || triggerData?.triggerEvent || "Choose an event"))
                   : (actionEvent?.actionEvent || "Choose an event")}
               </span>
             </div>

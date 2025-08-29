@@ -65,6 +65,16 @@ export default function ActionsList() {
   const [nodes, setNodes] = useState<CustomNode[]>(generateInitialNodes(2));
   const [edges, setEdges] = useState<StrictEdge[]>(initialEdges);
   const [newNodes, setNewNodes] = useState<CustomNode[]>([]);
+  const [flowKey, setFlowKey] = useState<number>(0);
+  const reactFlowInstanceRef = useRef<{
+    getViewport: () => { x: number; y: number; zoom: number };
+    setViewport: (vp: { x: number; y: number; zoom: number }) => void;
+  } | null>(null);
+  const [savedViewport, setSavedViewport] = useState<{
+    x: number;
+    y: number;
+    zoom: number;
+  } | null>(null);
 
   const setSelectedNode = useStore((state) => state.setSelectedNode);
   const setSelectedActions = useStore((state) => state.setSelectedActions);
@@ -237,6 +247,22 @@ export default function ActionsList() {
         availableActionId: selectedAction.id,
         index: curNodeIdx,
       });
+      // Proactively ensure nodes render by regenerating filter nodes and forcing a flow re-render
+      const regenerated = generateInitialNodes(actions.length || 2);
+      setFilterNodes(regenerated);
+      // Also update nodes and edges immediately to avoid transient edge loss
+      updateNodesAndEdges(regenerated);
+      // Preserve current viewport before remounting the flow
+      const instance = reactFlowInstanceRef.current;
+      if (instance) {
+        try {
+          const vp = instance.getViewport();
+          setSavedViewport(vp);
+        } catch (_e) {
+          // noop
+        }
+      }
+      setFlowKey((k) => k + 1);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAction, setSelectedActions, setSelectedNode]);
@@ -320,6 +346,20 @@ export default function ActionsList() {
         <Authentication></Authentication>
         <div ref={reactFlowWrapper} style={{ height: "100%", width: "100%" }}>
           <ReactFlow
+            key={flowKey}
+            onInit={(instance) => {
+              // Save instance for viewport ops and restore viewport if we have a saved one
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              reactFlowInstanceRef.current = instance;
+              if (savedViewport) {
+                try {
+                  instance.setViewport(savedViewport);
+                } catch (_e) {
+                  // noop
+                }
+              }
+            }}
             nodes={nodes}
             onNodesChange={onNodesChange}
             edges={edges}

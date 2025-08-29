@@ -579,9 +579,12 @@ export function useTriggerUpdate({
     }
   }, [data]);
 
-  // Initialize store with server value on first load so UI enables Continue
+  // Initialize store with server value on first load so UI enables Continue,
+  // but only when trigger updates are allowed (avoid restoring old event after app change)
   useEffect(() => {
     if (!zapId || !data) return;
+    const allowHydrate = useStore.getState().updateTrigger;
+    if (!allowHydrate) return;
     const currentMeta = useStore.getState().zapTriggerMeta;
     if (!currentMeta || !currentMeta.triggerEvent) {
       useStore.getState().setZapTriggerMeta(
