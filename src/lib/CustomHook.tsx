@@ -579,6 +579,25 @@ export function useTriggerUpdate({
     }
   }, [data]);
 
+  // Initialize store with server value on first load so UI enables Continue
+  useEffect(() => {
+    if (!zapId || !data) return;
+    const currentMeta = useStore.getState().zapTriggerMeta;
+    if (!currentMeta || !currentMeta.triggerEvent) {
+      useStore.getState().setZapTriggerMeta(
+        currentMeta
+          ? { ...currentMeta, triggerEvent: data.triggerEvent }
+          : {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              //@ts-ignore
+              zapId,
+              triggerApp: "",
+              triggerEvent: data.triggerEvent,
+            }
+      );
+    }
+  }, [zapId, data]);
+
   return { triggerData, isLoading, isError };
 }
 
