@@ -11,9 +11,10 @@ type GoogleFile = {
 async function fetchSpreadsheets(accessToken: string | null): Promise<GoogleFile[]> {
   if (!accessToken) return [];
   const res = await fetch(
-    `https://www.googleapis.com/drive/v3/files?q=mimeType='application/vnd.google-apps.spreadsheet'&fields=files(id,name)&pageSize=1000`,
+    `https://www.googleapis.com/drive/v3/files?q=mimeType='application/vnd.google-apps.spreadsheet' and trashed=false&fields=files(id,name)&pageSize=1000`,
     {
       headers: { Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
     }
   );
   const data = await res.json();
@@ -26,6 +27,7 @@ async function fetchWorksheets(accessToken: string | null, spreadsheetId: string
     `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=sheets(properties(sheetId,title))`,
     {
       headers: { Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
     }
   );
   const data = await res.json();
@@ -45,6 +47,7 @@ async function fetchColumns(
     )}?majorDimension=ROWS`,
     {
       headers: { Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
     }
   );
   const data = await res.json();
