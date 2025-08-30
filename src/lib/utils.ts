@@ -56,9 +56,11 @@ export const addTrailingPlusNode = (
   const filteredEdges = edgeList.filter(
     (e) => e.source !== "dummy" && e.target !== "dummy"
   );
+  
   const verticalGap = 120;
   const lastNodeId = filteredNodes[filteredNodes.length - 1].id;
   const dummyNodeId = "dummy";
+  
   // Make dummy node invisible and non-interactive, but keep edge visible
   const dummyNode = {
     id: dummyNodeId,
@@ -67,6 +69,7 @@ export const addTrailingPlusNode = (
     connectable: false,
     style: { width: 280, height: 70, opacity: 0, pointerEvents: "none" },
   };
+  
   filteredNodes.push(dummyNode);
   filteredEdges.push({
     id: `e${lastNodeId}-${dummyNodeId}`,
@@ -74,6 +77,7 @@ export const addTrailingPlusNode = (
     target: dummyNodeId,
     type: "custom",
   });
+  
   // Mutate the arrays in place
   nodeList.length = 0;
   edgeList.length = 0;

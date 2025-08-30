@@ -46,11 +46,11 @@ const edgeTypes = {
   custom: CustomEdge,
 };
 
-const generateEdges = (nodes: CustomNode[]) => {
-  const edges = [];
+const generateEdges = (nodes: CustomNode[]): StrictEdge[] => {
+  const edges: StrictEdge[] = [];
   for (let i = 0; i < nodes.length - 1; i++) {
     edges.push({
-      id: `edge-${i}-${i + 1}`,
+      id: `e${nodes[i].id}-${nodes[i + 1].id}`,
       source: nodes[i].id,
       target: nodes[i + 1].id,
       type: "custom",
@@ -72,7 +72,7 @@ export default function ActionsList() {
 
   const setSelectedNode = useStore((state) => state.setSelectedNode);
   const setSelectedActions = useStore((state) => state.setSelectedActions);
-  const setSelectedAction = useStore((state) => state.setSelectedAction);
+  // const setSelectedAction = useStore((state) => state.setSelectedAction); // Removed unused variable
   const setUpdateTrigger = useStore((state) => state.setUpdateTrigger);
   const setAvailableActions = useStore((state) => state.setAvailableActions);
   const setActions = useStore((state) => state.setActions);
@@ -119,10 +119,14 @@ export default function ActionsList() {
   });
 
   useEffect(() => {
-    if (actions.length) {
-      setFilterNodes(generateInitialNodes(actions.length));
+    // Only update filterNodes if the count actually changes
+    const currentCount = filterNodes.length;
+    const requiredCount = Math.max(actions.length, 2);
+    
+    if (currentCount !== requiredCount) {
+      setFilterNodes(generateInitialNodes(requiredCount));
     }
-  }, [actions, setFilterNodes]);
+  }, [actions, setFilterNodes, filterNodes.length]);
 
   useEffect(() => {
     const triggerNode = selectedActions.find((node) => node.index === 0);
@@ -140,13 +144,30 @@ export default function ActionsList() {
     setNewNodes(filterNodes);
   }, [filterNodes]);
 
+  // Ensure nodes are always properly initialized - consolidated logic
   useEffect(() => {
-    setSelectedAction(null);
-    setSelectedActions(null);
-  }, [setSelectedAction, setSelectedActions]);
+    if (!nodes || nodes.length === 0) {
+      const initialNodes = generateInitialNodes(Math.max(actions.length, 2));
+      const initialEdges = generateEdges(initialNodes);
+      
+      // Only call addTrailingPlusNode once
+      const nodesWithTrailing = [...initialNodes];
+      const edgesWithTrailing = [...initialEdges];
+      addTrailingPlusNode(nodesWithTrailing, edgesWithTrailing);
+      
+      setNodes(nodesWithTrailing);
+      setEdges(edgesWithTrailing);
+    }
+  }, [nodes, actions, setNodes, setEdges]);
+
+  // Remove the problematic useEffect that clears selectedActions on every render
+  // useEffect(() => {
+  //   setSelectedAction(null);
+  //   setSelectedActions(null);
+  // }, [setSelectedAction, setSelectedActions]);
 
   useEffect(() => {
-    if (selectedActions.length) {
+    if (selectedActions.length && actions.length > 0) {
       const updatedActions = actions.map((action) => {
         const match = selectedActions.find((val) => val.index === action.index);
         if (match) {
@@ -166,21 +187,33 @@ export default function ActionsList() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id, selectedActions, setActions, refetchActions]);
 
-  const updateNodesAndEdges = useCallback((nodeUpdates: CustomNode[]) => {
-    const newNodes = [...nodeUpdates];
-    const newEdges = generateEdges(newNodes);
-
-    addTrailingPlusNode(newNodes, newEdges);
-
-    setNodes(newNodes);
-    setEdges(newEdges);
-  }, []);
+  // Removed updateNodesAndEdges function as it was causing duplicate addTrailingPlusNode calls
 
   
   
 
   useEffect(() => {
     const verticalGap = 120;
+    
+    // Ensure we always have nodes to work with
+    if (!newNodes || newNodes.length === 0) {
+      // If newNodes is empty, fall back to current actions or generate default nodes
+      const fallbackCount = Math.max(actions.length, 2);
+      const fallbackNodes = generateInitialNodes(fallbackCount);
+      setNewNodes(fallbackNodes);
+      return;
+    }
+    
+    // Ensure newNodes has the correct number of nodes
+    const expectedCount = Math.max(actions.length, 2);
+    if (newNodes.length !== expectedCount) {
+      const correctedNodes = generateInitialNodes(expectedCount);
+      setNewNodes(correctedNodes);
+      return;
+    }
+    
+
+    
     const updatedNodes = newNodes.map((node, index) => {
       let match;
       const isTrigger = index === 0;
@@ -224,10 +257,14 @@ export default function ActionsList() {
     // Always ensure trailing node and edges are present
     const nodesWithTrailing = [...updatedNodes];
     const edgesWithTrailing = generateEdges(nodesWithTrailing);
-    addTrailingPlusNode(nodesWithTrailing, edgesWithTrailing);
     
-    setNodes(nodesWithTrailing);
-    setEdges(edgesWithTrailing);
+    // Create fresh copies to prevent mutation of React state
+    const freshNodes = [...nodesWithTrailing];
+    const freshEdges = [...edgesWithTrailing];
+    addTrailingPlusNode(freshNodes, freshEdges);
+    
+    setNodes(freshNodes);
+    setEdges(freshEdges);
   }, [
     newNodes,
     actions,
@@ -254,6 +291,9 @@ export default function ActionsList() {
       const refreshed = nodes.find((n) => n.id === selectedNode.id);
       if (refreshed) {
         setSelectedNode(refreshed as unknown as Node);
+      } else {
+        // If the selected node no longer exists, clear the selection
+        setSelectedNode(null);
       }
     }
   }, [actions, selectedActions, nodes, selectedNode, setSelectedNode]);
@@ -262,7 +302,8 @@ export default function ActionsList() {
 
   const findCurNodeIdx = useCallback(
     (node: Node) => {
-      return nodes.findIndex((val) => val.id === node.id);
+      const index = nodes.findIndex((val) => val.id === node.id);
+      return index >= 0 ? index : null;
     },
     [nodes]
   );
