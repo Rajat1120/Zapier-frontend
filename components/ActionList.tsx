@@ -384,6 +384,14 @@ export default function ActionsList() {
             onNodeClick={(_, node) => {
               setSelectedNode(node);
               setCurNodeIdx(findCurNodeIdx(node));
+              
+              // Only open ZapModal if the node doesn't have a match (is a new/empty node)
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              //@ts-ignore
+              const type = node?.data?.label?.props?.match;
+              if (!type) {
+                setShowZapModal(true);
+              }
             }}
             zoomOnScroll={false}
           >

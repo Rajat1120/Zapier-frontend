@@ -165,7 +165,8 @@ export function inActionTable(
   const type = selectedNode?.data?.label?.props?.match;
 
   if (!type) {
-    setShowZapModal(true);
+    // Don't automatically open ZapModal for newly created nodes
+    // Only open it if the node is explicitly clicked
     return true;
   }
 
