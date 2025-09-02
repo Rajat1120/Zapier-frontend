@@ -7,6 +7,7 @@ import { Edge } from "@xyflow/react";
 import { CustomNode } from "./type";
 import ConfigureGmail from "../../components/ConfigureGmail";
 import ConfigureNotion from "../../components/ConfigureNotion";
+import ConfigureDrive from "../../components/ConfigureDrive";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -104,6 +105,10 @@ export const configureComponentMap = {
   "New Database Item": ConfigureNotion,
   "Updated Database Item": ConfigureNotion,
   "Updated Page": ConfigureNotion,
+  "New File": ConfigureDrive,
+  "New File in Folder": ConfigureDrive,
+  "New Folder": ConfigureDrive,
+  "Updated File": ConfigureDrive,
   
   // Add more mappings as needed
 };

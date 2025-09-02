@@ -233,7 +233,7 @@ export const showConfigureArray = [
   "New Database Item",
   "Updated Database Item",
   "Updated page",
-  "New File",
+  
   "New Mention",
   "New Comment on Video",
   "New Attachment",
