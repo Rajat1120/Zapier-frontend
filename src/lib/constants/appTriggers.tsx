@@ -162,10 +162,20 @@ export const appActions: Record<
     },
   ],
   Gmail: [
+   
+   
     {
-      heading: "Create Draft",
-      subheading: "Create a draft email message.",
+      heading: "Archive Email",
+      subheading: "Archive an email message.",
     },
+    {
+      heading: "Delete Email",
+      subheading: "Sends an email message to the trash.",
+    },
+    {
+      heading: "Add label to email",
+      subheading: "Add a label to an email message.",
+    }
   ],
   "Google Calendar": [
     {
@@ -250,4 +260,7 @@ export const showConfigureArray = [
   "Create Shortcut",
   "Delete File",
   "Create Page",
+  "Add label to email",
+  "Archive Email",
+  "Delete Email",
 ];

@@ -8,6 +8,7 @@ import { CustomNode } from "./type";
 import ConfigureGmail from "../../components/ConfigureGmail";
 import ConfigureNotion from "../../components/ConfigureNotion";
 import ConfigureDrive from "../../components/ConfigureDrive";
+import ConfigureGmailActions from "../../components/ConfigureGmailActions";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -87,7 +88,7 @@ export const addTrailingPlusNode = (
 };
 
 export function isWordIncluded(str1: string, str2: string) {
-console.log(str1,str2);
+
   const s1 = str1.toLowerCase().replace(/\s+/g, "");
   const s2 = str2.toLowerCase().replace(/\s+/g, "");
   return s2.includes(s1);
@@ -109,6 +110,10 @@ export const configureComponentMap = {
   "New File in Folder": ConfigureDrive,
   "New Folder": ConfigureDrive,
   "Updated File": ConfigureDrive,
+  // Gmail Actions
+  "Add label to email": ConfigureGmailActions,
+  "Archive Email": ConfigureGmailActions,
+  "Delete Email": ConfigureGmailActions,
   
   // Add more mappings as needed
 };

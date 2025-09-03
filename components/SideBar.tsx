@@ -22,9 +22,18 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const [selectedField, setselectedField] = useState<string>("setup");
   const showZapModal = useStore((state) => state.showZapModal);
 
+  // Get the appropriate event for configuration component selection
+  const currentAction = curNodeIdx !== null && curNodeIdx !== 0 
+    ? actions.find((action) => action.index === curNodeIdx)
+    : null;
+  
+  const configureEvent = curNodeIdx === 0 
+    ? zapTriggerMeta?.triggerEvent 
+    : currentAction?.actionEvent;
+
   const SelectedConfigureComponent =
     configureComponentMap[
-      zapTriggerMeta?.triggerEvent as keyof typeof configureComponentMap
+      configureEvent as keyof typeof configureComponentMap
     ];
 
   

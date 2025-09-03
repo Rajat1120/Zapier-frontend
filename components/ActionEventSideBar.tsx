@@ -81,7 +81,7 @@ const ActionEventSideBar: React.FC<ActionEventSideBarProps> = ({
 
                     const newActions = actions.map((action) => {
                       if (Number(action.index) === Number(curNodeIdx)) {
-                        return { ...newAction, actionEvent: val.heading };
+                        return { ...newAction, actionEvent: val.heading, metadata: JSON.parse("{}") };
                       }
                       return action;
                     }) as Action[];
