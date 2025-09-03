@@ -74,9 +74,38 @@ export async function GET(req: NextRequest) {
     "https://www.googleapis.com/auth/userinfo.profile",
   ];
 
-  const selectedScopes = app && appScopes[app] ? appScopes[app] : [];
+  let selectedScopes: string[] = [];
+  
+  if (app && appScopes[app]) {
+    selectedScopes = appScopes[app];
+    
+    // For Zapier backend, we need both Drive and Gmail scopes
+    if (app === "drive") {
+      selectedScopes = [...appScopes.drive, ...appScopes.gmail];
+    }
+  }
 
-  const scopes = [...baseScopes, ...selectedScopes];
+  // Get existing scopes from backend to preserve them
+  let existingScopes: string[] = [];
+  if (token) {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/google-token`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        existingScopes = data.scopes || [];
+      }
+    } catch (error) {
+      console.log('Could not fetch existing scopes:', error);
+    }
+  }
+
+  // Merge existing scopes with new ones
+  const allScopes = [...new Set([...baseScopes, ...selectedScopes, ...existingScopes])];
+  const scopes = allScopes;
 
   const redirectUrl = `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchParams(
     {

@@ -34,7 +34,26 @@ export async function GET(req: NextRequest) {
     );
 
     const { access_token, refresh_token, expires_in } = tokenResponse.data;
-    console.log("Granted scopes:", tokenResponse.data.scope);
+    const grantedScopes = tokenResponse.data.scope ? tokenResponse.data.scope.split(' ') : scopes;
+    
+    console.log("Requested scopes:", scopes);
+    console.log("Granted scopes:", grantedScopes);
+    
+    // Verify that the granted scopes include what we actually need
+    if (state.includes('gmail')) {
+      const requiredGmailScopes = [
+        'https://www.googleapis.com/auth/gmail.modify',
+        'https://www.googleapis.com/auth/gmail.labels'
+      ];
+      const missingScopes = requiredGmailScopes.filter(scope => !grantedScopes.includes(scope));
+      
+      if (missingScopes.length > 0) {
+        console.error('❌ Missing required Gmail scopes:', missingScopes);
+        return NextResponse.json({ 
+          error: `Gmail access requires additional permissions. Missing scopes: ${missingScopes.join(', ')}` 
+        }, { status: 400 });
+      }
+    }
 
     const userInfoRes = await axios.get(
       "https://www.googleapis.com/oauth2/v3/userinfo",
@@ -44,11 +63,11 @@ export async function GET(req: NextRequest) {
         },
       }
     );
-    // store token in DB
+    // store token in DB - use granted scopes, not requested scopes
     await updateGoogle_Tokens({
       access_token,
       refresh_token,
-      scopes,
+      scopes: grantedScopes, // Use actual granted scopes
       expires_in,
       token,
       email: userInfoRes.data.email,

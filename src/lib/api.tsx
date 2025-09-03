@@ -140,8 +140,26 @@ export function useHasServiceAccess(serviceName: string, token: string | null) {
     select: (data) => {
       const scopes = data?.scopes ?? [];
       const requiredScopes = appScopes[normalizedKey];
-      const hasMatch =
-        requiredScopes?.some((scope) => scopes.includes(scope)) ?? false;
+      
+      // For Gmail, we need BOTH modify AND labels scopes for archiving to work
+      let hasMatch = false;
+      if (normalizedKey === 'gmail') {
+        const criticalScopes = [
+          'https://www.googleapis.com/auth/gmail.modify',
+          'https://www.googleapis.com/auth/gmail.labels'
+        ];
+        hasMatch = criticalScopes.every(scope => scopes.includes(scope));
+      } else {
+        // For other apps, having any required scope is sufficient
+        hasMatch = requiredScopes?.some((scope) => scopes.includes(scope)) ?? false;
+      }
+      
+      console.log('🔍 Scope validation for', normalizedKey, ':', {
+        userScopes: scopes,
+        requiredScopes,
+        hasMatch
+      });
+      
       return {
         scopesMatch: hasMatch,
         email: data?.email ?? null,
@@ -179,12 +197,16 @@ export function handleGoogleConnect(
     return;
   }
 
+  console.log(`🔗 Starting OAuth for ${appName} -> ${matchedApp}`);
+  
   const url = `/api/oauth/google/start?zapId=${zapId}&app=${matchedApp}&token=${token}`;
+  console.log(`🔗 OAuth URL:`, url);
 
   const popup = window.open(url, "google-oauth", "width=900,height=700");
 
   const interval = setInterval(() => {
     if (popup?.closed) {
+      console.log(`❌ OAuth popup closed for ${appName}`);
       setConnecting(false);
       clearInterval(interval);
       window.removeEventListener("message", handleOAuthMessage);
@@ -193,13 +215,19 @@ export function handleGoogleConnect(
 
   function handleOAuthMessage(event: MessageEvent) {
     setConnecting(false);
-    if (event.origin !== window.location.origin) return;
+    if (event.origin !== window.location.origin) {
+      console.warn('⚠️ OAuth message from wrong origin:', event.origin);
+      return;
+    }
     if (event.data === "oauth-success") {
+      console.log(`✅ OAuth success for ${appName}`);
       refetch();
       setButtonLabel("Change");
       console.log("✅ Google account connected!");
       window.removeEventListener("message", handleOAuthMessage);
       clearInterval(interval);
+    } else {
+      console.log(`💬 OAuth message:`, event.data);
     }
   }
 
