@@ -76,13 +76,15 @@ export async function GET(req: NextRequest) {
 
   let selectedScopes: string[] = [];
   
-  if (app && appScopes[app]) {
-    selectedScopes = appScopes[app];
-    
-    // For Zapier backend, we need both Drive and Gmail scopes
-    if (app === "drive") {
-      selectedScopes = [...appScopes.drive, ...appScopes.gmail];
+  if (app) {
+    const apps = app.split(',').map(a => a.trim());
+    for (const appName of apps) {
+      if (appScopes[appName]) {
+        selectedScopes = [...selectedScopes, ...appScopes[appName]];
+      }
     }
+    // Remove duplicates
+    selectedScopes = [...new Set(selectedScopes)];
   }
 
   // Get existing scopes from backend to preserve them
