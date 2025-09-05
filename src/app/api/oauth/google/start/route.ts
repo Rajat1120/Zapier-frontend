@@ -96,9 +96,15 @@ export async function GET(req: NextRequest) {
           'Authorization': `Bearer ${token}`,
         },
       });
+      console.log('Backend response status:', response.status);
+      console.log('Backend response ok:', response.ok);
       if (response.ok) {
         const data = await response.json();
+        console.log('Backend data:', data);
         existingScopes = data.scopes || [];
+        console.log('Existing scopes from backend:', existingScopes);
+      } else {
+        console.log('Backend response not ok, status:', response.status);
       }
     } catch (error) {
       console.log('Could not fetch existing scopes:', error);
