@@ -123,7 +123,7 @@ export async function GET(req: NextRequest) {
       scope: scopes.join(" "),
       access_type: "offline",
       prompt: "consent",
-      include_granted_scopes: "false",
+      include_granted_scopes: "true",
       state: encodeURIComponent(JSON.stringify({ token, scopes })),
     }
   ).toString()}`;
