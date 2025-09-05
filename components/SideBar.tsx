@@ -36,7 +36,10 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
       configureEvent as keyof typeof configureComponentMap
     ];
 
-  
+  // Determine if event is selected for current node (trigger or action event based on node index)
+  const isEventSelected = curNodeIdx === 0 
+    ? !!zapTriggerMeta?.triggerEvent
+    : !!currentAction?.actionEvent;
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
@@ -159,14 +162,14 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
               setselectedField("configure");
             }
           }}
-          disabled={!zapTriggerMeta?.triggerEvent}
+          disabled={!isEventSelected}
           className={`rounded-sm ${
-            !zapTriggerMeta?.triggerEvent
+            !isEventSelected
               ? "cursor-not-allowed text-[#737272] bg-[#ece9df]"
               : "cursor-pointer bg-[#695be8] text-white"
           } w-full   font-bold  p-2`}
         >
-          {zapTriggerMeta?.triggerEvent
+          {isEventSelected
             ? "Continue"
             : "To continue, choose an event"}
         </button>

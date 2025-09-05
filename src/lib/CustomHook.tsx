@@ -93,7 +93,7 @@ export const handleAddNode = (
       if (!params?.length) return;
 
       await updateZap(params, newNodes);
-      refetchActions();
+      // Removed refetchActions() to prevent timing conflicts during node operations
     }
 
     help();

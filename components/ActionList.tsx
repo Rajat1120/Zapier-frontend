@@ -182,7 +182,11 @@ export default function ActionsList() {
       });
       updateZap(params.id, updatedActions);
       setActions(updatedActions);
-      refetchActions();
+      // Removed refetchActions() to prevent immediate server fetches during node operations
+      // Add delayed refetch mechanism
+      setTimeout(() => {
+        refetchActions();
+      }, 2000);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id, selectedActions, setActions, refetchActions]);
