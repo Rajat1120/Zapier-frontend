@@ -73,61 +73,45 @@ const ConfigureGmailActions = () => {
   useEffect(() => {
     if (!actionEvent) return;
     
-    console.log("🔄 ActionEvent useEffect triggered:", {
-      actionEvent,
-      previousEvent: previousEventRef.current,
-      index,
-      zapId: params.id
-    });
-    
+  
     // Only reset if the event actually changed after initial mount
     if (previousEventRef.current === null) {
-      console.log("📝 Setting initial actionEvent:", actionEvent);
+      
       previousEventRef.current = actionEvent;
       return;
     }
     
     if (previousEventRef.current === actionEvent) {
-      console.log("⏭️ ActionEvent unchanged, skipping clear");
+      
       return;
     }
     
-    console.log("🧹 ActionEvent changed! Clearing metadata:", {
-      from: previousEventRef.current,
-      to: actionEvent,
-      index
-    });
+  
     
     previousEventRef.current = actionEvent;
     if (typeof index !== "number") {
-      console.log("❌ Invalid index, cannot clear metadata");
+      
       return;
     }
     
     // Clear metadata both locally and in DB
     const clearMetadata = async () => {
-      try {
-        console.log("🔄 Clearing metadata in DB...");
-        // Clear in DB first
-        const { updateActionsMetadata } = await import("@/lib/CustomHook");
-        await updateActionsMetadata({
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          //@ts-ignore
-          zapId: params.id,
-          metaData: {},
-          index,
-        });
-        
-        console.log("✅ DB metadata cleared, updating local state...");
-        // Clear metadata locally after successful DB update
-        const clearedMeta = {} as unknown as JSON;
-        setActions(
-          actions.map((a) => (a.index === index ? { ...a, metadata: clearedMeta } : a))
-        );
-        console.log("✅ Local metadata cleared");
-      } catch (error) {
-        console.error("❌ Failed to clear metadata:", error);
-      }
+      // Clear in DB first
+      const { updateActionsMetadata } = await import("@/lib/CustomHook");
+      await updateActionsMetadata({
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
+        zapId: params.id,
+        metaData: {},
+        index,
+      });
+      
+      
+      // Clear metadata locally after successful DB update
+      const clearedMeta = {} as unknown as JSON;
+      setActions(
+        actions.map((a) => (a.index === index ? { ...a, metadata: clearedMeta } : a))
+      );
     };
     
     clearMetadata();

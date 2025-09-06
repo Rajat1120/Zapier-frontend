@@ -154,11 +154,7 @@ export function useHasServiceAccess(serviceName: string, token: string | null) {
         hasMatch = requiredScopes?.some((scope) => scopes.includes(scope)) ?? false;
       }
       
-      console.log('🔍 Scope validation for', normalizedKey, ':', {
-        userScopes: scopes,
-        requiredScopes,
-        hasMatch
-      });
+     
       
       return {
         scopesMatch: hasMatch,

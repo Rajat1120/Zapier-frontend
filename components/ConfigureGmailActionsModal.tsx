@@ -165,19 +165,23 @@ const ConfigureGmailActionsModal = ({
   };
 
   const handleLabelSelect = async (label: GmailLabel) => {
+    
+
     setIsModalOpen(false);
     try {
       setIsUpdating(true);
+      const currentAction = actions.find(a => a.index === index);
+      const mergedMetaData = {
+        ...(currentAction?.metadata as object || {}),
+        labelId: label.id,
+        labelName: label.name,
+      };
       await updateActionsMetadata({
         zapId,
-        metaData: {
-          labelId: label.id,
-          labelName: label.name,
-        },
+        metaData: mergedMetaData,
         index
       });
       if (typeof index === 'number') {
-        const currentAction = actions.find(a => a.index === index);
         const newMeta = { 
           ...currentAction?.metadata,
           labelId: label.id, 
@@ -195,19 +199,23 @@ const ConfigureGmailActionsModal = ({
   };
 
   const handleMessageSelect = async (message: GmailMessage) => {
+    
+    
     setIsModalOpen(false);
     try {
       setIsUpdating(true);
+      const currentAction = actions.find(a => a.index === index);
+      const mergedMetaData = {
+        ...(currentAction?.metadata as object || {}),
+        messageId: message.id,
+        messageName: message.subject || message.snippet.substring(0, 50) + "...",
+      };
       await updateActionsMetadata({
         zapId,
-        metaData: {
-          messageId: message.id,
-          messageName: message.subject || message.snippet.substring(0, 50) + "...",
-        },
+        metaData: mergedMetaData,
         index
       });
       if (typeof index === 'number') {
-        const currentAction = actions.find(a => a.index === index);
         const newMeta = { 
           ...currentAction?.metadata,
           messageId: message.id, 
