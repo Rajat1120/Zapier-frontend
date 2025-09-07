@@ -6,6 +6,7 @@ import useStore from "../store";
 type GoogleFile = {
   id: string;
   name: string;
+  rowCount?: number;
 };
 
 async function fetchSpreadsheets(accessToken: string | null): Promise<GoogleFile[]> {
@@ -24,7 +25,7 @@ async function fetchSpreadsheets(accessToken: string | null): Promise<GoogleFile
 async function fetchWorksheets(accessToken: string | null, spreadsheetId: string | null): Promise<GoogleFile[]> {
   if (!accessToken || !spreadsheetId) return [];
   const res = await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=sheets(properties(sheetId,title))`,
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=sheets(properties(sheetId,title,gridProperties(rowCount)))`,
     {
       headers: { Authorization: `Bearer ${accessToken}` },
       cache: "no-store",
@@ -32,7 +33,7 @@ async function fetchWorksheets(accessToken: string | null, spreadsheetId: string
   );
   const data = await res.json();
   const sheets = data.sheets || [];
-  return sheets.map((s: any) => ({ id: String(s.properties.sheetId), name: s.properties.title }));
+  return sheets.map((s: any) => ({ id: String(s.properties.sheetId), name: s.properties.title, rowCount: s.properties.gridProperties?.rowCount || 1 }));
 }
 
 async function fetchColumns(
@@ -191,6 +192,7 @@ const ConfigureSheetsModal = ({
           worksheetId: worksheet.id,
           worksheetName: worksheet.name,
           triggerColumnName: null as unknown as string,
+          rowCount: worksheet.rowCount,
           triggerEventSnapshot: currentEvent,
         },
         index,
@@ -202,6 +204,7 @@ const ConfigureSheetsModal = ({
           worksheetId: worksheet.id,
           worksheetName: worksheet.name,
           triggerColumnName: null,
+          rowCount: worksheet.rowCount,
           triggerEventSnapshot: currentEvent,
         } as unknown as JSON;
         setActions(

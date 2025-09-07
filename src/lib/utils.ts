@@ -98,6 +98,7 @@ export const configureComponentMap = {
   "New Document in folder": ConfigureDocs,
   "New Spreadsheet row": ConfigureSheets,
   "New or Updated Spreadsheet Row": ConfigureSheets,
+  "Clear Spreadsheet Row(s)": ConfigureSheets,
   "New Worksheet": ConfigureSheets,
   "New Attachment": ConfigureGmail,
   "New Conversation": ConfigureGmail,

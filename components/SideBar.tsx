@@ -41,6 +41,11 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
     ? !!zapTriggerMeta?.triggerEvent
     : !!currentAction?.actionEvent;
 
+  // Compute header title: show trigger event for node 0, otherwise action event for the selected action node
+  const headerTitle = curNodeIdx === 0
+    ? (zapTriggerMeta?.triggerEvent || "Select the event")
+    : (currentAction?.actionEvent || "Select the event");
+
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
   const { name, image } = selectedNode?.data?.label?.props?.match;
@@ -70,8 +75,8 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
               alt={name}
             ></Image>
           </div>
-          <span className={`${zapTriggerMeta ? "font-medium" : ""}`}>
-            {zapTriggerMeta ? zapTriggerMeta.triggerEvent : "Select the event"}
+          <span className={`${headerTitle !== "Select the event" ? "font-medium" : ""}`}>
+            {headerTitle}
           </span>
         </div>
         <div className="flex space-x-3 items-center">

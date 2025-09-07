@@ -30,6 +30,9 @@ const ConfigureSheets = () => {
   const [isUpdatingSpreadsheet, setIsUpdatingSpreadsheet] = useState(false);
   const [isUpdatingWorksheet, setIsUpdatingWorksheet] = useState(false);
   const [isUpdatingColumn, setIsUpdatingColumn] = useState(false);
+  const [rowsInput, setRowsInput] = useState("");
+  const [rowsError, setRowsError] = useState("");
+  const [rows, setRows] = useState<number[]>([]);
   const spreadsheetTriggerRef = useRef<HTMLDivElement | null>(null);
   const worksheetTriggerRef = useRef<HTMLDivElement | null>(null);
   const columnTriggerRef = useRef<HTMLDivElement | null>(null);
@@ -48,13 +51,15 @@ const ConfigureSheets = () => {
   const metadata = matchedAction?.metadata;
   const actionEventFromAction = matchedAction?.actionEvent || null;
   const actionEventFromTrigger = zapTriggerMeta?.triggerEvent || null;
-  const effectiveEvent = (actionEventFromTrigger || actionEventFromAction || "").toString();
+  // Prefer the current action's event if present; otherwise fall back to trigger event
+  const effectiveEvent = (actionEventFromAction || actionEventFromTrigger || "").toString();
   const normalizedActionEvent = effectiveEvent.toLowerCase().trim();
   const spreadsheetId = (metadata as { spreadsheetId?: string } | undefined)?.spreadsheetId;
   const spreadsheetName = (metadata as { spreadsheetName?: string } | undefined)?.spreadsheetName;
-  const worksheetId = (metadata as { worksheetId?: string } | undefined)?.worksheetId;
   const worksheetName = (metadata as { worksheetName?: string } | undefined)?.worksheetName;
   const triggerColumnName = (metadata as { triggerColumnName?: string } | undefined)?.triggerColumnName;
+
+  const worksheetRowCount = (metadata as any)?.rowCount || null;
 
   const { data: googleAccessToken, isLoading, isError } = useGetGoogleAccessToken(token);
   const previousEventRef = useRef<string | null>(null);
@@ -76,6 +81,71 @@ const ConfigureSheets = () => {
     e.stopPropagation();
     setActiveMode("column");
     setIsModalOpen(true);
+  };
+
+  function validateRowsInput(input: string, maxRows: number | null): { rows: number[] } | { error: string } {
+    if (!input.trim()) return { rows: [] };
+    const parts = input.split(',').map(s => s.trim());
+    const rows: number[] = [];
+    for (const part of parts) {
+      if (part.includes('-')) {
+        const [startStr, endStr] = part.split('-').map(s => s.trim());
+        const start = parseInt(startStr);
+        const end = parseInt(endStr);
+        if (isNaN(start) || isNaN(end) || start > end || start < 1 || end < 1) {
+          return { error: "Invalid range format. Use start-end with start <= end." };
+        }
+        if (maxRows && end > maxRows) {
+          return { error: "Row number exceeds worksheet's maximum row count." };
+        }
+        for (let i = start; i <= end; i++) {
+          if (!rows.includes(i)) rows.push(i);
+        }
+      } else {
+        const num = parseInt(part);
+        if (isNaN(num) || num < 1) {
+          return { error: "Row numbers must be positive integers." };
+        }
+        if (maxRows && num > maxRows) {
+          return { error: "Row number exceeds worksheet's maximum row count." };
+        }
+        if (!rows.includes(num)) rows.push(num);
+      }
+    }
+    rows.sort((a,b)=>a-b);
+    return { rows };
+  }
+
+  const updateMetadata = (newMeta: any) => {
+    const setActions = useStore.getState().setActions;
+    const currentActions = useStore.getState().actions;
+    const currentMeta = matchedAction?.metadata || {};
+    const updatedMeta = { ...currentMeta, ...newMeta };
+    setActions(
+      currentActions.map((a) => (a.index === index ? { ...a, metadata: updatedMeta as JSON } : a))
+    );
+    // Update in DB
+    import("@/lib/CustomHook").then(({ updateActionsMetadata }) => {
+      const paramsZapId = params.id;
+      if (!paramsZapId) return;
+      void updateActionsMetadata({
+        zapId: paramsZapId,
+        metaData: updatedMeta,
+        index,
+      });
+    });
+  };
+
+  const validateAndUpdate = () => {
+    const result = validateRowsInput(rowsInput, worksheetRowCount);
+    if ('error' in result) {
+      setRowsError(result.error);
+      setRows([]);
+    } else {
+      setRowsError("");
+      setRows(result.rows);
+      updateMetadata({ rowsInput, rows: result.rows });
+    }
   };
 
   // Reset metadata when trigger event changes
@@ -112,6 +182,16 @@ const ConfigureSheets = () => {
       });
     });
   }, [normalizedActionEvent, index, params.id]);
+
+  useEffect(() => {
+    if (metadata) {
+      const rowsInputFromMeta = (metadata as any)?.rowsInput || "";
+      setRowsInput(rowsInputFromMeta);
+      const rowsFromMeta = (metadata as any)?.rows || [];
+      setRows(rowsFromMeta);
+      setRowsError("");
+    }
+  }, [metadata]);
 
   return (
     <div className="flex p-5 flex-col gap-y-2">
@@ -186,8 +266,8 @@ const ConfigureSheets = () => {
         </>
       )}
 
-      {/* Show Trigger Column only when NOT "New worksheet" and NOT "New spreadsheet row" */}
-      {normalizedActionEvent !== "new worksheet" && normalizedActionEvent !== "new spreadsheet row" && (
+      {/* Show Trigger Column only when NOT "New worksheet" and NOT "New spreadsheet row" and NOT "clear spreadsheet row(s)" */}
+      {normalizedActionEvent !== "new worksheet" && normalizedActionEvent !== "new spreadsheet row" && normalizedActionEvent !== "clear spreadsheet row(s)" && (
         <>
           <span className="text-sm font-semibold text-[#333333] mt-2">
             Trigger Column <span className="text-[#ff6666]">*</span>
@@ -223,6 +303,25 @@ const ConfigureSheets = () => {
               </svg>
             </div>
           </div>
+        </>
+      )}
+
+      {/* Show Row(s) for "clear spreadsheet row(s)" */}
+      {normalizedActionEvent === "clear spreadsheet row(s)" && (
+        <>
+          <span className="text-sm font-semibold text-[#333333] mt-2">
+            Row(s) <span className="text-[#ff6666]">*</span>
+          </span>
+          <input
+            type="text"
+            value={rowsInput}
+            onChange={(e) => setRowsInput(e.target.value)}
+            onBlur={() => validateAndUpdate()}
+            placeholder="e.g., 1,3-5"
+            className="border p-2 w-full"
+            disabled={isLoading || !spreadsheetId || !worksheetName}
+          />
+          {rowsError && <p className="text-red-500 text-sm">{rowsError}</p>}
         </>
       )}
 
