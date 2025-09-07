@@ -4,7 +4,7 @@ import Image from "next/image";
 import useStore from "../store";
 
 import ZapModal from "./ZapModal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import Setup from "./Setup";
 
@@ -61,6 +61,11 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
       );
     }
   }
+
+  // Reset selected tab to 'setup' when switching nodes
+  useEffect(() => {
+    setselectedField("setup");
+  }, [curNodeIdx]);
 
   return (
     <div className="fixed top-16 right-4 min-w-[400px] max-w-[400px] h-[80%] flex  flex-col border-2 border-[#695be8] bg-white rounded-md">
