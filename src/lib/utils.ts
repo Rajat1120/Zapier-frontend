@@ -99,6 +99,7 @@ export const configureComponentMap = {
   "New Spreadsheet row": ConfigureSheets,
   "New or Updated Spreadsheet Row": ConfigureSheets,
   "Clear Spreadsheet Row(s)": ConfigureSheets,
+  "Create Spreadsheet": ConfigureSheets,
   "New Worksheet": ConfigureSheets,
   "New Attachment": ConfigureGmail,
   "New Conversation": ConfigureGmail,

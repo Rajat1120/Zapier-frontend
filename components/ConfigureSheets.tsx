@@ -33,10 +33,15 @@ const ConfigureSheets = () => {
   const [rowsInput, setRowsInput] = useState("");
   const [rowsError, setRowsError] = useState("");
   const [rows, setRows] = useState<number[]>([]);
+  const [title, setTitle] = useState("");
+  const [copySpreadsheetId, setCopySpreadsheetId] = useState("");
+  const [copySpreadsheetName, setCopySpreadsheetName] = useState("");
+  const [isUpdatingCopySpreadsheet, setIsUpdatingCopySpreadsheet] = useState(false);
   const spreadsheetTriggerRef = useRef<HTMLDivElement | null>(null);
   const worksheetTriggerRef = useRef<HTMLDivElement | null>(null);
   const columnTriggerRef = useRef<HTMLDivElement | null>(null);
-  const [activeMode, setActiveMode] = useState<"spreadsheet" | "worksheet" | "column">("spreadsheet");
+  const copySpreadsheetTriggerRef = useRef<HTMLDivElement | null>(null);
+  const [activeMode, setActiveMode] = useState<"spreadsheet" | "worksheet" | "column" | "copy_spreadsheet">("spreadsheet");
   const selectedNode = useStore((state) => state.selectedNode);
   const zapTriggerMeta = useStore((state) => state.zapTriggerMeta);
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -60,6 +65,8 @@ const ConfigureSheets = () => {
   const triggerColumnName = (metadata as { triggerColumnName?: string } | undefined)?.triggerColumnName;
 
   const worksheetRowCount = (metadata as any)?.rowCount || null;
+  const copySpreadsheetIdValue = (metadata as { copySpreadsheetId?: string } | undefined)?.copySpreadsheetId || "";
+  const copySpreadsheetNameValue = (metadata as { copySpreadsheetName?: string } | undefined)?.copySpreadsheetName || "";
 
   const { data: googleAccessToken, isLoading, isError } = useGetGoogleAccessToken(token);
   const previousEventRef = useRef<string | null>(null);
@@ -80,6 +87,12 @@ const ConfigureSheets = () => {
   const openColumnModal = (e: React.MouseEvent) => {
     e.stopPropagation();
     setActiveMode("column");
+    setIsModalOpen(true);
+  };
+
+  const openCopySpreadsheetModal = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActiveMode("copy_spreadsheet");
     setIsModalOpen(true);
   };
 
@@ -190,44 +203,51 @@ const ConfigureSheets = () => {
       const rowsFromMeta = (metadata as any)?.rows || [];
       setRows(rowsFromMeta);
       setRowsError("");
+      setTitle((metadata as any)?.title || "");
+      setCopySpreadsheetId(copySpreadsheetIdValue);
+      setCopySpreadsheetName(copySpreadsheetNameValue);
     }
   }, [metadata]);
 
   return (
     <div className="flex p-5 flex-col gap-y-2">
-      <span className="text-sm font-semibold text-[#333333]">
-        Spreadsheet <span className="text-[#ff6666]">*</span>
-      </span>
-      <div
-        ref={spreadsheetTriggerRef}
-        onClick={openSpreadsheetModal}
-        className="flex justify-between border cursor-pointer hover:border-black text-sm font-semibold transition-all duration-500 p-2"
-      >
-        <button className="border-none cursor-pointer outline-0" disabled={isLoading || isUpdatingSpreadsheet}>
-          <span className={`${spreadsheetName ? "text-black" : "text-[#808080]"}`}>
-            {isUpdatingSpreadsheet ? "Saving..." : isLoading ? "Loading..." : isError ? "Error" : spreadsheetName || "Choose value"}
+      {normalizedActionEvent !== "create spreadsheet" && (
+        <>
+          <span className="text-sm font-semibold text-[#333333]">
+            Spreadsheet <span className="text-[#ff6666]">*</span>
           </span>
-        </button>
-        <div>
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 32 32"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
+          <div
+            ref={spreadsheetTriggerRef}
+            onClick={openSpreadsheetModal}
+            className="flex justify-between border cursor-pointer hover:border-black text-sm font-semibold transition-all duration-500 p-2"
           >
-            <path
-              stroke="#535358"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M9 20l7 7 7-7M23 12l-7-7-7 7"
-            ></path>
-          </svg>
-        </div>
-      </div>
+            <button className="border-none cursor-pointer outline-0" disabled={isLoading || isUpdatingSpreadsheet}>
+              <span className={`${spreadsheetName ? "text-black" : "text-[#808080]"}`}>
+                {isUpdatingSpreadsheet ? "Saving..." : isLoading ? "Loading..." : isError ? "Error" : spreadsheetName || "Choose value"}
+              </span>
+            </button>
+            <div>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 32 32"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+              >
+                <path
+                  stroke="#535358"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 20l7 7 7-7M23 12l-7-7-7 7"
+                ></path>
+              </svg>
+            </div>
+          </div>
+        </>
+      )}
       {/* Show Worksheet only when trigger is NOT "New worksheet" and NOT empty */}
-      {normalizedActionEvent !== "new worksheet" && (
+      {normalizedActionEvent !== "new worksheet" && normalizedActionEvent !== "create spreadsheet" && (
         <>
           <span className="text-sm font-semibold text-[#333333]">
             Worksheet <span className="text-[#ff6666]">*</span>
@@ -267,7 +287,7 @@ const ConfigureSheets = () => {
       )}
 
       {/* Show Trigger Column only when NOT "New worksheet" and NOT "New spreadsheet row" and NOT "clear spreadsheet row(s)" */}
-      {normalizedActionEvent !== "new worksheet" && normalizedActionEvent !== "new spreadsheet row" && normalizedActionEvent !== "clear spreadsheet row(s)" && (
+      {normalizedActionEvent !== "new worksheet" && normalizedActionEvent !== "new spreadsheet row" && normalizedActionEvent !== "clear spreadsheet row(s)" && normalizedActionEvent !== "create spreadsheet" && (
         <>
           <span className="text-sm font-semibold text-[#333333] mt-2">
             Trigger Column <span className="text-[#ff6666]">*</span>
@@ -325,13 +345,61 @@ const ConfigureSheets = () => {
         </>
       )}
 
+      {normalizedActionEvent === "create spreadsheet" && (
+        <>
+          <span className="text-sm font-semibold text-[#333333] mt-2">
+            Title <span className="text-[#ff6666]">*</span>
+          </span>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onBlur={() => updateMetadata({ title })}
+            placeholder="Enter title for new spreadsheet"
+            className="border p-2 w-full"
+            disabled={isLoading}
+          />
+          <span className="text-sm font-semibold text-[#333333] mt-2">
+            Spreadsheet to Copy <span className="text-[#ff6666]">*</span>
+          </span>
+          <div
+            ref={copySpreadsheetTriggerRef}
+            onClick={openCopySpreadsheetModal}
+            className="flex justify-between border cursor-pointer hover:border-black text-sm font-semibold transition-all duration-500 p-2"
+          >
+            <button className="border-none cursor-pointer outline-0" disabled={isLoading || isUpdatingCopySpreadsheet}>
+              <span className={`${copySpreadsheetName ? "text-black" : "text-[#808080]"}`}>
+                {isUpdatingCopySpreadsheet ? "Saving..." : isLoading ? "Loading..." : isError ? "Error" : copySpreadsheetName || "Choose spreadsheet to copy"}
+              </span>
+            </button>
+            <div>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 32 32"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+              >
+                <path
+                  stroke="#535358"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 20l7 7 7-7M23 12l-7-7-7 7"
+                ></path>
+              </svg>
+            </div>
+          </div>
+        </>
+      )}
+
       {isModalOpen && (
         <ConfigureSheetsModal
           setIsModalOpen={setIsModalOpen}
           googleAccessToken={googleAccessToken}
-          triggerRef={activeMode === "spreadsheet" ? spreadsheetTriggerRef : activeMode === "worksheet" ? worksheetTriggerRef : columnTriggerRef}
+          triggerRef={activeMode === "spreadsheet" ? spreadsheetTriggerRef : activeMode === "worksheet" ? worksheetTriggerRef : activeMode === "column" ? columnTriggerRef : copySpreadsheetTriggerRef}
           index={index}
-          setIsUpdating={activeMode === "spreadsheet" ? setIsUpdatingSpreadsheet : activeMode === "worksheet" ? setIsUpdatingWorksheet : setIsUpdatingColumn}
+          setIsUpdating={activeMode === "spreadsheet" ? setIsUpdatingSpreadsheet : activeMode === "worksheet" ? setIsUpdatingWorksheet : activeMode === "column" ? setIsUpdatingColumn : setIsUpdatingCopySpreadsheet}
           mode={activeMode}
           selectedSpreadsheet={spreadsheetId && spreadsheetName ? { id: spreadsheetId, name: spreadsheetName } : null}
           selectedWorksheetName={worksheetName || null}

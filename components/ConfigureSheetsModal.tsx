@@ -73,7 +73,7 @@ const ConfigureSheetsModal = ({
   triggerRef: React.RefObject<HTMLDivElement | null>;
   index: number | undefined;
   setIsUpdating: (updating: boolean) => void;
-  mode: "spreadsheet" | "worksheet" | "column";
+  mode: "spreadsheet" | "worksheet" | "column" | "copy_spreadsheet";
   selectedSpreadsheet: { id: string; name: string } | null;
   selectedWorksheetName: string | null;
   currentEvent: string;
@@ -118,7 +118,7 @@ const ConfigureSheetsModal = ({
       try {
         document.body.style.pointerEvents = "none";
         setLoading(true);
-        if (mode === "spreadsheet") {
+        if (mode === "spreadsheet" || mode === "copy_spreadsheet") {
           const files = await fetchSpreadsheets(googleAccessToken);
           if (!cancelled) setSpreadsheets(files);
         } else if (mode === "worksheet") {
@@ -147,9 +147,14 @@ const ConfigureSheetsModal = ({
     try {
       setIsUpdating(true);
       document.body.style.pointerEvents = "none";
+      const isCopy = mode === "copy_spreadsheet";
       await updateActionsMetadata({
         zapId,
-        metaData: {
+        metaData: isCopy ? {
+          copySpreadsheetId: file.id,
+          copySpreadsheetName: file.name,
+          triggerEventSnapshot: currentEvent,
+        } : {
           spreadsheetId: file.id,
           spreadsheetName: file.name,
           worksheetId: null as unknown as string,
@@ -160,14 +165,18 @@ const ConfigureSheetsModal = ({
         index,
       });
       if (typeof index === "number") {
-        const newMeta = {
+        const newMeta = isCopy ? {
+          copySpreadsheetId: file.id,
+          copySpreadsheetName: file.name,
+          triggerEventSnapshot: currentEvent,
+        } as any : {
           spreadsheetId: file.id,
           spreadsheetName: file.name,
           worksheetId: null,
           worksheetName: null,
           triggerColumnName: null,
           triggerEventSnapshot: currentEvent,
-        } as unknown as JSON;
+        } as any;
         setActions(
           actions.map((a) => (a.index === index ? { ...a, metadata: newMeta } : a))
         );
@@ -259,7 +268,7 @@ const ConfigureSheetsModal = ({
     >
       <div className="flex items-center justify-between mb-4 border-b border-gray-100 px-4 py-4">
         <span className="text-sm font-bold">
-          {mode === "spreadsheet" && "Select a spreadsheet"}
+          {(mode === "spreadsheet" || mode === "copy_spreadsheet") && (mode === "copy_spreadsheet" ? "Select a spreadsheet to copy" : "Select a spreadsheet")}
           {mode === "worksheet" && "Select a worksheet"}
           {mode === "column" && "Select a column"}
         </span>
@@ -281,7 +290,7 @@ const ConfigureSheetsModal = ({
           {loading && (
             <li className="p-2 text-sm rounded border-b border-gray-100 last:border-b-0 bg-gray-200 animate-pulse h-12" />
           )}
-          {!loading && mode === "spreadsheet" && spreadsheets.map((file) => (
+          {!loading && (mode === "spreadsheet" || mode === "copy_spreadsheet") && spreadsheets.map((file) => (
             <li
               key={file.id}
               onClick={() => persistSpreadsheet(file)}
