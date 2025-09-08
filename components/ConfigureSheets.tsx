@@ -360,7 +360,7 @@ const ConfigureSheets = () => {
             disabled={isLoading}
           />
           <span className="text-sm font-semibold text-[#333333] mt-2">
-            Spreadsheet to Copy <span className="text-[#ff6666]">*</span>
+            Spreadsheet to Copy
           </span>
           <div
             ref={copySpreadsheetTriggerRef}
