@@ -141,20 +141,10 @@ export function useHasServiceAccess(serviceName: string, token: string | null) {
       const scopes = data?.scopes ?? [];
       const requiredScopes = appScopes[normalizedKey];
       
-      // For Gmail, we need BOTH modify AND labels scopes for archiving to work
-      let hasMatch = false;
-      if (normalizedKey === 'gmail') {
-        const criticalScopes = [
-          'https://www.googleapis.com/auth/gmail.modify',
-          'https://www.googleapis.com/auth/gmail.labels'
-        ];
-        hasMatch = criticalScopes.every(scope => scopes.includes(scope));
-      } else {
-        // For other apps, having any required scope is sufficient
-        hasMatch = requiredScopes?.some((scope) => scopes.includes(scope)) ?? false;
-      }
       
+      let hasMatch = false;
      
+        hasMatch = requiredScopes?.every((scope) => scopes.includes(scope)) ?? false;
       
       return {
         scopesMatch: hasMatch,
