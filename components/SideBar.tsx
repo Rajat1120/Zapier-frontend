@@ -20,7 +20,22 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   const actions = useStore((state) => state.actions);
 
   const [selectedField, setselectedField] = useState<string>("setup");
+  const [isContinueDisabled, setIsContinueDisabled] = useState(false);
   const showZapModal = useStore((state) => state.showZapModal);
+
+  // Handle continue button state updates from child components
+  useEffect(() => {
+    const handleUpdateContinueButton = (event: Event) => {
+      const customEvent = event as CustomEvent<{ disabled: boolean }>;
+      setIsContinueDisabled(customEvent.detail.disabled);
+    };
+
+    window.addEventListener('updateContinueButton', handleUpdateContinueButton as EventListener);
+    
+    return () => {
+      window.removeEventListener('updateContinueButton', handleUpdateContinueButton as EventListener);
+    };
+  }, []);
 
   // Get the appropriate event for configuration component selection
   const currentAction = curNodeIdx !== null && curNodeIdx !== 0 
@@ -68,7 +83,7 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
   }, [curNodeIdx]);
 
   return (
-    <div className="fixed top-16 right-4 min-w-[400px] max-w-[400px] h-[80%] flex  flex-col border-2 border-[#695be8] bg-white rounded-md">
+    <div className="fixed top-16 right-4 min-w-[400px] max-w-[400px] h-[80%] flex flex-col border-2 border-[#695be8] bg-white rounded-md">
       <div className="p-3 rounded-md justify-between  bg-[#f0eefb] flex">
         <div className="flex items-center space-x-2">
           <div className="bg-white h-8 w-8 border border-[#d7d3c9] rounded-xs flex items-center justify-center ">
@@ -165,19 +180,19 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
         <SelectedConfigureComponent />
       )}
       {selectedField === "test" && <Test></Test>}
-      <div className="p-3 flex justify-center items-center ">
+      <div className="mt-auto p-3 flex justify-center items-center">
         <button
           onClick={() => {
             if (showConfigure(curNodeIdx)) {
               setselectedField("configure");
             }
           }}
-          disabled={!isEventSelected}
-          className={`rounded-sm ${
-            !isEventSelected
+          disabled={!isEventSelected || isContinueDisabled}
+          className={`rounded-sm w-full font-bold p-2 ${
+            !isEventSelected || isContinueDisabled
               ? "cursor-not-allowed text-[#737272] bg-[#ece9df]"
-              : "cursor-pointer bg-[#695be8] text-white"
-          } w-full   font-bold  p-2`}
+              : "cursor-pointer bg-[#695be8] text-white hover:bg-[#5a4fd3] transition-colors"
+          }`}
         >
           {isEventSelected
             ? "Continue"

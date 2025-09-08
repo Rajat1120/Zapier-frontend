@@ -209,6 +209,20 @@ const ConfigureSheets = () => {
     }
   }, [metadata]);
 
+  // Check if title is required and not empty
+  const isTitleRequired = normalizedActionEvent === "create spreadsheet";
+  const isTitleValid = !isTitleRequired || (isTitleRequired && title.trim() !== "");
+  
+  // Update the continue button state in the parent component
+  useEffect(() => {
+    const event = new CustomEvent('updateContinueButton', { 
+      detail: { 
+        disabled: !isTitleValid 
+      } 
+    });
+    window.dispatchEvent(event);
+  }, [isTitleValid]);
+
   return (
     <div className="flex p-5 flex-col gap-y-2">
       {normalizedActionEvent !== "create spreadsheet" && (
