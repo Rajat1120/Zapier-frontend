@@ -57,6 +57,19 @@ const Setup = ({ curNodeIdx }: { curNodeIdx: number | null }) => {
       setIsTrigger(isWordIncluded(zapTriggerMeta?.triggerApp, name));
     }
   }, [name, zapTriggerMeta]);
+
+  // Dispatch event to update continue button state when action/trigger event changes
+  useEffect(() => {
+    const isEventSelected = curNodeIdx === 0 
+      ? !!zapTriggerMeta?.triggerEvent
+      : !!actions.find(a => a.index === curNodeIdx)?.actionEvent;
+    
+    window.dispatchEvent(new CustomEvent('updateContinueButton', { 
+      detail: { 
+        disabled: !isEventSelected 
+      } 
+    }));
+  }, [zapTriggerMeta, actions, curNodeIdx]);
   useEffect(() => {
     setShowZapModal(false);
   }, [setShowZapModal]);

@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 
 import Setup from "./Setup";
 
-import Test from "./Test";
+
 import { showConfigureArray } from "@/lib/constants/appTriggers";
 import { configureComponentMap } from "@/lib/utils";
 
@@ -165,21 +165,14 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
             }
           ></Image>
 
-          <div
-            onClick={() => setselectedField("test")}
-            className={`p-3 cursor-pointer font-semibold text-sm border-b-2 ${
-              selectedField === "test" ? " border-[#695be8]" : "border-white"
-            } `}
-          >
-            Test
-          </div>
+         
         </div>
       </div>
       {selectedField === "setup" && <Setup curNodeIdx={curNodeIdx}></Setup>}
       {selectedField === "configure" && SelectedConfigureComponent && (
         <SelectedConfigureComponent />
       )}
-      {selectedField === "test" && <Test></Test>}
+      
       <div className="mt-auto p-3 flex justify-center items-center">
         <button
           onClick={() => {

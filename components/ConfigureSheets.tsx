@@ -213,15 +213,28 @@ const ConfigureSheets = () => {
   const isTitleRequired = normalizedActionEvent === "create spreadsheet";
   const isTitleValid = !isTitleRequired || (isTitleRequired && title.trim() !== "");
   
+  // Check if all required fields for Clear Spreadsheet Row(s) are filled
+  const isClearRowsValid = normalizedActionEvent === "clear spreadsheet row(s)" 
+    ? !!spreadsheetId && !!worksheetName && rows.length > 0
+    : true;
+
   // Update the continue button state in the parent component
   useEffect(() => {
+    let isDisabled = false;
+    
+    if (normalizedActionEvent === "clear spreadsheet row(s)") {
+      isDisabled = !isClearRowsValid;
+    } else if (normalizedActionEvent === "create spreadsheet") {
+      isDisabled = !isTitleValid;
+    }
+    
     const event = new CustomEvent('updateContinueButton', { 
       detail: { 
-        disabled: !isTitleValid 
+        disabled: isDisabled
       } 
     });
     window.dispatchEvent(event);
-  }, [isTitleValid]);
+  }, [isTitleValid, normalizedActionEvent, isClearRowsValid]);
 
   return (
     <div className="flex p-5 flex-col gap-y-2">
