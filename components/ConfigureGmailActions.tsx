@@ -121,6 +121,26 @@ const ConfigureGmailActions = () => {
   const showLabelSelection = actionEvent === "Add label to email";
   const showMessageSelection = ["Add label to email", "Archive Email", "Delete Email"].includes(actionEvent || "");
 
+  // Update the continue button state in the parent component based on required fields for each action event type
+  useEffect(() => {
+    let isDisabled = false;
+    
+    if (actionEvent === "Add label to email") {
+      // Both label and message are required for "Add label to email"
+      isDisabled = !labelName || !messageName;
+    } else if (actionEvent === "Archive Email" || actionEvent === "Delete Email") {
+      // Only message is required for these actions
+      isDisabled = !messageName;
+    }
+    
+    const event = new CustomEvent('updateContinueButton', { 
+      detail: { 
+        disabled: isDisabled
+      } 
+    });
+    window.dispatchEvent(event);
+  }, [labelName, messageName, actionEvent]);
+
   return (
     <div className="flex p-5 flex-col gap-y-2">
       {/* Label Selection - only for "Add label to email" */}
