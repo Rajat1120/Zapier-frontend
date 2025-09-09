@@ -368,7 +368,7 @@ export default function ActionsList() {
             {params.id ? "Edit zap" : "Publish"}
           </button>
         </div>
-        {loading ? <span>Loaidng...</span> : null}
+        {loading ? <span>Loading...</span> : null}
         <Authentication></Authentication>
         <div ref={reactFlowWrapper} style={{ height: "100%", width: "100%" }}>
           <ReactFlow
@@ -444,7 +444,18 @@ export default function ActionsList() {
 
         {pathName === "/zap/create" && selectedNode && <ZapModal></ZapModal>}
         {params.id && selectedNode && showSideBar && (
-          <Sidebar curNodeIdx={curNodeIdx}></Sidebar>
+          <Sidebar 
+            curNodeIdx={curNodeIdx} 
+            onNavigateToNextNode={() => {
+              // Find the current node and move to the next one
+              const currentNodeIndex = nodes.findIndex((node) => node.id === selectedNode?.id);
+              if (currentNodeIndex >= 0 && currentNodeIndex < nodes.length - 1) {
+                const nextNode = nodes[currentNodeIndex + 1];
+                setSelectedNode(nextNode);
+                setCurNodeIdx(findCurNodeIdx(nextNode));
+              }
+            }} 
+          />
         )}
         {selectedNode &&
           inActionTable(selectedNode, setShowZapModal) &&
@@ -452,4 +463,3 @@ export default function ActionsList() {
       </div>
     </ReactFlowProvider>
   );
-}

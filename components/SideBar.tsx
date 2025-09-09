@@ -8,11 +8,10 @@ import { useState, useEffect } from "react";
 
 import Setup from "./Setup";
 
-
 import { showConfigureArray } from "@/lib/constants/appTriggers";
 import { configureComponentMap } from "@/lib/utils";
 
-export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
+export default function Sidebar({ curNodeIdx, onNavigateToNextNode }: { curNodeIdx: number | null, onNavigateToNextNode?: () => void }) {
   const selectedNode = useStore((state) => state.selectedNode);
   const setSelectedNode = useStore((state) => state.setSelectedNode);
 
@@ -183,8 +182,20 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
       <div className="mt-auto p-3 flex justify-center items-center">
         <button
           onClick={() => {
-            if (showConfigure(curNodeIdx)) {
-              setselectedField("configure");
+            if (selectedField === "setup") {
+              // If on setup tab
+              if (showConfigure(curNodeIdx)) {
+                // If configure tab exists, switch to it
+                setselectedField("configure");
+              } else if (onNavigateToNextNode) {
+                // If no configure tab exists, navigate to next node
+                onNavigateToNextNode();
+              }
+            } else if (selectedField === "configure" && onNavigateToNextNode) {
+              // If on configure tab, navigate to next node (unless it's the last node's configure tab)
+              if (!(isLastNode() && selectedField === "configure")) {
+                onNavigateToNextNode();
+              }
             }
           }}
           disabled={!isEventSelected || isContinueDisabled}
