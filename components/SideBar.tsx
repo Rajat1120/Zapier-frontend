@@ -56,6 +56,13 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
     ? !!zapTriggerMeta?.triggerEvent
     : !!currentAction?.actionEvent;
 
+  // Determine if current node is the last node in the Zap workflow
+  const isLastNode = () => {
+    if (!actions.length) return curNodeIdx === 0; // Only trigger node
+    const maxActionIndex = Math.max(...actions.map(action => action.index));
+    return curNodeIdx === maxActionIndex;
+  };
+
   // Compute header title: show trigger event for node 0, otherwise action event for the selected action node
   const headerTitle = curNodeIdx === 0
     ? (zapTriggerMeta?.triggerEvent || "Select the event")
@@ -188,7 +195,9 @@ export default function Sidebar({ curNodeIdx }: { curNodeIdx: number | null }) {
           }`}
         >
           {isEventSelected
-            ? "Continue"
+            ? (isLastNode() 
+                ? (selectedField === "configure" ? "Publish" : "Continue") 
+                : "Continue")
             : "To continue, choose an event"}
         </button>
       </div>
