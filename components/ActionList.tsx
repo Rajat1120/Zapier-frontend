@@ -122,7 +122,7 @@ export default function ActionsList() {
     // Only update filterNodes if the count actually changes
     const currentCount = filterNodes.length;
     const requiredCount = Math.max(actions.length, 2);
-    
+
     if (currentCount !== requiredCount) {
       setFilterNodes(generateInitialNodes(requiredCount));
     }
@@ -149,12 +149,12 @@ export default function ActionsList() {
     if (!nodes || nodes.length === 0) {
       const initialNodes = generateInitialNodes(Math.max(actions.length, 2));
       const initialEdges = generateEdges(initialNodes);
-      
+
       // Only call addTrailingPlusNode once
       const nodesWithTrailing = [...initialNodes];
       const edgesWithTrailing = [...initialEdges];
       addTrailingPlusNode(nodesWithTrailing, edgesWithTrailing);
-      
+
       setNodes(nodesWithTrailing);
       setEdges(edgesWithTrailing);
     }
@@ -193,12 +193,9 @@ export default function ActionsList() {
 
   // Removed updateNodesAndEdges function as it was causing duplicate addTrailingPlusNode calls
 
-  
-  
-
   useEffect(() => {
     const verticalGap = 120;
-    
+
     // Ensure we always have nodes to work with
     if (!newNodes || newNodes.length === 0) {
       // If newNodes is empty, fall back to current actions or generate default nodes
@@ -207,7 +204,7 @@ export default function ActionsList() {
       setNewNodes(fallbackNodes);
       return;
     }
-    
+
     // Ensure newNodes has the correct number of nodes
     const expectedCount = Math.max(actions.length, 2);
     if (newNodes.length !== expectedCount) {
@@ -215,9 +212,7 @@ export default function ActionsList() {
       setNewNodes(correctedNodes);
       return;
     }
-    
 
-    
     const updatedNodes = newNodes.map((node, index) => {
       let match;
       const isTrigger = index === 0;
@@ -257,24 +252,19 @@ export default function ActionsList() {
     });
 
     if (!updatedNodes.length) return;
-    
+
     // Always ensure trailing node and edges are present
     const nodesWithTrailing = [...updatedNodes];
     const edgesWithTrailing = generateEdges(nodesWithTrailing);
-    
+
     // Create fresh copies to prevent mutation of React state
     const freshNodes = [...nodesWithTrailing];
     const freshEdges = [...edgesWithTrailing];
     addTrailingPlusNode(freshNodes, freshEdges);
-    
+
     setNodes(freshNodes);
     setEdges(freshEdges);
-  }, [
-    newNodes,
-    actions,
-    AvailableActions,
-    selectedActions,
-  ]);
+  }, [newNodes, actions, AvailableActions, selectedActions]);
 
   useEffect(() => {
     if (selectedAction && selectedNode && curNodeIdx !== null) {
@@ -388,7 +378,7 @@ export default function ActionsList() {
             onNodeClick={(_, node) => {
               setSelectedNode(node);
               setCurNodeIdx(findCurNodeIdx(node));
-              
+
               // Only open ZapModal if the node doesn't have a match (is a new/empty node)
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               //@ts-ignore
@@ -444,17 +434,22 @@ export default function ActionsList() {
 
         {pathName === "/zap/create" && selectedNode && <ZapModal></ZapModal>}
         {params.id && selectedNode && showSideBar && (
-          <Sidebar 
-            curNodeIdx={curNodeIdx} 
+          <Sidebar
+            curNodeIdx={curNodeIdx}
             onNavigateToNextNode={() => {
               // Find the current node and move to the next one
-              const currentNodeIndex = nodes.findIndex((node) => node.id === selectedNode?.id);
-              if (currentNodeIndex >= 0 && currentNodeIndex < nodes.length - 1) {
+              const currentNodeIndex = nodes.findIndex(
+                (node) => node.id === selectedNode?.id
+              );
+              if (
+                currentNodeIndex >= 0 &&
+                currentNodeIndex < nodes.length - 1
+              ) {
                 const nextNode = nodes[currentNodeIndex + 1];
                 setSelectedNode(nextNode);
                 setCurNodeIdx(findCurNodeIdx(nextNode));
               }
-            }} 
+            }}
           />
         )}
         {selectedNode &&
@@ -463,3 +458,4 @@ export default function ActionsList() {
       </div>
     </ReactFlowProvider>
   );
+}
