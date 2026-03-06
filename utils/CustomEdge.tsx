@@ -37,9 +37,12 @@ const CustomEdge = ({
             pointerEvents: "all",
           }}
         >
-          <div
-            className="rounded-full bg-[#fdf7f2] hover:bg-[#695be8]  h-4 w-4 hover:scale-110 transition-all hover:text-white flex items-center justify-center text-xs font-bold cursor-pointer relative"
-            onClick={() => {
+          <button
+            type="button"
+            className="nopan nodrag nowheel rounded-full bg-[#fdf7f2] hover:bg-[#695be8] h-5 w-5 hover:scale-110 transition-all hover:text-white flex items-center justify-center text-xs font-bold cursor-pointer relative leading-none"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
               const event = new CustomEvent("add-node", {
                 detail: { edgeId: id },
               });
@@ -58,7 +61,10 @@ const CustomEdge = ({
               if (tooltip) tooltip.style.opacity = "0";
             }}
           >
-            +
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+              <line x1="5" y1="1" x2="5" y2="9" />
+              <line x1="1" y1="5" x2="9" y2="5" />
+            </svg>
             <div
               className="tooltip"
               style={{
@@ -79,7 +85,7 @@ const CustomEdge = ({
             >
               Add step
             </div>
-          </div>
+          </button>
         </div>
       </EdgeLabelRenderer>
     </>
