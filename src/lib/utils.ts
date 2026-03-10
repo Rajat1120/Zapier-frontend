@@ -83,6 +83,7 @@ export const addTrailingPlusNode = (
     source: lastNodeId,
     target: dummyNodeId,
     type: "custom",
+    data: { isTrailing: true },
   });
 
   // Mutate the arrays in place

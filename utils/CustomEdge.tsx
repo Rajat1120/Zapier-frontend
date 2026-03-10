@@ -14,6 +14,7 @@ const CustomEdge = ({
   targetY,
   style = {},
   markerEnd,
+  data,
 }: EdgeProps) => {
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -22,10 +23,13 @@ const CustomEdge = ({
     targetY,
   });
 
+  const isTrailing = data?.isTrailing as boolean;
+  const path = isTrailing ? `M ${sourceX} ${sourceY} L ${labelX} ${labelY}` : edgePath;
+
   // Render "+" button for all edges (including trailing/dummy edge)
   return (
     <>
-      <BaseEdge path={edgePath} markerEnd={markerEnd} style={style} />
+      <BaseEdge path={path} markerEnd={isTrailing ? undefined : markerEnd} style={style} />
       <EdgeLabelRenderer>
         <div
           style={{
