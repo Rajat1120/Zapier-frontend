@@ -4,6 +4,7 @@ import useStore from "../store";
 import { Action, CustomNode, StrictEdge } from "@/lib/type";
 import { useParams } from "next/navigation";
 import { updateZap } from "../utils/HelperFunctions";
+import { addTrailingPlusNode, VERTICAL_GAP } from "@/lib/utils";
 import { ParamValue } from "next/dist/server/request/params";
 
 interface ActionSideBarProps {
@@ -108,7 +109,7 @@ function updateActionsAfterDelete(
     );
 
     // Recalculate positions and update node IDs to be sequential
-    const verticalGap = 120;
+    const verticalGap = VERTICAL_GAP;
     const updatedNodes = filteredNodes.map((node, nodeIndex) => ({
       ...node,
       id: (nodeIndex + 1).toString(),

@@ -1,3 +1,5 @@
+import { VERTICAL_GAP } from "./utils";
+
 export const icon = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -43,7 +45,7 @@ export const generateInitialNodes = (count: number) => {
 
     nodes.push({
       id: `${i + 1}`,
-      position: { x: 0, y: i * 100 },
+      position: { x: 0, y: i * VERTICAL_GAP },
       data: {
         label: (
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>

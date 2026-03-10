@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { addTrailingPlusNode } from "./utils";
+import { addTrailingPlusNode, VERTICAL_GAP } from "./utils";
 
 import useStore from "../../store";
 import Image from "next/image";
@@ -57,7 +57,7 @@ export const handleAddNode = (
     : Math.max(sourceIndex, targetIndex);
   newNodeList.splice(insertIndex, 0, newNode);
 
-  const verticalGap = 120;
+  const verticalGap = VERTICAL_GAP;
   const updatedNodes = newNodeList.map((node, index) => {
     const isSelected = selectedActions.find(
       (val) => Number(val.sortingOrder) === Number(node.id)

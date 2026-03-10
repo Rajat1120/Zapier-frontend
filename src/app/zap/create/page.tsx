@@ -24,7 +24,7 @@ import { CustomNode, StrictEdge } from "@/lib/type";
 import useStore from "../../../../store";
 import CustomEdge from "../../../../utils/CustomEdge";
 import ZapModal from "../../../../components/ZapModal";
-import { addTrailingPlusNode } from "@/lib/utils";
+import { addTrailingPlusNode, VERTICAL_GAP } from "@/lib/utils";
 import { useAddNode } from "@/lib/CustomHookZapCreate";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import handleZapCreate from "../../../../utils/HelperFunctions";
@@ -320,7 +320,7 @@ export default function CreateNewZap() {
   useAddNode({ nodes, edges, setNodes, setEdges });
 
   useEffect(() => {
-    const verticalGap = 120;
+    const verticalGap = VERTICAL_GAP;
     const updatedNodes = nodes.map((node, index) => ({
       ...node,
       position: { x: 0, y: index * verticalGap },

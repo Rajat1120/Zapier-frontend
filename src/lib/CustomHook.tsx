@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { addTrailingPlusNode } from "./utils";
+import { addTrailingPlusNode, VERTICAL_GAP } from "./utils";
 import {
   Action,
   AvailableAction,
@@ -80,7 +80,7 @@ export const handleAddNode = (
     : Math.max(sourceIndex, targetIndex);
   newNodeList.splice(insertIndex, 0, newNode);
 
-  const verticalGap = 120;
+  const verticalGap = VERTICAL_GAP;
 
   let newNodes: UpdatedAction[];
 

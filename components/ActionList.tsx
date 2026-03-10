@@ -23,7 +23,7 @@ import ZapModal from "./ZapModal";
 import CustomEdge from "../utils/CustomEdge";
 
 import useStore from "../store";
-import { addTrailingPlusNode } from "@/lib/utils";
+import { addTrailingPlusNode, VERTICAL_GAP } from "@/lib/utils";
 import { generateInitialNodes, icon } from "@/lib/reactFlow";
 import { useAddNode } from "@/lib/CustomHook";
 
@@ -194,7 +194,7 @@ export default function ActionsList() {
   // Removed updateNodesAndEdges function as it was causing duplicate addTrailingPlusNode calls
 
   useEffect(() => {
-    const verticalGap = 120;
+    const verticalGap = VERTICAL_GAP;
 
     // Ensure we always have nodes to work with
     if (!newNodes || newNodes.length === 0) {

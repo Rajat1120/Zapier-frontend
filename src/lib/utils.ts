@@ -10,6 +10,8 @@ import ConfigureNotion from "../../components/ConfigureNotion";
 import ConfigureDrive from "../../components/ConfigureDrive";
 import ConfigureGmailActions from "../../components/ConfigureGmailActions";
 
+export const VERTICAL_GAP = 160;
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -42,7 +44,7 @@ export async function createZap({
         headers: {
           Authorization: localStorage.getItem("token"),
         },
-      }
+      },
     );
 
     router.push("/dashboard");
@@ -51,27 +53,30 @@ export async function createZap({
 
 export const addTrailingPlusNode = (
   nodeList: CustomNode[],
-  edgeList: Edge[]
+  edgeList: Edge[],
 ) => {
   // Always remove any existing dummy node and its edges before adding new one
   const filteredNodes = nodeList.filter((n) => n.id !== "dummy");
   const filteredEdges = edgeList.filter(
-    (e) => e.source !== "dummy" && e.target !== "dummy"
+    (e) => e.source !== "dummy" && e.target !== "dummy",
   );
-  
-  const verticalGap = 120;
-  const lastNodeId = filteredNodes[filteredNodes.length - 1].id;
+
+  const lastNode = filteredNodes[filteredNodes.length - 1];
+  const lastNodeId = lastNode.id;
   const dummyNodeId = "dummy";
-  
+
+  // Keep the trailing line shorter instead of completely matching the new 180px gap
+  const edgeLength = 160;
   // Make dummy node invisible and non-interactive, but keep edge visible
   const dummyNode = {
     id: dummyNodeId,
-    position: { x: 0, y: filteredNodes.length * verticalGap },
+
+    position: { x: 0, y: lastNode.position.y + edgeLength },
     data: { label: "" },
     connectable: false,
     style: { width: 280, height: 70, opacity: 0, pointerEvents: "none" },
   };
-  
+
   filteredNodes.push(dummyNode);
   filteredEdges.push({
     id: `e${lastNodeId}-${dummyNodeId}`,
@@ -79,7 +84,7 @@ export const addTrailingPlusNode = (
     target: dummyNodeId,
     type: "custom",
   });
-  
+
   // Mutate the arrays in place
   nodeList.length = 0;
   edgeList.length = 0;
@@ -88,7 +93,6 @@ export const addTrailingPlusNode = (
 };
 
 export function isWordIncluded(str1: string, str2: string) {
-
   const s1 = str1.toLowerCase().replace(/\s+/g, "");
   const s2 = str2.toLowerCase().replace(/\s+/g, "");
   return s2.includes(s1);
@@ -116,6 +120,6 @@ export const configureComponentMap = {
   "Add label to email": ConfigureGmailActions,
   "Archive Email": ConfigureGmailActions,
   "Delete Email": ConfigureGmailActions,
-  
+
   // Add more mappings as needed
 };
