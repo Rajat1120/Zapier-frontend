@@ -58,31 +58,7 @@ export default function CreateNewZap() {
     }
   }, [selectedNode, setShowZapModal]);
 
-  useEffect(() => {
-    if (selectedNode) {
-      setSelectedAction(null);
-    }
-    if (selectedAction && selectedNode && curNodeIdx !== null) {
-      setSelectedActions({
-        name: selectedAction.name,
-        sortingOrder: String(
-          nodes.findIndex((val) => val.id === selectedNode.id) + 1
-        ),
-        metadata: {},
-        availableActionId: selectedAction.id,
-        index: curNodeIdx,
-      });
-      setSelectedNode(null);
-    }
-  }, [
-    selectedNode,
-    selectedAction,
-    nodes,
-    setSelectedActions,
-    setSelectedAction,
-    curNodeIdx,
-    setSelectedNode,
-  ]);
+
 
   useEffect(() => {
     setSelectedAction(null);
@@ -463,7 +439,24 @@ export default function CreateNewZap() {
               </ReactFlow>
             </div>
 
-            {selectedNode && <ZapModal></ZapModal>}
+            {selectedNode && (
+              <ZapModal
+                onActionSelect={(action: any) => {
+                  if (curNodeIdx !== null) {
+                    setSelectedActions({
+                      name: action.name,
+                      sortingOrder: String(
+                        nodes.findIndex((val) => val.id === selectedNode.id) + 1
+                      ),
+                      metadata: {},
+                      availableActionId: action.id,
+                      index: curNodeIdx,
+                    });
+                    setSelectedNode(null);
+                  }
+                }}
+              />
+            )}
           </div>
         </ReactFlowProvider>
       </div>

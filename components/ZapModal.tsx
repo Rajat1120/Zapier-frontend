@@ -43,7 +43,11 @@ const builtInTools = [
   },
 ];
 
-export default function ZapModal() {
+export default function ZapModal({
+  onActionSelect,
+}: {
+  onActionSelect?: (action: any) => void;
+} = {}) {
   const modalRef = useRef<HTMLDivElement>(null);
   const setSelectedAction = useStore((state) => state.setSelectedAction);
   const AvailableActions = useStore((state) => state.AvailableActions);
@@ -174,6 +178,12 @@ export default function ZapModal() {
                           ...action,
                           selectionId: Date.now(),
                         });
+                        
+                        // Use new prop if it exists to drive logic instead of useEffect
+                        if (onActionSelect) {
+                          onActionSelect(action);
+                        }
+                        
                         setShowZapModal(false);
                       }}
                     >

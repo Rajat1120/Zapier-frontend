@@ -4,7 +4,7 @@ import useStore from "../store";
 import { Action, CustomNode, StrictEdge } from "@/lib/type";
 import { useParams } from "next/navigation";
 import { updateZap } from "../utils/HelperFunctions";
-import { addTrailingPlusNode, VERTICAL_GAP } from "@/lib/utils";
+import { VERTICAL_GAP } from "@/lib/utils";
 import { ParamValue } from "next/dist/server/request/params";
 
 interface ActionSideBarProps {
@@ -59,7 +59,7 @@ export default function ActionSideBar({
           setActions,
           actions,
           setShowSideBar, // Add this parameter
-          params.id
+          params.id,
         );
       }}
       ref={actionRef}
@@ -89,7 +89,7 @@ function updateActionsAfterDelete(
   setActions: (val: Action[]) => void,
   actions: Action[],
   setShowSideBar: (show: boolean) => void,
-  params: ParamValue
+  params: ParamValue,
 ) {
   // Step 1: Remove the action at the specified index
   const updatedActions = actions.filter((action) => action.index !== index);
@@ -105,7 +105,7 @@ function updateActionsAfterDelete(
   // Step 3: Update nodes - remove the node at the specified index
   setNodes((prevNodes) => {
     const filteredNodes = prevNodes.filter(
-      (_, nodeIndex) => nodeIndex !== index
+      (_, nodeIndex) => nodeIndex !== index,
     );
 
     // Recalculate positions and update node IDs to be sequential
